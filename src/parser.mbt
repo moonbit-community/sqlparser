@@ -9,7 +9,7 @@ suberror ParserError {
 } derive(Show)
 
 ///|
-typealias (T, ArrayView[Token]) as ParserResult[T]
+type ParserResult[T] = (T, ArrayView[Token])
 
 ///|
 pub struct Parser {

@@ -442,7 +442,12 @@ fn Parser::parse_primary_expr(
       // Check if this is a BigQuery named parameter (@param_name)
       if name.strip_prefix("@") is Some(_) &&
         self.dialect.supports_named_parameters() {
-        let param_name = name.substring(start=1) // Remove the @ prefix
+        let param_name = name[1:].to_string() catch {
+          e =>
+            raise InternalBug(
+              "parse_primary_expr: illegal token after named parameter: \{e}",
+            )
+        }
         (NamedParameter(param_name), tokens)
       } else {
         (Identifier(name), tokens)

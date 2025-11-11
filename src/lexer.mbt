@@ -72,8 +72,8 @@ pub fn tokenize(
 ///|
 fn Lexer::next_token(
   self : Lexer,
-  input : @string.View,
-) -> (Token, @string.View) raise LexerError {
+  input : StringView,
+) -> (Token, StringView) raise LexerError {
   match skip_whitespace(input) {
     [',', .. rest] => (Comma, rest)
     [':', .. rest] => (Colon, rest)
@@ -125,7 +125,7 @@ fn Lexer::next_token(
 }
 
 ///|
-fn skip_whitespace(input : @string.View) -> @string.View {
+fn skip_whitespace(input : StringView) -> StringView {
   loop input {
     [c, .. rest] if c.is_ascii_whitespace() => continue rest
     input => break input
@@ -133,7 +133,7 @@ fn skip_whitespace(input : @string.View) -> @string.View {
 }
 
 ///|
-fn read_frac(input : @string.View) -> (Token, @string.View) {
+fn read_frac(input : StringView) -> (Token, StringView) {
   let (idx, rest) = loop (input, 0) {
     ([c, .. rest], n) if c.is_ascii_digit() => continue (rest, n + 1)
     (rest, n) => break (n, rest)
@@ -146,7 +146,7 @@ fn read_frac(input : @string.View) -> (Token, @string.View) {
 }
 
 ///|
-fn read_number(input : @string.View) -> (Token, @string.View) {
+fn read_number(input : StringView) -> (Token, StringView) {
   let (idx, rest) = loop (input, 0) {
     ([c, .. rest], n) if c.is_ascii_digit() => continue (rest, n + 1)
     (rest, n) => break (n, rest)
@@ -165,8 +165,8 @@ fn read_number(input : @string.View) -> (Token, @string.View) {
 ///|
 fn Lexer::read_identifier_or_keyword(
   self : Lexer,
-  input : @string.View,
-) -> (Token, @string.View) {
+  input : StringView,
+) -> (Token, StringView) {
   let (idx, rest) = loop (input, 0) {
     ([c, .. rest], n) if is_ascii_alphabetic_or_digit(c) =>
       continue (rest, n + 1)
@@ -404,8 +404,8 @@ fn is_ascii_alphabetic_or_digit(ch : Char) -> Bool {
 ///|
 fn Lexer::read_user_variable(
   _self : Lexer,
-  input : @string.View,
-) -> (Token, @string.View) {
+  input : StringView,
+) -> (Token, StringView) {
   // Skip the @ character
   let input = match input {
     ['@', .. rest] => rest
@@ -426,8 +426,8 @@ fn Lexer::read_user_variable(
 ///|
 fn Lexer::read_single_quoted_string(
   self : Lexer,
-  input : @string.View,
-) -> (Token, @string.View) raise LexerError {
+  input : StringView,
+) -> (Token, StringView) raise LexerError {
   let result = StringBuilder::new()
   let rest = loop input {
     [.. "''", .. rest] => {
@@ -471,8 +471,8 @@ fn Lexer::read_single_quoted_string(
 ///|
 fn Lexer::read_double_quoted_string(
   self : Lexer,
-  input : @string.View,
-) -> (Token, @string.View) raise LexerError {
+  input : StringView,
+) -> (Token, StringView) raise LexerError {
   let result = StringBuilder::new()
   let rest = loop input {
     [.. "\\\"", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
@@ -512,8 +512,8 @@ fn Lexer::read_double_quoted_string(
 ///|
 fn Lexer::read_backtick_quoted_identifier(
   self : Lexer,
-  input : @string.View,
-) -> (Token, @string.View) raise LexerError {
+  input : StringView,
+) -> (Token, StringView) raise LexerError {
   let result = StringBuilder::new()
   let rest = loop input {
     [.. "``", .. rest] => {
@@ -551,7 +551,7 @@ test "Double quoted string" {
 }
 
 ///|
-fn skip_line_comment(input : @string.View) -> @string.View {
+fn skip_line_comment(input : StringView) -> StringView {
   loop input {
     ['\r' | '\n', .. rest] => break rest
     [_c, .. rest] => continue rest
@@ -629,7 +629,7 @@ test "Skip line comment" {
 }
 
 ///|
-test "Skip line comment" {
+test "Skip line comment 2" {
   let input = "-- License: Apache-2.0\nSELECT * FROM t -- This is a comment\n WHERE id = 1;\n --x \r -- Another comment \n 123"
   let tokens = tokenize(input)
   inspect(
