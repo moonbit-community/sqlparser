@@ -1,10 +1,17 @@
 ///| Parameterized Query Support Tests
+
 ///|
+
 ///| Tests for prepared statement placeholders and parameterized queries.
+
 ///| Supports multiple placeholder formats:
+
 ///| - `?` - Anonymous placeholder (MySQL, SQLite)
+
 ///| - `$1`, `$2` - Numbered placeholders (PostgreSQL)
+
 ///| - `:name` - Named parameters (Oracle, PostgreSQL)
+
 ///| - `@name` - Variable parameters (SQL Server, MySQL)
 
 ///|
@@ -38,7 +45,6 @@ test "Multiple question mark placeholders" {
       #|WHERE
       #|  age > ? 
       #|  AND name = ?;
-
     ),
   )
 }
@@ -65,7 +71,6 @@ test "Question mark placeholder in UPDATE" {
       #|UPDATE users
       #|SET name = ?, age = ?
       #|WHERE id = ?;
-
     ),
   )
 }
@@ -83,7 +88,6 @@ test "Question mark placeholder in LIMIT" {
       #|  users
       #|LIMIT
       #|  ?;
-
     ),
   )
 }
@@ -103,7 +107,6 @@ test "Question mark placeholder in LIMIT and OFFSET" {
       #|  ?
       #|OFFSET
       #|  ?;
-
     ),
   )
 }
@@ -139,7 +142,6 @@ test "PostgreSQL multiple numbered placeholders" {
       #|WHERE
       #|  age > $1 
       #|  AND name = $2;
-
     ),
   )
 }
@@ -150,9 +152,7 @@ test "PostgreSQL numbered placeholders in INSERT" {
   let stmt = parse_sql(dialect=Postgres::{  }, sql).stmts[0] |> pretty_print
   inspect(
     stmt,
-    content=(
-      "INSERT INTO users (name, age, email) VALUES ($1, $2, $3);"
-    ),
+    content="INSERT INTO users (name, age, email) VALUES ($1, $2, $3);",
   )
 }
 
@@ -171,7 +171,6 @@ test "PostgreSQL numbered placeholders in LIMIT OFFSET" {
       #|  $1
       #|OFFSET
       #|  $2;
-
     ),
   )
 }
@@ -190,7 +189,6 @@ test "PostgreSQL numbered placeholders out of order" {
       #|WHERE
       #|  id = $2 
       #|  AND name = $1;
-
     ),
   )
 }
@@ -226,7 +224,6 @@ test "Multiple colon named parameters" {
       #|WHERE
       #|  age > :min_age 
       #|  AND city = :city_name;
-
     ),
   )
 }
@@ -235,12 +232,7 @@ test "Multiple colon named parameters" {
 test "Colon named parameters in INSERT" {
   let sql = "INSERT INTO users (name, age) VALUES (:name, :age);"
   let stmt = parse_sql(dialect=Postgres::{  }, sql).stmts[0] |> pretty_print
-  inspect(
-    stmt,
-    content=(
-      "INSERT INTO users (name, age) VALUES (:name, :age);"
-    ),
-  )
+  inspect(stmt, content="INSERT INTO users (name, age) VALUES (:name, :age);")
 }
 
 ///|
@@ -274,7 +266,6 @@ test "Multiple at-sign named parameters" {
       #|WHERE
       #|  age > @min_age 
       #|  AND city = @city_name;
-
     ),
   )
 }
@@ -290,7 +281,6 @@ test "Placeholder in function call" {
       #|  upper(?)
       #|FROM
       #|  users;
-
     ),
   )
 }
@@ -360,7 +350,6 @@ test "PostgreSQL numbered placeholder in CASE expression" {
       #|  END
       #|FROM
       #|  users;
-
     ),
   )
 }
@@ -379,7 +368,6 @@ test "Named parameter in JOIN condition" {
       #|    ON u.id = o.user_id
       #|WHERE
       #|  o.total > :min_total;
-
     ),
   )
 }
@@ -391,11 +379,9 @@ test "Mixed placeholders should work independently" {
   let sql1 = "SELECT * FROM users WHERE id = ?;"
   let sql2 = "SELECT * FROM users WHERE id = $1;"
   let sql3 = "SELECT * FROM users WHERE id = :user_id;"
-
   let stmt1 = parse_sql(dialect=MySQL::{  }, sql1).stmts[0] |> pretty_print
   let stmt2 = parse_sql(dialect=Postgres::{  }, sql2).stmts[0] |> pretty_print
   let stmt3 = parse_sql(dialect=Postgres::{  }, sql3).stmts[0] |> pretty_print
-
   inspect(
     stmt1,
     content=(
@@ -440,7 +426,6 @@ test "Placeholder in DELETE statement" {
     content=(
       #|DELETE FROM users
       #|WHERE id = ?;
-
     ),
   )
 }

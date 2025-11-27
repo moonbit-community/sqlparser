@@ -1306,7 +1306,10 @@ fn Parser::parse_prepare_statement(
             [Comma, .. rest_tokens] => continue rest_tokens
             [RParen, .. rest_tokens] => break rest_tokens
             [token, ..] => raise UnexpectedTokenError(token, RParen)
-            [] => raise ParserError::InternalBug("parse_prepare_statement: unexpected end of tokens")
+            [] =>
+              raise ParserError::InternalBug(
+                "parse_prepare_statement: unexpected end of tokens",
+              )
           }
         }
       }
@@ -1320,7 +1323,6 @@ fn Parser::parse_prepare_statement(
 
   // statement
   let (statement, tokens) = self.parse_statement(tokens)
-
   ({ name, data_types, statement }, tokens)
 }
 
@@ -1344,7 +1346,11 @@ fn Parser::parse_execute_statement(
       let object_name : ObjectName = { parts: [id] }
       (Some(object_name), tokens)
     }
-    _ => raise UnexpectedTokenMessageError(tokens[0], "statement name or IMMEDIATE")
+    _ =>
+      raise UnexpectedTokenMessageError(
+        tokens[0],
+        "statement name or IMMEDIATE",
+      )
   }
 
   // Parameters: either (param1, param2, ...) or USING expr1, expr2, ...
@@ -1360,7 +1366,10 @@ fn Parser::parse_execute_statement(
             [Comma, .. rest_tokens] => continue rest_tokens
             [RParen, .. rest_tokens] => break rest_tokens
             [token, ..] => raise UnexpectedTokenError(token, RParen)
-            [] => raise ParserError::InternalBug("parse_execute_statement: unexpected end of tokens")
+            [] =>
+              raise ParserError::InternalBug(
+                "parse_execute_statement: unexpected end of tokens",
+              )
           }
         }
       }
@@ -1410,7 +1419,6 @@ fn Parser::parse_execute_statement(
     }
     _ => ([], tokens)
   }
-
   ({ name, parameters, has_parentheses, into, using_exprs }, tokens)
 }
 
@@ -1435,6 +1443,5 @@ fn Parser::parse_deallocate_statement(
     [Identifier(name), .. tokens] => (name, tokens)
     _ => raise UnexpectedTokenMessageError(tokens[0], "prepared statement name")
   }
-
   ({ name, prepare }, tokens)
 }

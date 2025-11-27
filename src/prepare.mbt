@@ -14,8 +14,6 @@ test "PREPARE simple SELECT" {
       #|  users
       #|WHERE
       #|  id = ?;
-
-
     ),
   )
 }
@@ -34,8 +32,6 @@ test "PREPARE with data types" {
       #|WHERE
       #|  id = ? 
       #|  AND name = ?;
-
-
     ),
   )
 }
@@ -46,9 +42,7 @@ test "PREPARE INSERT statement" {
   let stmt = parse_sql(sql)[0] |> pretty_print
   inspect(
     stmt,
-    content=(
-      "PREPARE insert_user AS INSERT INTO users (name, email) VALUES (?, ?);"
-    ),
+    content="PREPARE insert_user AS INSERT INTO users (name, email) VALUES (?, ?);",
   )
 }
 
@@ -62,8 +56,6 @@ test "PREPARE UPDATE statement" {
       #|PREPARE update_user AS UPDATE users
       #|SET name = ?
       #|WHERE id = ?;
-
-
     ),
   )
 }
@@ -77,8 +69,6 @@ test "PREPARE DELETE statement" {
     content=(
       #|PREPARE delete_user AS DELETE FROM users
       #|WHERE id = ?;
-
-
     ),
   )
 }
@@ -97,8 +87,6 @@ test "PREPARE with PostgreSQL numbered placeholders" {
       #|WHERE
       #|  id = $1 
       #|  AND name = $2;
-
-
     ),
   )
 }
@@ -117,8 +105,6 @@ test "PREPARE with named parameters" {
       #|WHERE
       #|  id = :id 
       #|  AND name = :name;
-
-
     ),
   )
 }
@@ -144,8 +130,6 @@ test "PREPARE with complex query" {
       #|  u.name
       #|HAVING
       #|  count(o.id) > ?;
-
-
     ),
   )
 }
@@ -170,8 +154,6 @@ test "PREPARE with subquery" {
       #|    WHERE
       #|      amount > ?
       #|  );
-
-
     ),
   )
 }
@@ -191,8 +173,6 @@ test "PREPARE with window function" {
       #|  employees
       #|WHERE
       #|  department = ?;
-
-
     ),
   )
 }
@@ -218,8 +198,6 @@ test "PREPARE with CTE" {
       #|  recent_orders
       #|WHERE
       #|  status = ?;
-
-
     ),
   )
 }
@@ -264,12 +242,7 @@ test "EXECUTE with USING clause" {
 test "EXECUTE with complex expressions" {
   let sql = "EXECUTE stmt USING 1 + 2, CONCAT('Hello', ' World')"
   let stmt = parse_sql(sql)[0] |> pretty_print
-  inspect(
-    stmt,
-    content=(
-      "EXECUTE stmt USING 1 + 2, concat('Hello', ' World');"
-    ),
-  )
+  inspect(stmt, content="EXECUTE stmt USING 1 + 2, concat('Hello', ' World');")
 }
 
 ///|
@@ -359,8 +332,6 @@ test "PREPARE and EXECUTE separately" {
       #|  users
       #|WHERE
       #|  id = ?;
-
-
     ),
   )
   inspect(
@@ -384,8 +355,6 @@ test "PREPARE with multiple data types" {
       #|  users
       #|WHERE
       #|  id = ?;
-
-
     ),
   )
 }

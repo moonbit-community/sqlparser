@@ -77,7 +77,7 @@ fn Lexer::next_token(
   match skip_whitespace(input) {
     [',', .. rest] => (Comma, rest)
     // : followed by identifier is a named parameter, otherwise it's just Colon
-    [':', c, .. _] as code if c.is_ascii_alphabetic() || c == '_' =>
+    [':', c, ..] as code if c.is_ascii_alphabetic() || c == '_' =>
       self.read_colon_parameter(code)
     [':', .. rest] => (Colon, rest)
     ['?', .. rest] => (Placeholder("?"), rest)
@@ -117,7 +117,7 @@ fn Lexer::next_token(
     [.. "#>", .. rest] => (JsonExtractPath, rest) // PostgreSQL JSON #>
     [.. "@>", .. rest] => (JsonContains, rest) // PostgreSQL JSON @>
     // $ followed by digits is a PostgreSQL numbered placeholder
-    ['$', c, .. _] as code if c.is_ascii_digit() =>
+    ['$', c, ..] as code if c.is_ascii_digit() =>
       self.read_dollar_placeholder(code)
     // General patterns after specific operators
     [c, .. _rest] as code if c.is_ascii_digit() => read_number(code)

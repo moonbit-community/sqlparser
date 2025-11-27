@@ -9,7 +9,7 @@ pub fn[T : Show] structural_print(obj : T) -> String {
 }
 
 ///|
-pub struct Statements {
+pub(all) struct Statements {
   /// The list of SQL statements parsed from the input.
   stmts : Array[Statement]
 } derive(Eq, Show)
@@ -25,7 +25,7 @@ pub fn Statements::op_get(self : Self, index : Int) -> Statement {
 }
 
 ///|
-pub enum Statement {
+pub(all) enum Statement {
   Query(QueryStmt)
   CreateTable(CreateTableStmt)
   CreateView(CreateViewStmt)
@@ -123,7 +123,7 @@ pub impl @pp.Pretty for Statement with pretty(self) {
 }
 
 ///|
-pub struct QueryStmt {
+pub(all) struct QueryStmt {
   // WITH <cte1> AS (...), <cte2> AS (...)
   with_clause : Array[Cte]?
   // SELECT ...
@@ -270,7 +270,7 @@ pub impl @pp.Pretty for SetOperator with pretty(self) {
 }
 
 ///|
-pub enum Projection {
+pub(all) enum Projection {
   Wildcard
   UnamedExpr(Expr)
   AliasedExpr(Expr, String)
@@ -287,7 +287,7 @@ pub impl @pp.Pretty for Projection with pretty(self) {
 }
 
 ///|
-pub enum Expr {
+pub(all) enum Expr {
   // <identifier>
   Identifier(String)
   // <identifier>.<identifier>
@@ -455,7 +455,7 @@ pub impl @pp.Pretty for Expr with pretty(self) {
 }
 
 ///|
-pub enum Literal {
+pub(all) enum Literal {
   Integer(Int)
   Double(Double) // TODO: float32
   String(String)
@@ -476,7 +476,7 @@ pub impl @pp.Pretty for Literal with pretty(self) {
 
 ///|
 /// PostgreSQL array expression
-pub struct ArrayExpr {
+pub(all) struct ArrayExpr {
   elem : Array[Expr] // The list of expressions between brackets
   named : Bool // true for ARRAY[..], false for [..]
 } derive(Eq, Show)
@@ -491,7 +491,7 @@ pub impl @pp.Pretty for ArrayExpr with pretty(self) {
 
 ///|
 /// Access expression for array indexing, slicing, and field access
-pub enum AccessExpr {
+pub(all) enum AccessExpr {
   Dot(Expr) // Field access: obj.field
   Subscript(Subscript) // Array/map subscript: arr[index] or arr[start:end]
 } derive(Eq, Show)
@@ -506,7 +506,7 @@ pub impl @pp.Pretty for AccessExpr with pretty(self) {
 
 ///|
 /// Subscript expression for array indexing and slicing
-pub enum Subscript {
+pub(all) enum Subscript {
   Index(Expr) // Simple index: arr[1]
   Slice(Expr?, Expr?, Expr?) // Array slice: arr[1:3] (lower, upper, stride)
 } derive(Eq, Show)
@@ -536,7 +536,7 @@ pub impl @pp.Pretty for Subscript with pretty(self) {
 
 ///|
 /// Common Table Expression (CTE) for WITH clauses
-pub struct Cte {
+pub(all) struct Cte {
   name : String // CTE name
   query : QueryStmt // CTE query body
   columns : Array[String]? // Optional column list: WITH cte(col1, col2) AS (...)
@@ -559,7 +559,7 @@ pub impl @pp.Pretty for Cte with pretty(self) {
 }
 
 ///|
-pub enum BinaryOperator {
+pub(all) enum BinaryOperator {
   Eq
   Neq
   Lt
@@ -613,7 +613,7 @@ pub impl @pp.Pretty for BinaryOperator with pretty(self) {
 }
 
 ///|
-pub enum UnaryOperator {
+pub(all) enum UnaryOperator {
   Plus
   Minus
   Not
@@ -629,7 +629,7 @@ pub impl @pp.Pretty for UnaryOperator with pretty(self) {
 }
 
 ///|
-pub struct OrderByExpr {
+pub(all) struct OrderByExpr {
   // ORDER BY <expr>
   expr : Expr
   // ASC | DESC
@@ -654,7 +654,7 @@ pub impl @pp.Pretty for OrderByExpr with pretty(self) {
 }
 
 ///|
-pub struct TableRef {
+pub(all) struct TableRef {
   factor : TableFactor
   joins : Array[Join]
 } derive(Eq, Show)
@@ -666,7 +666,7 @@ pub impl @pp.Pretty for TableRef with pretty(self) {
 }
 
 ///|
-pub enum TableFactor {
+pub(all) enum TableFactor {
   // <col_name> [AS <alias>]
   Column(ObjectName, TableAlias?)
   // FROM (SELECT ...) [AS <alias>]
@@ -692,7 +692,7 @@ pub impl @pp.Pretty for TableFactor with pretty(self) {
 }
 
 ///|
-pub struct TableAlias {
+pub(all) struct TableAlias {
   /// AS <alias>
   name : String
   /// AS <alias> (<col_name>, ...)
@@ -712,7 +712,7 @@ pub impl @pp.Pretty for TableAlias with pretty(self) {
 }
 
 ///|
-pub struct Join {
+pub(all) struct Join {
   // JOIN <table_ref> ON <expr>
   table_ref : TableRef
   // LEFT JOIN | RIGHT JOIN | FULL | INNER | CROSS
@@ -739,7 +739,7 @@ pub impl @pp.Pretty for Join with pretty(self) {
 }
 
 ///|
-pub enum JoinOperator {
+pub(all) enum JoinOperator {
   Join(JoinConstraint)
   Left(JoinConstraint)
   LeftOuter(JoinConstraint)
@@ -767,7 +767,7 @@ pub impl @pp.Pretty for JoinOperator with pretty(self) {
 }
 
 ///|
-pub enum JoinConstraint {
+pub(all) enum JoinConstraint {
   // ON <expr>
   On(Expr)
   // USING (<col_name>, ...)
@@ -792,7 +792,7 @@ pub impl @pp.Pretty for JoinConstraint with pretty(self) {
 }
 
 ///|
-pub enum IntervalQualifier {
+pub(all) enum IntervalQualifier {
   // YEAR, MONTH, DAY, HOUR, MINUTE, SECOND
   Single(PrimaryDatetimeField)
   // <from> TO <to>
@@ -829,7 +829,7 @@ pub impl @pp.Pretty for PrimaryDatetimeField with pretty(self) {
 }
 
 ///|
-pub enum DatetimeUnit {
+pub(all) enum DatetimeUnit {
   Year
   Month
   Day
@@ -852,7 +852,7 @@ pub impl @pp.Pretty for DatetimeUnit with pretty(self) {
 
 ///|
 /// CASE [operand] WHEN <expr> THEN <expr> [...] [ELSE <expr>] END
-pub struct CaseExpr {
+pub(all) struct CaseExpr {
   // CASE [operand]
   operand : Expr?
   // WHEN <expr> THEN <expr> [...]
@@ -892,7 +892,7 @@ pub impl @pp.Pretty for CaseExpr with pretty(self) {
 
 ///|
 /// Window function specification: OVER ([PARTITION BY ...] [ORDER BY ...] [frame_clause])
-pub struct WindowSpec {
+pub(all) struct WindowSpec {
   // PARTITION BY <expr>, ...
   partition_by : Array[Expr]
   // ORDER BY <expr> [ASC|DESC] [NULLS FIRST|LAST], ...
@@ -903,7 +903,7 @@ pub struct WindowSpec {
 
 ///|
 /// Window frame clause
-pub struct WindowFrameClause {
+pub(all) struct WindowFrameClause {
   // ROWS or RANGE
   frame_units : WindowFrameUnits
   // Frame bounds
@@ -913,14 +913,14 @@ pub struct WindowFrameClause {
 
 ///|
 /// Window frame units
-pub enum WindowFrameUnits {
+pub(all) enum WindowFrameUnits {
   Rows
   Range
 } derive(Eq, Show)
 
 ///|
 /// Window frame bound
-pub enum WindowFrameBound {
+pub(all) enum WindowFrameBound {
   UnboundedPreceding
   UnboundedFollowing
   CurrentRow
@@ -985,7 +985,7 @@ pub impl @pp.Pretty for WindowFrameBound with pretty(self) {
 }
 
 ///|
-pub struct CreateTableStmt {
+pub(all) struct CreateTableStmt {
   // CREATE TABLE <table_name>
   name : String
   // IF NOT EXISTS flag
@@ -995,7 +995,7 @@ pub struct CreateTableStmt {
 } derive(Eq, Show)
 
 ///|
-pub enum CreateTableDefinition {
+pub(all) enum CreateTableDefinition {
   /// (col_name col_type, ...)
   Columns(Array[ColumnDef], Array[TableConstraint])
   /// AS SELECT ...
@@ -1037,7 +1037,7 @@ pub impl @pp.Pretty for CreateTableDefinition with pretty(self) {
 }
 
 ///|
-pub struct ColumnDef {
+pub(all) struct ColumnDef {
   name : String
   data_type : DataType
   options : Array[ColumnDefOption]
@@ -1052,7 +1052,7 @@ pub impl @pp.Pretty for ColumnDef with pretty(self) {
 }
 
 ///|
-pub enum DataType {
+pub(all) enum DataType {
   Integer
   Smallint
   Bigint
@@ -1088,7 +1088,7 @@ pub impl @pp.Pretty for DataType with pretty(self) {
 }
 
 ///|
-pub enum ColumnDefOption {
+pub(all) enum ColumnDefOption {
   NotNull
   Unique
   Default(Expr)
@@ -1133,13 +1133,13 @@ pub impl @pp.Pretty for CreateViewStmt with pretty(self) {
 }
 
 ///|
-pub struct ViewColumnDef {
+pub(all) struct ViewColumnDef {
   name : String
 } derive(Eq, Show)
 
 ///|
 /// CREATE INDEX statement
-pub struct CreateIndexStmt {
+pub(all) struct CreateIndexStmt {
   // CREATE [UNIQUE] INDEX [CONCURRENTLY] [IF NOT EXISTS] <index_name>
   unique : Bool
   concurrently : Bool
@@ -1157,7 +1157,7 @@ pub struct CreateIndexStmt {
 
 ///|
 /// Index creation method
-pub enum IndexMethod {
+pub(all) enum IndexMethod {
   Btree
   Hash
   Gin
@@ -1168,7 +1168,7 @@ pub enum IndexMethod {
 
 ///|
 /// Index column specification
-pub struct IndexColumn {
+pub(all) struct IndexColumn {
   name : Expr // Can be column name or expression
   asc : Bool? // None = default, Some(true) = ASC, Some(false) = DESC
   nulls_first : Bool? // None = default, Some(true) = NULLS FIRST, Some(false) = NULLS LAST
@@ -1232,7 +1232,7 @@ pub impl @pp.Pretty for ViewColumnDef with pretty(self) {
 
 ///|
 /// CREATE DATABASE statement
-pub struct CreateDatabaseStmt {
+pub(all) struct CreateDatabaseStmt {
   /// CREATE DATABASE <database_name>
   name : String
   /// IF NOT EXISTS flag
@@ -1260,7 +1260,7 @@ pub impl @pp.Pretty for CreateDatabaseStmt with pretty(self) {
 
 ///|
 /// CREATE SCHEMA statement (synonym for CREATE DATABASE in many dialects)
-pub struct CreateSchemaStmt {
+pub(all) struct CreateSchemaStmt {
   /// CREATE SCHEMA <schema_name>
   name : String
   /// IF NOT EXISTS flag
@@ -1282,7 +1282,7 @@ pub impl @pp.Pretty for CreateSchemaStmt with pretty(self) {
 
 ///|
 /// CREATE FUNCTION statement
-pub struct CreateFunctionStmt {
+pub(all) struct CreateFunctionStmt {
   /// CREATE FUNCTION <function_name>
   name : String
   /// Function parameters: (param1 type1, param2 type2, ...)
@@ -1301,7 +1301,7 @@ pub struct CreateFunctionStmt {
 
 ///|
 /// Function parameter definition
-pub struct FunctionParameter {
+pub(all) struct FunctionParameter {
   /// Parameter name
   name : String
   /// Parameter data type
@@ -1312,7 +1312,7 @@ pub struct FunctionParameter {
 
 ///|
 /// Parameter mode for functions/procedures
-pub enum ParameterMode {
+pub(all) enum ParameterMode {
   In
   Out
   InOut
@@ -1320,7 +1320,7 @@ pub enum ParameterMode {
 
 ///|
 /// CREATE PROCEDURE statement
-pub struct CreateProcedureStmt {
+pub(all) struct CreateProcedureStmt {
   /// CREATE PROCEDURE <procedure_name>
   name : String
   /// Procedure parameters: (param1 type1, param2 type2, ...)
@@ -1374,7 +1374,7 @@ pub impl @pp.Pretty for CreateProcedureStmt with pretty(self) {
 
 ///|
 /// CREATE SEQUENCE statement
-pub struct CreateSequenceStmt {
+pub(all) struct CreateSequenceStmt {
   /// CREATE SEQUENCE <sequence_name>
   name : String
   /// IF NOT EXISTS flag
@@ -1399,7 +1399,7 @@ pub struct CreateSequenceStmt {
 
 ///|
 /// Sequence limit specification
-pub enum SequenceLimit {
+pub(all) enum SequenceLimit {
   /// MINVALUE/MAXVALUE value
   Value(Int)
   /// NO MINVALUE/NO MAXVALUE
@@ -1408,7 +1408,7 @@ pub enum SequenceLimit {
 
 ///|
 /// OWNED BY specification for sequences  
-pub enum SequenceOwnedBy {
+pub(all) enum SequenceOwnedBy {
   /// OWNED BY table.column
   Column(ObjectName, String)
   /// OWNED BY NONE
@@ -1499,7 +1499,7 @@ pub impl @pp.Pretty for ParameterMode with pretty(self) {
 }
 
 ///|
-pub struct DropViewStmt {
+pub(all) struct DropViewStmt {
   // DROP VIEW <view_name>
   name : String
 } derive(Eq, Show)
@@ -1510,7 +1510,7 @@ pub impl @pp.Pretty for DropViewStmt with pretty(self) {
 }
 
 ///|
-pub enum DuplicateTreatment {
+pub(all) enum DuplicateTreatment {
   // DISTINCT
   Distinct
   // ALL
@@ -1526,7 +1526,7 @@ pub impl @pp.Pretty for DuplicateTreatment with pretty(self) {
 }
 
 ///|
-pub enum TableConstraint {
+pub(all) enum TableConstraint {
   Unique(Array[OrderByExpr])
   PrimaryKey(Array[OrderByExpr])
   ForeignKey(
@@ -1562,7 +1562,7 @@ pub impl @pp.Pretty for TableConstraint with pretty(self) {
 }
 
 ///|
-pub struct ObjectName {
+pub(all) struct ObjectName {
   // <identifier>.<identifier>.<identifier>
   parts : Array[String]
 } derive(Eq, Show)
@@ -1583,7 +1583,7 @@ pub impl @pp.Pretty for ObjectName with pretty(self) {
 }
 
 ///|
-pub enum Top {
+pub(all) enum Top {
   Constant(Int)
   Expr(Expr)
 } derive(Eq, Show)
@@ -1597,7 +1597,7 @@ pub impl @pp.Pretty for Top with pretty(self) {
 }
 
 ///|
-pub struct InsertStmt {
+pub(all) struct InsertStmt {
   // INSERT INTO <table_name>
   table_name : ObjectName
   // Optional column list: (<col1>, <col2>, ...)
@@ -1635,7 +1635,7 @@ pub impl @pp.Pretty for InsertStmt with pretty(self) {
 }
 
 ///|
-pub enum InsertSource {
+pub(all) enum InsertSource {
   // VALUES (<expr>, ...), (<expr>, ...), ...
   Values(Array[Array[Expr]])
   // SELECT ...
@@ -1658,7 +1658,7 @@ pub impl @pp.Pretty for InsertSource with pretty(self) {
 }
 
 ///|
-pub struct DeleteStmt {
+pub(all) struct DeleteStmt {
   /// DELETE FROM <table_name>
   table_name : ObjectName
   /// Optional WHERE clause
@@ -1676,7 +1676,7 @@ pub impl @pp.Pretty for DeleteStmt with pretty(self) {
 }
 
 ///|
-pub struct UpdateStmt {
+pub(all) struct UpdateStmt {
   // UPDATE <table_name>
   table_name : ObjectName
   // SET assignments
@@ -1686,7 +1686,7 @@ pub struct UpdateStmt {
 } derive(Eq, Show)
 
 ///|
-pub struct Assignment {
+pub(all) struct Assignment {
   // Column name
   column : String
   // Value expression
@@ -1713,7 +1713,7 @@ pub impl @pp.Pretty for Assignment with pretty(self) {
 
 ///|
 /// MERGE statement for conditional INSERT/UPDATE/DELETE operations
-pub struct MergeStmt {
+pub(all) struct MergeStmt {
   /// Target table: MERGE INTO target_table
   target_table : ObjectName
   /// Target table alias: MERGE INTO target_table AS alias
@@ -1730,7 +1730,7 @@ pub struct MergeStmt {
 
 ///|
 /// Source for MERGE statement
-pub enum MergeSource {
+pub(all) enum MergeSource {
   /// Table source: USING table_name
   Table(ObjectName)
   /// Subquery source: USING (SELECT ...)
@@ -1739,7 +1739,7 @@ pub enum MergeSource {
 
 ///|
 /// WHEN clause in MERGE statement
-pub struct MergeWhenClause {
+pub(all) struct MergeWhenClause {
   /// WHEN MATCHED / WHEN NOT MATCHED
   match_type : MergeMatchType
   /// Optional additional condition: WHEN MATCHED AND condition
@@ -1750,7 +1750,7 @@ pub struct MergeWhenClause {
 
 ///|
 /// Match type for WHEN clause
-pub enum MergeMatchType {
+pub(all) enum MergeMatchType {
   /// WHEN MATCHED
   Matched
   /// WHEN NOT MATCHED
@@ -1759,7 +1759,7 @@ pub enum MergeMatchType {
 
 ///|
 /// Actions that can be performed in MERGE
-pub enum MergeAction {
+pub(all) enum MergeAction {
   /// INSERT (columns) VALUES (values)
   Insert(Array[String], Array[Expr]) // columns, values
   /// UPDATE SET assignments
@@ -1847,7 +1847,7 @@ pub impl @pp.Pretty for MergeAction with pretty(self) {
 }
 
 ///|
-pub struct TruncateStmt {
+pub(all) struct TruncateStmt {
   // TRUNCATE <table_name>
   table_name : ObjectName
 } derive(Eq, Show)
@@ -1858,7 +1858,7 @@ pub impl @pp.Pretty for TruncateStmt with pretty(self) {
 }
 
 ///|
-pub struct DropTableStmt {
+pub(all) struct DropTableStmt {
   /// DROP TABLE <table_name>
   table_name : ObjectName
   /// IF EXISTS flag
@@ -1873,7 +1873,7 @@ pub impl @pp.Pretty for DropTableStmt with pretty(self) {
 }
 
 ///|
-pub struct DropIndexStmt {
+pub(all) struct DropIndexStmt {
   /// DROP INDEX <index_name>
   name : String
   /// IF EXISTS flag
@@ -1897,7 +1897,7 @@ pub impl @pp.Pretty for DropIndexStmt with pretty(self) {
 }
 
 ///|
-pub struct AlterTableStmt {
+pub(all) struct AlterTableStmt {
   // ALTER TABLE <table_name>
   table_name : ObjectName
   // IF EXISTS flag
@@ -1907,7 +1907,7 @@ pub struct AlterTableStmt {
 } derive(Eq, Show)
 
 ///|
-pub enum AlterTableOperation {
+pub(all) enum AlterTableOperation {
   // DROP COLUMN [IF EXISTS] <column_name>
   DropColumn(String, Bool) // column_name, if_exists
 } derive(Eq, Show)
@@ -1933,7 +1933,7 @@ pub impl @pp.Pretty for AlterTableOperation with pretty(self) {
 
 ///|
 /// ALTER INDEX statement
-pub struct AlterIndexStmt {
+pub(all) struct AlterIndexStmt {
   // ALTER INDEX <index_name>
   name : String
   // IF EXISTS flag  
@@ -1944,7 +1944,7 @@ pub struct AlterIndexStmt {
 
 ///|
 /// ALTER INDEX operations
-pub enum AlterIndexOperation {
+pub(all) enum AlterIndexOperation {
   /// RENAME TO new_name
   RenameTo(String)
   /// SET TABLESPACE tablespace_name
@@ -1957,7 +1957,7 @@ pub enum AlterIndexOperation {
 
 ///|
 /// Index parameter for SET operations
-pub struct IndexParameter {
+pub(all) struct IndexParameter {
   name : String
   value : String
 } derive(Eq, Show)
@@ -1996,7 +1996,7 @@ pub impl @pp.Pretty for IndexParameter with pretty(self) {
 
 ///|
 /// MySQL SHOW statement
-pub struct ShowStmt {
+pub(all) struct ShowStmt {
   // The type of SHOW statement
   show_type : ShowType
   // Optional object name (table, database, etc.)
@@ -2010,7 +2010,7 @@ pub struct ShowStmt {
 } derive(Eq, Show)
 
 ///|
-pub enum ShowType {
+pub(all) enum ShowType {
   Tables
   Columns
   Status
@@ -2029,7 +2029,7 @@ pub enum ShowType {
 } derive(Eq, Show)
 
 ///|
-pub enum ShowFilter {
+pub(all) enum ShowFilter {
   Like(String)
   Where(Expr)
 } derive(Eq, Show)
@@ -2092,7 +2092,7 @@ pub impl @pp.Pretty for ShowFilter with pretty(self) {
 }
 
 ///|
-pub struct SetStmt {
+pub(all) struct SetStmt {
   // Variable scope (GLOBAL, SESSION, or LOCAL/user variables)
   scope : SetScope
   // Variable assignments
@@ -2100,7 +2100,7 @@ pub struct SetStmt {
 } derive(Eq, Show)
 
 ///|
-pub enum SetScope {
+pub(all) enum SetScope {
   Global // SET GLOBAL var = value
   Session // SET SESSION var = value  
   UserVar // SET @var = value
@@ -2108,7 +2108,7 @@ pub enum SetScope {
 } derive(Eq, Show)
 
 ///|
-pub struct SetAssignment {
+pub(all) struct SetAssignment {
   // Variable name
   variable : String
   // Assigned value
@@ -2139,7 +2139,7 @@ pub impl @pp.Pretty for SetAssignment with pretty(self) {
 
 ///|
 /// USE database statement for database switching
-pub struct UseStmt {
+pub(all) struct UseStmt {
   /// Database name to switch to
   database_name : ObjectName
 } derive(Eq, Show)
@@ -2151,7 +2151,7 @@ pub impl @pp.Pretty for UseStmt with pretty(self) {
 
 ///|
 /// COPY statement for bulk data import/export operations
-pub struct CopyStmt {
+pub(all) struct CopyStmt {
   /// Source or target specification
   source : CopySource
   /// Direction of the operation (TO file or FROM file)
@@ -2164,7 +2164,7 @@ pub struct CopyStmt {
 
 ///|
 /// Source specification for COPY statement
-pub enum CopySource {
+pub(all) enum CopySource {
   /// Copy from a table: COPY table_name
   Table(ObjectName, Array[String]?) // table_name, optional column_list
   /// Copy from a query: COPY (SELECT ...)
@@ -2173,7 +2173,7 @@ pub enum CopySource {
 
 ///|
 /// Direction of COPY operation
-pub enum CopyDirection {
+pub(all) enum CopyDirection {
   /// COPY ... TO target
   To
   /// COPY ... FROM target  
@@ -2182,7 +2182,7 @@ pub enum CopyDirection {
 
 ///|
 /// Target specification for COPY statement
-pub enum CopyTarget {
+pub(all) enum CopyTarget {
   /// File path: COPY ... TO/FROM 'filename'
   File(String)
   /// Standard input: COPY ... FROM STDIN
@@ -2195,7 +2195,7 @@ pub enum CopyTarget {
 
 ///|
 /// COPY statement options
-pub enum CopyOption {
+pub(all) enum CopyOption {
   /// FORMAT format_name (CSV, TEXT, BINARY)
   Format(CopyFormat)
   /// DELIMITER 'delimiter_string'
@@ -2220,7 +2220,7 @@ pub enum CopyOption {
 
 ///|
 /// COPY format specification
-pub enum CopyFormat {
+pub(all) enum CopyFormat {
   Csv
   Text
   Binary
@@ -2228,7 +2228,7 @@ pub enum CopyFormat {
 
 ///|
 /// FORCE_QUOTE specification
-pub enum CopyForceQuote {
+pub(all) enum CopyForceQuote {
   /// FORCE_QUOTE *
   All
   /// FORCE_QUOTE (column_list)
@@ -2339,7 +2339,7 @@ pub impl @pp.Pretty for CopyForceQuote with pretty(self) {
 
 ///|
 /// MySQL ON DUPLICATE KEY UPDATE or PostgreSQL ON CONFLICT
-pub enum OnInsert {
+pub(all) enum OnInsert {
   /// ON DUPLICATE KEY UPDATE (MySQL when the key already exists, then execute an update instead)
   DuplicateKeyUpdate(Array[Assignment])
   /// ON CONFLICT clause (PostgreSQL and SQLite extension)
@@ -2360,7 +2360,7 @@ pub impl @pp.Pretty for OnInsert with pretty(self) {
 ///|
 /// PostgreSQL ON CONFLICT clause for advanced conflict resolution
 /// Syntax: ON CONFLICT [ conflict_target ] conflict_action
-pub struct OnConflictClause {
+pub(all) struct OnConflictClause {
   /// Optional conflict target (column names, index expression, or constraint name)
   conflict_target : ConflictTarget?
   /// Action to take when conflict occurs
@@ -2369,7 +2369,7 @@ pub struct OnConflictClause {
 
 ///|
 /// Conflict target specification
-pub enum ConflictTarget {
+pub(all) enum ConflictTarget {
   /// ON CONFLICT (column1, column2, ...)
   Columns(Array[String])
   /// ON CONFLICT ON CONSTRAINT constraint_name
@@ -2380,7 +2380,7 @@ pub enum ConflictTarget {
 
 ///|
 /// Action to take when conflict occurs
-pub enum ConflictAction {
+pub(all) enum ConflictAction {
   /// DO NOTHING
   DoNothing
   /// DO UPDATE SET assignments [WHERE condition]
@@ -2429,7 +2429,7 @@ pub impl @pp.Pretty for ConflictAction with pretty(self) {
 ///|
 /// SQLite-style conflict resolution for INSERT statements
 /// See: https://sqlite.org/lang_conflict.html
-pub enum SqliteOnConflict {
+pub(all) enum SqliteOnConflict {
   Rollback
   Abort
   Fail
@@ -2451,7 +2451,7 @@ pub impl @pp.Pretty for SqliteOnConflict with pretty(self) {
 ///|
 // TCL (Transaction Control Language) statement structures
 
-pub struct BeginStmt {
+pub(all) struct BeginStmt {
   // BEGIN [WORK] [TRANSACTION] or START TRANSACTION
   work : Bool // whether WORK keyword was used
   transaction : Bool // whether TRANSACTION keyword was used
@@ -2465,7 +2465,7 @@ pub impl @pp.Pretty for BeginStmt with pretty(self) {
 }
 
 ///|
-pub struct CommitStmt {
+pub(all) struct CommitStmt {
   // COMMIT [WORK] [TRANSACTION]
   work : Bool // whether WORK keyword was used  
   transaction : Bool // whether TRANSACTION keyword was used
@@ -2479,7 +2479,7 @@ pub impl @pp.Pretty for CommitStmt with pretty(self) {
 }
 
 ///|
-pub struct RollbackStmt {
+pub(all) struct RollbackStmt {
   // ROLLBACK [WORK] [TRANSACTION] [TO [SAVEPOINT] savepoint_name]
   work : Bool // whether WORK keyword was used
   transaction : Bool // whether TRANSACTION keyword was used  
@@ -2498,7 +2498,7 @@ pub impl @pp.Pretty for RollbackStmt with pretty(self) {
 }
 
 ///|
-pub struct SavepointStmt {
+pub(all) struct SavepointStmt {
   // SAVEPOINT savepoint_name
   name : String
 } derive(Eq, Show)
@@ -2509,7 +2509,7 @@ pub impl @pp.Pretty for SavepointStmt with pretty(self) {
 }
 
 ///|
-pub struct ReleaseSavepointStmt {
+pub(all) struct ReleaseSavepointStmt {
   // RELEASE [SAVEPOINT] savepoint_name
   savepoint_keyword : Bool // whether SAVEPOINT keyword was used
   name : String
@@ -2525,7 +2525,7 @@ pub impl @pp.Pretty for ReleaseSavepointStmt with pretty(self) {
 ///|
 // DCL (Data Control Language) statement structures
 
-pub struct GrantStmt {
+pub(all) struct GrantStmt {
   // GRANT privileges ON object TO grantees [WITH GRANT OPTION]
   privileges : Array[Privilege]
   objects : Array[ObjectName] // tables, views, etc.
@@ -2534,7 +2534,7 @@ pub struct GrantStmt {
 } derive(Eq, Show)
 
 ///|
-pub enum Privilege {
+pub(all) enum Privilege {
   // Basic privileges
   Select(Array[String]?) // SELECT [(column_list)]
   Insert(Array[String]?) // INSERT [(column_list)]
@@ -2614,7 +2614,7 @@ pub impl @pp.Pretty for Privilege with pretty(self) {
 }
 
 ///|
-pub struct RevokeStmt {
+pub(all) struct RevokeStmt {
   // REVOKE [GRANT OPTION FOR] privileges ON object FROM grantees [RESTRICT | CASCADE]
   grant_option_for : Bool // whether GRANT OPTION FOR was specified
   privileges : Array[Privilege]
@@ -2624,7 +2624,7 @@ pub struct RevokeStmt {
 } derive(Eq, Show)
 
 ///|
-pub enum RevokeOption {
+pub(all) enum RevokeOption {
   Restrict // RESTRICT
   Cascade // CASCADE
 } derive(Eq, Show)
@@ -2659,7 +2659,7 @@ pub impl @pp.Pretty for RevokeOption with pretty(self) {
 
 ///|
 /// LOAD DATA statement for MySQL-style bulk data loading
-pub struct LoadDataStmt {
+pub(all) struct LoadDataStmt {
   /// LOAD DATA [LOCAL] INFILE 'filename'
   is_local : Bool // LOCAL keyword
   filename : String // INFILE filename
@@ -2683,14 +2683,14 @@ pub struct LoadDataStmt {
 
 ///|
 /// Duplicate handling for LOAD DATA
-pub enum LoadDataDuplicateHandling {
+pub(all) enum LoadDataDuplicateHandling {
   Replace // REPLACE
   Ignore // IGNORE
 } derive(Eq, Show)
 
 ///|
 /// FIELDS options for LOAD DATA
-pub struct LoadDataFieldsOptions {
+pub(all) struct LoadDataFieldsOptions {
   /// TERMINATED BY 'string'
   terminated_by : String?
   /// [OPTIONALLY] ENCLOSED BY 'char'
@@ -2702,7 +2702,7 @@ pub struct LoadDataFieldsOptions {
 
 ///|
 /// LINES options for LOAD DATA
-pub struct LoadDataLinesOptions {
+pub(all) struct LoadDataLinesOptions {
   /// STARTING BY 'string'
   starting_by : String?
   /// TERMINATED BY 'string'
@@ -2823,7 +2823,7 @@ pub impl @pp.Pretty for LoadDataLinesOptions with pretty(self) {
 ///|
 /// PREPARE statement
 /// Syntax: PREPARE name [(data_type [, ...])] AS statement
-pub struct PrepareStmt {
+pub(all) struct PrepareStmt {
   /// Name of the prepared statement
   name : String
   /// Optional data types for parameters
@@ -2900,7 +2900,7 @@ pub impl @pp.Pretty for PrepareStmt with pretty(self) {
 ///   EXECUTE name [(param [, ...])]
 ///   EXECUTE name USING expr [, ...]
 ///   EXECUTE IMMEDIATE 'sql_string' [INTO var [, ...]] [USING expr [, ...]]
-pub struct ExecuteStmt {
+pub(all) struct ExecuteStmt {
   /// Statement name (None for EXECUTE IMMEDIATE)
   name : ObjectName?
   /// Parameters for EXECUTE name(params...)
@@ -2947,7 +2947,7 @@ pub impl @pp.Pretty for ExecuteStmt with pretty(self) {
 ///|
 /// DEALLOCATE statement
 /// Syntax: DEALLOCATE [PREPARE] name
-pub struct DeallocateStmt {
+pub(all) struct DeallocateStmt {
   /// Name of the prepared statement to deallocate
   name : String
   /// Whether PREPARE keyword is present
