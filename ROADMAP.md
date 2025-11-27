@@ -21,8 +21,8 @@ This document outlines missing features compared to comprehensive SQL parsers li
 ### Essential Utilities
 - [x] **USE database** - Database switching (critical for multi-database environments) ✅ **COMPLETED**
 - [x] **Parameterized queries** - Prepared statement placeholders (?, $1, :name, @param) ✅ **COMPLETED**
+- [x] **PREPARE/EXECUTE** - Prepared statement support ✅ **COMPLETED**
 - [ ] **EXPLAIN variants** - EXPLAIN ANALYZE, EXPLAIN VERBOSE, etc.
-- [ ] **PREPARE/EXECUTE** - Prepared statement support
 - [ ] **SHOW variants** - SHOW FUNCTIONS, SHOW VARIABLES, SHOW STATUS
 
 ## Medium Priority (Enhanced Functionality)
@@ -113,15 +113,16 @@ This document outlines missing features compared to comprehensive SQL parsers li
 10. **USE Database** - Database switching for multi-database environments
 11. **COPY Statements** - Comprehensive bulk data import/export operations with full PostgreSQL syntax support
 12. **Parameterized Queries** - Prepared statement placeholders supporting multiple formats (?, $1, :name, @param) across all SQL dialects
+13. **PREPARE/EXECUTE/DEALLOCATE** - Complete prepared statement lifecycle management with support for PostgreSQL, MySQL, and Oracle syntax variations
 
 ### Current Coverage
 - **~35% feature coverage** compared to comprehensive SQL parsers
-- **345+ comprehensive tests** with high-quality test coverage
+- **368 comprehensive tests** with high-quality test coverage
 - **5 major SQL language categories** fully supported (DML, DDL, TCL, DCL, Utility)
 - **6+ SQL dialects** with dialect-specific extensions
-- **Prepared statements** with multi-dialect placeholder support
+- **Full prepared statement support** - Complete lifecycle (PREPARE/EXECUTE/DEALLOCATE) with multi-dialect placeholder support
 
 ### Next Up
 - **EXPLAIN variants** - EXPLAIN ANALYZE, EXPLAIN VERBOSE for query analysis
-- **PREPARE/EXECUTE** - Full prepared statement lifecycle management
 - **LOAD DATA** - MySQL-style data loading operations
+- **SHOW variants** - SHOW FUNCTIONS, SHOW VARIABLES, SHOW STATUS
