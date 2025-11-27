@@ -2844,7 +2844,54 @@ pub impl @pp.Pretty for PrepareStmt with pretty(self) {
     @pp.empty
   }) +
   @pp.text(" AS ") +
-  self.statement.pretty()
+  (match self.statement {
+    Statement::Query(stmt) => stmt.pretty()
+    CreateTable(stmt) => stmt.pretty()
+    CreateView(stmt) => stmt.pretty()
+    CreateIndex(stmt) => stmt.pretty()
+    CreateDatabase(stmt) => stmt.pretty()
+    CreateSchema(stmt) => stmt.pretty()
+    CreateFunction(stmt) => stmt.pretty()
+    CreateProcedure(stmt) => stmt.pretty()
+    CreateSequence(stmt) => stmt.pretty()
+    DropView(stmt) => stmt.pretty()
+    DropTable(stmt) => stmt.pretty()
+    DropIndex(stmt) => stmt.pretty()
+    Insert(stmt) => stmt.pretty()
+    Delete(stmt) => stmt.pretty()
+    Update(stmt) => stmt.pretty()
+    Merge(stmt) => stmt.pretty()
+    Truncate(stmt) => stmt.pretty()
+    AlterTable(stmt) => stmt.pretty()
+    AlterIndex(stmt) => stmt.pretty()
+    Show(stmt) => stmt.pretty()
+    Set(stmt) => stmt.pretty()
+    Use(stmt) => stmt.pretty()
+    Copy(stmt) => stmt.pretty()
+    LoadData(stmt) => stmt.pretty()
+    Prepare(stmt) => stmt.pretty()
+    Execute(stmt) => stmt.pretty()
+    Deallocate(stmt) => stmt.pretty()
+    LockTables(tables) =>
+      @pp.text("LOCK TABLES ") +
+      @pp.separate(@pp.text(", "), tables.map(@pp.pretty))
+    UnlockTables => @pp.text("UNLOCK TABLES")
+    Listen(channel) => @pp.text("LISTEN ") + @pp.text(channel)
+    Notify(channel, payload) =>
+      @pp.text("NOTIFY ") +
+      @pp.text(channel) +
+      (match payload {
+        Some(msg) => @pp.text(", '") + @pp.text(msg) + @pp.text("'")
+        None => @pp.empty
+      })
+    Begin(stmt) => stmt.pretty()
+    Commit(stmt) => stmt.pretty()
+    Rollback(stmt) => stmt.pretty()
+    Savepoint(stmt) => stmt.pretty()
+    ReleaseSavepoint(stmt) => stmt.pretty()
+    Grant(stmt) => stmt.pretty()
+    Revoke(stmt) => stmt.pretty()
+  })
 }
 
 ///|

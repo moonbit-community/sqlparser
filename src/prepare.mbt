@@ -13,7 +13,8 @@ test "PREPARE simple SELECT" {
       #|FROM
       #|  users
       #|WHERE
-      #|  id = ?;;
+      #|  id = ?;
+
 
     ),
   )
@@ -32,7 +33,8 @@ test "PREPARE with data types" {
       #|  users
       #|WHERE
       #|  id = ? 
-      #|  AND name = ?;;
+      #|  AND name = ?;
+
 
     ),
   )
@@ -45,7 +47,7 @@ test "PREPARE INSERT statement" {
   inspect(
     stmt,
     content=(
-      "PREPARE insert_user AS INSERT INTO users (name, email) VALUES (?, ?);;"
+      "PREPARE insert_user AS INSERT INTO users (name, email) VALUES (?, ?);"
     ),
   )
 }
@@ -59,7 +61,8 @@ test "PREPARE UPDATE statement" {
     content=(
       #|PREPARE update_user AS UPDATE users
       #|SET name = ?
-      #|WHERE id = ?;;
+      #|WHERE id = ?;
+
 
     ),
   )
@@ -73,7 +76,8 @@ test "PREPARE DELETE statement" {
     stmt,
     content=(
       #|PREPARE delete_user AS DELETE FROM users
-      #|WHERE id = ?;;
+      #|WHERE id = ?;
+
 
     ),
   )
@@ -92,7 +96,8 @@ test "PREPARE with PostgreSQL numbered placeholders" {
       #|  users
       #|WHERE
       #|  id = $1 
-      #|  AND name = $2;;
+      #|  AND name = $2;
+
 
     ),
   )
@@ -111,7 +116,8 @@ test "PREPARE with named parameters" {
       #|  users
       #|WHERE
       #|  id = :id 
-      #|  AND name = :name;;
+      #|  AND name = :name;
+
 
     ),
   )
@@ -137,7 +143,8 @@ test "PREPARE with complex query" {
       #|  u.id,
       #|  u.name
       #|HAVING
-      #|  count(o.id) > ?;;
+      #|  count(o.id) > ?;
+
 
     ),
   )
@@ -162,7 +169,8 @@ test "PREPARE with subquery" {
       #|      orders
       #|    WHERE
       #|      amount > ?
-      #|  );;
+      #|  );
+
 
     ),
   )
@@ -182,7 +190,8 @@ test "PREPARE with window function" {
       #|FROM
       #|  employees
       #|WHERE
-      #|  department = ?;;
+      #|  department = ?;
+
 
     ),
   )
@@ -208,7 +217,8 @@ test "PREPARE with CTE" {
       #|FROM
       #|  recent_orders
       #|WHERE
-      #|  status = ?;;
+      #|  status = ?;
+
 
     ),
   )
@@ -348,7 +358,8 @@ test "PREPARE and EXECUTE separately" {
       #|FROM
       #|  users
       #|WHERE
-      #|  id = ?;;
+      #|  id = ?;
+
 
     ),
   )
@@ -372,7 +383,8 @@ test "PREPARE with multiple data types" {
       #|FROM
       #|  users
       #|WHERE
-      #|  id = ?;;
+      #|  id = ?;
+
 
     ),
   )
