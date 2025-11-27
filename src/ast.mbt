@@ -50,6 +50,9 @@ pub enum Statement {
   Use(UseStmt)
   Copy(CopyStmt)
   LoadData(LoadDataStmt)
+  Prepare(PrepareStmt)
+  Execute(ExecuteStmt)
+  Deallocate(DeallocateStmt)
   LockTables(Array[ObjectName])
   UnlockTables
   // PostgreSQL-specific statements
@@ -93,6 +96,9 @@ pub impl @pp.Pretty for Statement with pretty(self) {
     Use(stmt) => stmt.pretty()
     Copy(stmt) => stmt.pretty()
     LoadData(stmt) => stmt.pretty()
+    Prepare(stmt) => stmt.pretty()
+    Execute(stmt) => stmt.pretty()
+    Deallocate(stmt) => stmt.pretty()
     LockTables(tables) =>
       @pp.text("LOCK TABLES ") +
       @pp.separate(@pp.text(", "), tables.map(@pp.pretty))
@@ -2812,4 +2818,98 @@ pub impl @pp.Pretty for LoadDataLinesOptions with pretty(self) {
   } else {
     @pp.empty
   }
+}
+
+///|
+/// PREPARE statement
+/// Syntax: PREPARE name [(data_type [, ...])] AS statement
+pub struct PrepareStmt {
+  /// Name of the prepared statement
+  name : String
+  /// Optional data types for parameters
+  data_types : Array[DataType]
+  /// The SQL statement to prepare
+  statement : Statement
+} derive(Eq, Show)
+
+///|
+pub impl @pp.Pretty for PrepareStmt with pretty(self) {
+  @pp.text("PREPARE ") +
+  @pp.text(self.name) +
+  (if self.data_types.length() > 0 {
+    @pp.text(" (") +
+    @pp.separate(@pp.text(", "), self.data_types.map(@pp.pretty)) +
+    @pp.text(")")
+  } else {
+    @pp.empty
+  }) +
+  @pp.text(" AS ") +
+  self.statement.pretty()
+}
+
+///|
+/// EXECUTE statement
+/// Syntax:
+///   EXECUTE name [(param [, ...])]
+///   EXECUTE name USING expr [, ...]
+///   EXECUTE IMMEDIATE 'sql_string' [INTO var [, ...]] [USING expr [, ...]]
+pub struct ExecuteStmt {
+  /// Statement name (None for EXECUTE IMMEDIATE)
+  name : ObjectName?
+  /// Parameters for EXECUTE name(params...)
+  parameters : Array[Expr]
+  /// Whether parameters are in parentheses
+  has_parentheses : Bool
+  /// INTO clause variables (Oracle style)
+  into : Array[String]
+  /// USING clause expressions (PostgreSQL style)
+  using_exprs : Array[Expr]
+} derive(Eq, Show)
+
+///|
+pub impl @pp.Pretty for ExecuteStmt with pretty(self) {
+  @pp.text("EXECUTE ") +
+  (match self.name {
+    Some(name) =>
+      name.pretty() +
+      (if self.has_parentheses && self.parameters.length() > 0 {
+        @pp.text("(") +
+        @pp.separate(@pp.text(", "), self.parameters.map(@pp.pretty)) +
+        @pp.text(")")
+      } else if self.parameters.length() > 0 {
+        @pp.space +
+        @pp.separate(@pp.text(", "), self.parameters.map(@pp.pretty))
+      } else {
+        @pp.empty
+      })
+    None => @pp.text("IMMEDIATE")
+  }) +
+  (if self.into.length() > 0 {
+    @pp.text(" INTO ") + @pp.separate(@pp.text(", "), self.into.map(@pp.text))
+  } else {
+    @pp.empty
+  }) +
+  (if self.using_exprs.length() > 0 {
+    @pp.text(" USING ") +
+    @pp.separate(@pp.text(", "), self.using_exprs.map(@pp.pretty))
+  } else {
+    @pp.empty
+  })
+}
+
+///|
+/// DEALLOCATE statement
+/// Syntax: DEALLOCATE [PREPARE] name
+pub struct DeallocateStmt {
+  /// Name of the prepared statement to deallocate
+  name : String
+  /// Whether PREPARE keyword is present
+  prepare : Bool
+} derive(Eq, Show)
+
+///|
+pub impl @pp.Pretty for DeallocateStmt with pretty(self) {
+  @pp.text("DEALLOCATE ") +
+  (if self.prepare { @pp.text("PREPARE ") } else { @pp.empty }) +
+  @pp.text(self.name)
 }

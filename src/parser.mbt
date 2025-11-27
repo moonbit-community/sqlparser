@@ -160,6 +160,12 @@ fn Parser::parse_statement(
       self.parse_use_statement(tokens).map(Statement::Use(_))
     [Keyword(Copy), .. _rest] =>
       self.parse_copy_statement(tokens).map(Statement::Copy(_))
+    [Keyword(Prepare), .. _rest] =>
+      self.parse_prepare_statement(tokens).map(Statement::Prepare(_))
+    [Keyword(Execute), .. _rest] =>
+      self.parse_execute_statement(tokens).map(Statement::Execute(_))
+    [Keyword(Deallocate), .. _rest] =>
+      self.parse_deallocate_statement(tokens).map(Statement::Deallocate(_))
     [LParen, .. rest] => {
       let (stmt, tokens) = self.parse_statement(rest)
       let tokens = self.expect_token(tokens, RParen)
@@ -1269,4 +1275,166 @@ fn Parser::parse_load_data_lines_options(
     tokens => break tokens
   }
   ({ starting_by, terminated_by }, tokens)
+}
+
+///|
+/// Parse PREPARE statement
+/// Syntax: PREPARE name [(data_type [, ...])] AS statement
+fn Parser::parse_prepare_statement(
+  self : Parser,
+  tokens : ArrayView[Token],
+) -> ParserResult[PrepareStmt] raise ParserError {
+  // PREPARE
+  let tokens = self.expect_token(tokens, Keyword(Prepare))
+
+  // name
+  let (name, tokens) = match tokens {
+    [Identifier(name), .. tokens] => (name, tokens)
+    _ => raise UnexpectedTokenMessageError(tokens[0], "prepared statement name")
+  }
+
+  // Optional data types: [(data_type, ...)]
+  let (data_types, tokens) = match tokens {
+    [LParen, .. rest_tokens] => {
+      let data_types = []
+      let tokens = loop rest_tokens {
+        [RParen, .. rest_tokens] => break rest_tokens
+        rest_tokens => {
+          let (data_type, rest_tokens) = self.parse_data_type(rest_tokens)
+          data_types.push(data_type)
+          match rest_tokens {
+            [Comma, .. rest_tokens] => continue rest_tokens
+            [RParen, .. rest_tokens] => break rest_tokens
+            [token, ..] => raise UnexpectedTokenError(token, RParen)
+            [] => raise ParserError::InternalBug("parse_prepare_statement: unexpected end of tokens")
+          }
+        }
+      }
+      (data_types, tokens)
+    }
+    _ => ([], tokens)
+  }
+
+  // AS
+  let tokens = self.expect_token(tokens, Keyword(As))
+
+  // statement
+  let (statement, tokens) = self.parse_statement(tokens)
+
+  ({ name, data_types, statement }, tokens)
+}
+
+///|
+/// Parse EXECUTE statement
+/// Syntax:
+///   EXECUTE name [(param [, ...])]
+///   EXECUTE name USING expr [, ...]
+///   EXECUTE IMMEDIATE 'sql_string' [INTO var [, ...]] [USING expr [, ...]]
+fn Parser::parse_execute_statement(
+  self : Parser,
+  tokens : ArrayView[Token],
+) -> ParserResult[ExecuteStmt] raise ParserError {
+  // EXECUTE
+  let tokens = self.expect_token(tokens, Keyword(Execute))
+
+  // Check for IMMEDIATE (EXECUTE IMMEDIATE is different from EXECUTE name)
+  let (name, tokens) = match tokens {
+    [Keyword(Immediate), .. tokens] => (None, tokens)
+    [Identifier(id), .. tokens] => {
+      let object_name : ObjectName = { parts: [id] }
+      (Some(object_name), tokens)
+    }
+    _ => raise UnexpectedTokenMessageError(tokens[0], "statement name or IMMEDIATE")
+  }
+
+  // Parameters: either (param1, param2, ...) or USING expr1, expr2, ...
+  let (parameters, has_parentheses, tokens) = match tokens {
+    [LParen, .. rest_tokens] => {
+      let parameters = []
+      let tokens = loop rest_tokens {
+        [RParen, .. rest_tokens] => break rest_tokens
+        rest_tokens => {
+          let (expr, rest_tokens) = self.parse_expr(rest_tokens)
+          parameters.push(expr)
+          match rest_tokens {
+            [Comma, .. rest_tokens] => continue rest_tokens
+            [RParen, .. rest_tokens] => break rest_tokens
+            [token, ..] => raise UnexpectedTokenError(token, RParen)
+            [] => raise ParserError::InternalBug("parse_execute_statement: unexpected end of tokens")
+          }
+        }
+      }
+      (parameters, true, tokens)
+    }
+    _ => ([], false, tokens)
+  }
+
+  // INTO clause (Oracle style): INTO var1, var2, ...
+  let (into, tokens) = match tokens {
+    [Keyword(Into), .. rest_tokens] => {
+      let into = []
+      let first = match rest_tokens {
+        [Identifier(id), .. tokens] => {
+          into.push(id)
+          tokens
+        }
+        _ => rest_tokens
+      }
+      let tokens = loop first {
+        [Comma, Identifier(id), .. tokens] => {
+          into.push(id)
+          continue tokens
+        }
+        tokens => break tokens
+      }
+      (into, tokens)
+    }
+    _ => ([], tokens)
+  }
+
+  // USING clause: USING expr1, expr2, ...
+  let (using_exprs, tokens) = match tokens {
+    [Keyword(Using), .. rest_tokens] => {
+      let using_exprs = []
+      let (expr, rest_tokens) = self.parse_expr(rest_tokens)
+      using_exprs.push(expr)
+      let tokens = loop rest_tokens {
+        [Comma, .. rest_tokens] => {
+          let (expr, rest_tokens) = self.parse_expr(rest_tokens)
+          using_exprs.push(expr)
+          continue rest_tokens
+        }
+        tokens => break tokens
+      }
+      (using_exprs, tokens)
+    }
+    _ => ([], tokens)
+  }
+
+  ({ name, parameters, has_parentheses, into, using_exprs }, tokens)
+}
+
+///|
+/// Parse DEALLOCATE statement
+/// Syntax: DEALLOCATE [PREPARE] name
+fn Parser::parse_deallocate_statement(
+  self : Parser,
+  tokens : ArrayView[Token],
+) -> ParserResult[DeallocateStmt] raise ParserError {
+  // DEALLOCATE
+  let tokens = self.expect_token(tokens, Keyword(Deallocate))
+
+  // Optional PREPARE keyword
+  let (prepare, tokens) = match tokens {
+    [Keyword(Prepare), .. tokens] => (true, tokens)
+    _ => (false, tokens)
+  }
+
+  // name
+  let (name, tokens) = match tokens {
+    [Identifier(name), .. tokens] => (name, tokens)
+    _ => raise UnexpectedTokenMessageError(tokens[0], "prepared statement name")
+  }
+
+  ({ name, prepare }, tokens)
 }

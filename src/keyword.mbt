@@ -152,6 +152,9 @@ pub(all) enum Keyword {
   Usage
   Use
   Execute
+  Prepare
+  Deallocate
+  Immediate
   Connect
   Temporary
   Temp
