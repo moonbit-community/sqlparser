@@ -20,6 +20,7 @@ This document outlines missing features compared to comprehensive SQL parsers li
 
 ### Essential Utilities
 - [x] **USE database** - Database switching (critical for multi-database environments) ✅ **COMPLETED**
+- [x] **Parameterized queries** - Prepared statement placeholders (?, $1, :name, @param) ✅ **COMPLETED**
 - [ ] **EXPLAIN variants** - EXPLAIN ANALYZE, EXPLAIN VERBOSE, etc.
 - [ ] **PREPARE/EXECUTE** - Prepared statement support
 - [ ] **SHOW variants** - SHOW FUNCTIONS, SHOW VARIABLES, SHOW STATUS
@@ -111,13 +112,16 @@ This document outlines missing features compared to comprehensive SQL parsers li
 9. **MERGE Statements** - Advanced UPSERT operations for data synchronization
 10. **USE Database** - Database switching for multi-database environments
 11. **COPY Statements** - Comprehensive bulk data import/export operations with full PostgreSQL syntax support
+12. **Parameterized Queries** - Prepared statement placeholders supporting multiple formats (?, $1, :name, @param) across all SQL dialects
 
 ### Current Coverage
-- **~30% feature coverage** compared to comprehensive SQL parsers
-- **317+ comprehensive tests** with high-quality test coverage
+- **~35% feature coverage** compared to comprehensive SQL parsers
+- **345+ comprehensive tests** with high-quality test coverage
 - **5 major SQL language categories** fully supported (DML, DDL, TCL, DCL, Utility)
 - **6+ SQL dialects** with dialect-specific extensions
+- **Prepared statements** with multi-dialect placeholder support
 
 ### Next Up
-- **LOAD DATA** - MySQL-style data loading operations
 - **EXPLAIN variants** - EXPLAIN ANALYZE, EXPLAIN VERBOSE for query analysis
+- **PREPARE/EXECUTE** - Full prepared statement lifecycle management
+- **LOAD DATA** - MySQL-style data loading operations
