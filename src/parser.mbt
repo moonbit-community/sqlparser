@@ -318,6 +318,7 @@ fn Parser::parse_set_assignments(
   // Parse first assignment
   let (variable, tokens) = match tokens {
     [Identifier(name), .. rest] => (name, rest)
+    [Token::Placeholder(name), .. rest] => (name, rest) // Support @variable syntax
     [token, ..] =>
       raise UnexpectedTokenMessageError(token, "expected variable name")
     [] => raise InternalBug("parse_set_assignments: unexpected end of tokens")
@@ -331,6 +332,7 @@ fn Parser::parse_set_assignments(
     [Comma, .. rest] => {
       let (variable, remaining_tokens) = match rest {
         [Identifier(name), .. remaining] => (name, remaining)
+        [Token::Placeholder(name), .. remaining] => (name, remaining) // Support @variable syntax
         [token, ..] =>
           raise UnexpectedTokenMessageError(token, "expected variable name")
         [] =>

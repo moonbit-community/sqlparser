@@ -326,10 +326,8 @@ pub enum Expr {
   // SUBSTRING(<expr>, <expr>, <expr>)
   // ```
   Substring(Expr, Expr?, Expr?)
-  // ?
-  PlaceHolder
-  // @param_name (BigQuery named parameter)
-  NamedParameter(String)
+  // Placeholder for prepared statements: ?, $1, :name, @param
+  Placeholder(String)
   // Array expression: ARRAY[1, 2, 3] or [1, 2, 3]
   Array(ArrayExpr)
   // Array/Map indexing and slicing: arr[1], arr[1:3], obj.field
@@ -434,8 +432,7 @@ pub impl @pp.Pretty for Expr with pretty(self) {
         None => @pp.empty
       }) +
       @pp.char(')')
-    Expr::PlaceHolder => @pp.text("?")
-    Expr::NamedParameter(name) => @pp.text("@") + @pp.text(name)
+    Expr::Placeholder(s) => @pp.text(s)
     Expr::Array(arr) => arr.pretty()
     Expr::CompoundFieldAccess(root, access_chain) =>
       root.pretty() + @pp.separate(@pp.empty, access_chain.map(@pp.pretty))

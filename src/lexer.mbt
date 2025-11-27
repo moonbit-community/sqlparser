@@ -34,7 +34,7 @@ pub(all) enum Token {
   LParen
   RParen
   Period
-  PlaceHolder
+  Placeholder(String) // ?, $1, :name, @name
   // PostgreSQL JSON operators
   JsonExtract // ->
   JsonExtractText // ->>
@@ -76,8 +76,11 @@ fn Lexer::next_token(
 ) -> (Token, StringView) raise LexerError {
   match skip_whitespace(input) {
     [',', .. rest] => (Comma, rest)
+    // : followed by identifier is a named parameter, otherwise it's just Colon
+    [':', c, .. _] as code if c.is_ascii_alphabetic() || c == '_' =>
+      self.read_colon_parameter(code)
     [':', .. rest] => (Colon, rest)
-    ['?', .. rest] => (PlaceHolder, rest)
+    ['?', .. rest] => (Placeholder("?"), rest)
     [';', .. rest] => (Semicolon, rest)
     ['*', .. rest] => (Mul, rest)
     [.. "==", .. rest] => (DoubleEq, rest)
@@ -113,10 +116,13 @@ fn Lexer::next_token(
     [.. "#>>", .. rest] => (JsonExtractPathText, rest) // PostgreSQL JSON #>>
     [.. "#>", .. rest] => (JsonExtractPath, rest) // PostgreSQL JSON #>
     [.. "@>", .. rest] => (JsonContains, rest) // PostgreSQL JSON @>
-    // General patterns after specific JSON operators
+    // $ followed by digits is a PostgreSQL numbered placeholder
+    ['$', c, .. _] as code if c.is_ascii_digit() =>
+      self.read_dollar_placeholder(code)
+    // General patterns after specific operators
     [c, .. _rest] as code if c.is_ascii_digit() => read_number(code)
     ['_', .. _rest] as code => self.read_identifier_or_keyword(code)
-    ['@', .. _rest] as code => self.read_user_variable(code)
+    ['@', .. _rest] as code => self.read_at_parameter(code)
     [c, .. _rest] as code if c.is_ascii_alphabetic() =>
       self.read_identifier_or_keyword(code)
     [c, .. _rest] => raise UnknownCharacter(c)
@@ -402,7 +408,52 @@ fn is_ascii_alphabetic_or_digit(ch : Char) -> Bool {
 }
 
 ///|
-fn Lexer::read_user_variable(
+/// Read PostgreSQL numbered placeholder: $1, $2, $3, etc.
+fn Lexer::read_dollar_placeholder(
+  _self : Lexer,
+  input : StringView,
+) -> (Token, StringView) {
+  // Skip the $ character
+  let input = match input {
+    ['$', .. rest] => rest
+    _ => input
+  }
+
+  // Read the number part
+  let (idx, rest) = loop (input, 0) {
+    ([c, .. rest], n) if c.is_ascii_digit() => continue (rest, n + 1)
+    (rest, n) => break (n, rest)
+  }
+  let placeholder = "$" + input.view(start_offset=0, end_offset=idx).to_string()
+  (Token::Placeholder(placeholder), rest)
+}
+
+///|
+/// Read colon-prefixed named parameter: :name, :param1, etc.
+fn Lexer::read_colon_parameter(
+  _self : Lexer,
+  input : StringView,
+) -> (Token, StringView) {
+  // Skip the : character
+  let input = match input {
+    [':', .. rest] => rest
+    _ => input
+  }
+
+  // Read the parameter name part
+  let (idx, rest) = loop (input, 0) {
+    ([c, .. rest], n) if is_ascii_alphabetic_or_digit(c) =>
+      continue (rest, n + 1)
+    (rest, n) => break (n, rest)
+  }
+  let placeholder = ":" + input.view(start_offset=0, end_offset=idx).to_string()
+  (Token::Placeholder(placeholder), rest)
+}
+
+///|
+/// Read at-sign parameter: @name, @param1, etc.
+/// This can be either a placeholder or a user variable depending on context
+fn Lexer::read_at_parameter(
   _self : Lexer,
   input : StringView,
 ) -> (Token, StringView) {
@@ -412,15 +463,14 @@ fn Lexer::read_user_variable(
     _ => input
   }
 
-  // Read the variable name part
+  // Read the parameter name part
   let (idx, rest) = loop (input, 0) {
     ([c, .. rest], n) if is_ascii_alphabetic_or_digit(c) =>
       continue (rest, n + 1)
     (rest, n) => break (n, rest)
   }
-  let variable_name = "@" +
-    input.view(start_offset=0, end_offset=idx).to_string()
-  (Token::Identifier(variable_name), rest)
+  let placeholder = "@" + input.view(start_offset=0, end_offset=idx).to_string()
+  (Token::Placeholder(placeholder), rest)
 }
 
 ///|

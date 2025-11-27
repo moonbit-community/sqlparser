@@ -344,7 +344,7 @@ fn Parser::parse_primary_expr(
       }
       (UnaryOperation(op, expr), tokens)
     }
-    [PlaceHolder, .. tokens] => (PlaceHolder, tokens)
+    [Token::Placeholder(s), .. tokens] => (Expr::Placeholder(s), tokens)
     [Boolean(b), .. tokens] => (Literal(Literal::Boolean(b)), tokens)
     [Keyword(Null), .. tokens] => (Literal(Literal::Null), tokens)
     [Number(n), .. tokens] =>
@@ -438,20 +438,7 @@ fn Parser::parse_primary_expr(
           )
       }
     }
-    [Identifier(name), .. tokens] =>
-      // Check if this is a BigQuery named parameter (@param_name)
-      if name.strip_prefix("@") is Some(_) &&
-        self.dialect.supports_named_parameters() {
-        let param_name = name[1:].to_string() catch {
-          e =>
-            raise InternalBug(
-              "parse_primary_expr: illegal token after named parameter: \{e}",
-            )
-        }
-        (NamedParameter(param_name), tokens)
-      } else {
-        (Identifier(name), tokens)
-      }
+    [Identifier(name), .. tokens] => (Identifier(name), tokens)
     [Keyword(Exists), LParen, .. tokens] => {
       let (sub_query, tokens) = self.parse_query(tokens)
       match tokens {
@@ -736,6 +723,12 @@ fn Parser::parse_table_factor(
   match tokens {
     [Identifier(_) | StringLiteral(_), ..] as tokens => {
       let (object_name, tokens) = self.parse_object_name(tokens)
+      let (optional_alias, tokens) = self.parse_aliasing(tokens)
+      (TableFactor::Column(object_name, optional_alias), tokens)
+    }
+    [Token::Placeholder(name), .. tokens] => {
+      // Support parameterized table names (e.g., BigQuery @table)
+      let object_name : ObjectName = { parts: [name] }
       let (optional_alias, tokens) = self.parse_aliasing(tokens)
       (TableFactor::Column(object_name, optional_alias), tokens)
     }
