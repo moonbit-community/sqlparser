@@ -393,7 +393,7 @@ fn Parser::parse_data_type(
     [Keyword(Smallint), .. tokens] => (Smallint, tokens)
     [Keyword(Bigint), .. tokens] => (Bigint, tokens)
     [Keyword(Float), LParen, Number(n), RParen, .. tokens] => {
-      let n = @strconv.parse_int(n) catch {
+      let n = @string.parse_int(n) catch {
         _ => raise ParserError::InvalidDataTypeError(n)
       }
       (Float(Some(n)), tokens)
@@ -402,13 +402,13 @@ fn Parser::parse_data_type(
     [Keyword(Real), .. tokens] => (Real, tokens)
     [Keyword(Double), .. tokens] => (Double, tokens)
     [Keyword(Char), LParen, Number(n), RParen, .. tokens] => {
-      let n = @strconv.parse_int(n) catch {
+      let n = @string.parse_int(n) catch {
         _ => raise ParserError::InvalidDataTypeError(n)
       }
       (Char(n), tokens)
     }
     [Keyword(Varchar), LParen, Number(n), RParen, .. tokens] => {
-      let n = @strconv.parse_int(n) catch {
+      let n = @string.parse_int(n) catch {
         _ => raise ParserError::InvalidDataTypeError(n)
       }
       (Varchar(n), tokens)
@@ -1728,21 +1728,21 @@ fn Parser::parse_create_sequence_statement(
   let mut owned_by = None
   let tokens = loop tokens {
     [Keyword(Increment), Keyword(By), Number(inc_str), .. rest_tokens] => {
-      let inc_val = @strconv.parse_int(inc_str) catch {
+      let inc_val = @string.parse_int(inc_str) catch {
         _ => raise ParserError::InvalidDataTypeError(inc_str)
       }
       increment = Some(inc_val)
       continue rest_tokens
     }
     [Keyword(Increment), Number(inc_str), .. rest_tokens] => {
-      let inc_val = @strconv.parse_int(inc_str) catch {
+      let inc_val = @string.parse_int(inc_str) catch {
         _ => raise ParserError::InvalidDataTypeError(inc_str)
       }
       increment = Some(inc_val)
       continue rest_tokens
     }
     [Keyword(Minvalue), Number(min_str), .. rest_tokens] => {
-      let min_val = @strconv.parse_int(min_str) catch {
+      let min_val = @string.parse_int(min_str) catch {
         _ => raise ParserError::InvalidDataTypeError(min_str)
       }
       minvalue = Some(SequenceLimit::Value(min_val))
@@ -1753,7 +1753,7 @@ fn Parser::parse_create_sequence_statement(
       continue rest_tokens
     }
     [Keyword(Maxvalue), Number(max_str), .. rest_tokens] => {
-      let max_val = @strconv.parse_int(max_str) catch {
+      let max_val = @string.parse_int(max_str) catch {
         _ => raise ParserError::InvalidDataTypeError(max_str)
       }
       maxvalue = Some(SequenceLimit::Value(max_val))
@@ -1764,21 +1764,21 @@ fn Parser::parse_create_sequence_statement(
       continue rest_tokens
     }
     [Keyword(Start), Keyword(With), Number(start_str), .. rest_tokens] => {
-      let start_val = @strconv.parse_int(start_str) catch {
+      let start_val = @string.parse_int(start_str) catch {
         _ => raise ParserError::InvalidDataTypeError(start_str)
       }
       start_with = Some(start_val)
       continue rest_tokens
     }
     [Keyword(Start), Number(start_str), .. rest_tokens] => {
-      let start_val = @strconv.parse_int(start_str) catch {
+      let start_val = @string.parse_int(start_str) catch {
         _ => raise ParserError::InvalidDataTypeError(start_str)
       }
       start_with = Some(start_val)
       continue rest_tokens
     }
     [Keyword(Cache), Number(cache_str), .. rest_tokens] => {
-      let cache_val = @strconv.parse_int(cache_str) catch {
+      let cache_val = @string.parse_int(cache_str) catch {
         _ => raise ParserError::InvalidDataTypeError(cache_str)
       }
       cache = Some(cache_val)

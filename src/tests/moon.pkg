@@ -1,0 +1,4 @@
+import {
+  "moonbitlang/x/fs",
+  "moonbit-community/sqlparser",
+} for "test"

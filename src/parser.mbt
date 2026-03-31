@@ -71,101 +71,131 @@ fn Parser::parse_statement(
   }
   let (stmt, tokens) = match tokens {
     [Keyword(Select), .. _rest] =>
-      self.parse_query(tokens).map(Statement::Query(_))
+      self.parse_query(tokens).map(stmt => Statement::Query(stmt))
     [Keyword(With), .. _rest] =>
-      self.parse_query(tokens).map(Statement::Query(_))
+      self.parse_query(tokens).map(stmt => Statement::Query(stmt))
     [Keyword(Show), .. _rest] =>
-      self.parse_show_statement(tokens).map(Statement::Show(_))
+      self.parse_show_statement(tokens).map(stmt => Statement::Show(stmt))
     [Keyword(Set), .. _rest] =>
-      self.parse_set_statement(tokens).map(Statement::Set(_))
+      self.parse_set_statement(tokens).map(stmt => Statement::Set(stmt))
     [Keyword(Create), Keyword(Table), .. _rest] =>
-      self.parse_create_table_statement(tokens).map(Statement::CreateTable(_))
+      self
+      .parse_create_table_statement(tokens)
+      .map(stmt => Statement::CreateTable(stmt))
     [Keyword(Create), Keyword(View), .. _rest] =>
-      self.parse_create_view_statement(tokens).map(Statement::CreateView(_))
+      self
+      .parse_create_view_statement(tokens)
+      .map(stmt => Statement::CreateView(stmt))
     [Keyword(Create), Keyword(Index), .. _rest] =>
-      self.parse_create_index_statement(tokens).map(Statement::CreateIndex(_))
+      self
+      .parse_create_index_statement(tokens)
+      .map(stmt => Statement::CreateIndex(stmt))
     [Keyword(Create), Keyword(Unique), Keyword(Index), .. _rest] =>
-      self.parse_create_index_statement(tokens).map(Statement::CreateIndex(_))
+      self
+      .parse_create_index_statement(tokens)
+      .map(stmt => Statement::CreateIndex(stmt))
     [Keyword(Create), Keyword(Database), .. _rest] =>
       self
       .parse_create_database_statement(tokens)
-      .map(Statement::CreateDatabase(_))
+      .map(stmt => Statement::CreateDatabase(stmt))
     [Keyword(Create), Keyword(Schema), .. _rest] =>
-      self.parse_create_schema_statement(tokens).map(Statement::CreateSchema(_))
+      self
+      .parse_create_schema_statement(tokens)
+      .map(stmt => Statement::CreateSchema(stmt))
     [Keyword(Create), Keyword(Function), .. _rest] =>
       self
       .parse_create_function_statement(tokens)
-      .map(Statement::CreateFunction(_))
+      .map(stmt => Statement::CreateFunction(stmt))
     [Keyword(Create), Keyword(Procedure), .. _rest] =>
       self
       .parse_create_procedure_statement(tokens)
-      .map(Statement::CreateProcedure(_))
+      .map(stmt => Statement::CreateProcedure(stmt))
     [Keyword(Create), Keyword(Sequence), .. _rest] =>
       self
       .parse_create_sequence_statement(tokens)
-      .map(Statement::CreateSequence(_))
+      .map(stmt => Statement::CreateSequence(stmt))
     [Keyword(Create), Keyword(Temporary), Keyword(Sequence), .. _rest] =>
       self
       .parse_create_sequence_statement(tokens)
-      .map(Statement::CreateSequence(_))
+      .map(stmt => Statement::CreateSequence(stmt))
     [Keyword(Create), Keyword(Temp), Keyword(Sequence), .. _rest] =>
       self
       .parse_create_sequence_statement(tokens)
-      .map(Statement::CreateSequence(_))
+      .map(stmt => Statement::CreateSequence(stmt))
     [Keyword(Drop), Keyword(View), .. _rest] =>
-      self.parse_drop_view_statement(tokens).map(Statement::DropView(_))
+      self
+      .parse_drop_view_statement(tokens)
+      .map(stmt => Statement::DropView(stmt))
     [Keyword(Drop), Keyword(Table), .. _rest] =>
-      self.parse_drop_table_statement(tokens).map(Statement::DropTable(_))
+      self
+      .parse_drop_table_statement(tokens)
+      .map(stmt => Statement::DropTable(stmt))
     [Keyword(Drop), Keyword(Index), .. _rest] =>
-      self.parse_drop_index_statement(tokens).map(Statement::DropIndex(_))
+      self
+      .parse_drop_index_statement(tokens)
+      .map(stmt => Statement::DropIndex(stmt))
     [Keyword(Insert), .. _rest] =>
-      self.parse_insert_statement(tokens).map(Statement::Insert(_))
+      self.parse_insert_statement(tokens).map(stmt => Statement::Insert(stmt))
     [Keyword(Replace), .. _rest] =>
-      self.parse_replace_statement(tokens).map(Statement::Insert(_))
+      self.parse_replace_statement(tokens).map(stmt => Statement::Insert(stmt))
     [Keyword(Delete), .. _rest] =>
-      self.parse_delete_statement(tokens).map(Statement::Delete(_))
+      self.parse_delete_statement(tokens).map(stmt => Statement::Delete(stmt))
     [Keyword(Update), .. _rest] =>
-      self.parse_update_statement(tokens).map(Statement::Update(_))
+      self.parse_update_statement(tokens).map(stmt => Statement::Update(stmt))
     [Keyword(Merge), .. _rest] =>
-      self.parse_merge_statement(tokens).map(Statement::Merge(_))
+      self.parse_merge_statement(tokens).map(stmt => Statement::Merge(stmt))
     [Keyword(Truncate), .. _rest] =>
-      self.parse_truncate_statement(tokens).map(Statement::Truncate(_))
+      self
+      .parse_truncate_statement(tokens)
+      .map(stmt => Statement::Truncate(stmt))
     [Keyword(Alter), Keyword(Table), .. _rest] =>
-      self.parse_alter_table_statement(tokens).map(Statement::AlterTable(_))
+      self
+      .parse_alter_table_statement(tokens)
+      .map(stmt => Statement::AlterTable(stmt))
     [Keyword(Alter), Keyword(Index), .. _rest] =>
-      self.parse_alter_index_statement(tokens).map(Statement::AlterIndex(_))
+      self
+      .parse_alter_index_statement(tokens)
+      .map(stmt => Statement::AlterIndex(stmt))
     [Keyword(Begin), .. _rest] =>
-      self.parse_begin_statement(tokens).map(Statement::Begin(_))
+      self.parse_begin_statement(tokens).map(stmt => Statement::Begin(stmt))
     [Keyword(Start), Keyword(Transaction), .. _rest] =>
-      self.parse_start_transaction_statement(tokens).map(Statement::Begin(_))
+      self
+      .parse_start_transaction_statement(tokens)
+      .map(stmt => Statement::Begin(stmt))
     [Keyword(Commit), .. _rest] =>
-      self.parse_commit_statement(tokens).map(Statement::Commit(_))
+      self.parse_commit_statement(tokens).map(stmt => Statement::Commit(stmt))
     [Keyword(Rollback), .. _rest] =>
-      self.parse_rollback_statement(tokens).map(Statement::Rollback(_))
+      self
+      .parse_rollback_statement(tokens)
+      .map(stmt => Statement::Rollback(stmt))
     [Keyword(Savepoint), .. _rest] =>
-      self.parse_savepoint_statement(tokens).map(Statement::Savepoint(_))
+      self
+      .parse_savepoint_statement(tokens)
+      .map(stmt => Statement::Savepoint(stmt))
     [Keyword(Release), Keyword(Savepoint), .. _rest] =>
       self
       .parse_release_savepoint_statement(tokens)
-      .map(Statement::ReleaseSavepoint(_))
+      .map(stmt => Statement::ReleaseSavepoint(stmt))
     [Keyword(Release), .. _rest] =>
       self
       .parse_release_savepoint_statement(tokens)
-      .map(Statement::ReleaseSavepoint(_))
+      .map(stmt => Statement::ReleaseSavepoint(stmt))
     [Keyword(Grant), .. _rest] =>
-      self.parse_grant_statement(tokens).map(Statement::Grant(_))
+      self.parse_grant_statement(tokens).map(stmt => Statement::Grant(stmt))
     [Keyword(Revoke), .. _rest] =>
-      self.parse_revoke_statement(tokens).map(Statement::Revoke(_))
+      self.parse_revoke_statement(tokens).map(stmt => Statement::Revoke(stmt))
     [Keyword(Use), .. _rest] =>
-      self.parse_use_statement(tokens).map(Statement::Use(_))
+      self.parse_use_statement(tokens).map(stmt => Statement::Use(stmt))
     [Keyword(Copy), .. _rest] =>
-      self.parse_copy_statement(tokens).map(Statement::Copy(_))
+      self.parse_copy_statement(tokens).map(stmt => Statement::Copy(stmt))
     [Keyword(Prepare), .. _rest] =>
-      self.parse_prepare_statement(tokens).map(Statement::Prepare(_))
+      self.parse_prepare_statement(tokens).map(stmt => Statement::Prepare(stmt))
     [Keyword(Execute), .. _rest] =>
-      self.parse_execute_statement(tokens).map(Statement::Execute(_))
+      self.parse_execute_statement(tokens).map(stmt => Statement::Execute(stmt))
     [Keyword(Deallocate), .. _rest] =>
-      self.parse_deallocate_statement(tokens).map(Statement::Deallocate(_))
+      self
+      .parse_deallocate_statement(tokens)
+      .map(stmt => Statement::Deallocate(stmt))
     [LParen, .. rest] => {
       let (stmt, tokens) = self.parse_statement(rest)
       let tokens = self.expect_token(tokens, RParen)
@@ -1120,7 +1150,7 @@ fn Parser::parse_load_data_statement(
   let (ignore_lines, tokens) = match tokens {
     [Keyword(Ignore), Number(num_str), Keyword(Lines), .. tokens] => {
       // Convert string to integer
-      let num = @strconv.parse_int(num_str) catch {
+      let num = @string.parse_int(num_str) catch {
         _ =>
           raise UnexpectedTokenMessageError(
             tokens[0],

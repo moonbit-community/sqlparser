@@ -21,7 +21,7 @@ fn Parser::parse_set_expr(
     [] =>
       raise ParserError::InternalBug("parse_set_expr: unexpected end of tokens")
   }
-  for {
+  for ;; {
     let left = left_tokens.0
     let tokens = left_tokens.1
     // let (op, tokens) = self.parse_next_set_operator(tokens)
@@ -228,7 +228,7 @@ fn Parser::parse_binary_expr(
   let mut expr_tokens = self.parse_primary_expr(tokens)
   // Handle postfix operations like array subscripts and field access
   expr_tokens = self.parse_postfix_expr(expr_tokens.0, expr_tokens.1)
-  for {
+  for ;; {
     let expr = expr_tokens.0
     let tokens = expr_tokens.1
     let next_bp = get_next_bp(tokens)
@@ -349,15 +349,19 @@ fn Parser::parse_primary_expr(
     [Keyword(Null), .. tokens] => (Literal(Literal::Null), tokens)
     [Number(n), .. tokens] =>
       if n.contains_char('.') {
-        let v = @strconv.parse_double(n) catch {
-          StrConvError(e) =>
-            raise ParserError::InternalBug("parse_primary_expr: \{e}")
+        let v = @string.parse_double(n) catch {
+          _ =>
+            raise ParserError::InternalBug(
+              "parse_primary_expr: invalid numeric literal \{n}",
+            )
         }
         (Literal(Literal::Double(v)), tokens)
       } else {
-        let v = @strconv.parse_int(n) catch {
-          StrConvError(e) =>
-            raise ParserError::InternalBug("parse_primary_expr: \{e}")
+        let v = @string.parse_int(n) catch {
+          _ =>
+            raise ParserError::InternalBug(
+              "parse_primary_expr: invalid numeric literal \{n}",
+            )
         }
         (Literal(Literal::Integer(v)), tokens)
       }
@@ -631,21 +635,22 @@ fn Parser::parse_table_ref(
       tokens[0] is Keyword(Full) ||
       tokens[0] is Keyword(Inner) => {
       let (join_operator_maker, tokens) = match tokens {
-        [Keyword(Join), .. tokens] => (JoinOperator::Join(_), tokens)
+        [Keyword(Join), .. tokens] =>
+          (constraint => JoinOperator::Join(constraint), tokens)
         [Keyword(Left), Keyword(Join), .. tokens] =>
-          (JoinOperator::Left(_), tokens)
+          (constraint => JoinOperator::Left(constraint), tokens)
         [Keyword(Left), Keyword(Outer), Keyword(Join), .. tokens] =>
-          (JoinOperator::LeftOuter(_), tokens)
+          (constraint => JoinOperator::LeftOuter(constraint), tokens)
         [Keyword(Right), Keyword(Join), .. tokens] =>
-          (JoinOperator::Right(_), tokens)
+          (constraint => JoinOperator::Right(constraint), tokens)
         [Keyword(Right), Keyword(Outer), Keyword(Join), .. tokens] =>
-          (JoinOperator::RightOuter(_), tokens)
+          (constraint => JoinOperator::RightOuter(constraint), tokens)
         [Keyword(Full), Keyword(Join), .. tokens] =>
-          (JoinOperator::Full(_), tokens)
+          (constraint => JoinOperator::Full(constraint), tokens)
         [Keyword(Full), Keyword(Outer), Keyword(Join), .. tokens] =>
-          (JoinOperator::FullOuter(_), tokens)
+          (constraint => JoinOperator::FullOuter(constraint), tokens)
         [Keyword(Inner), Keyword(Join), .. tokens] =>
-          (JoinOperator::Inner(_), tokens)
+          (constraint => JoinOperator::Inner(constraint), tokens)
         _ =>
           raise UnexpectedTokenMessageError(
             tokens[0],
@@ -936,10 +941,10 @@ fn Parser::parse_primary_datetime_field(
     [keyword, .. tokens] if datetime_unit_from_keyword(keyword) is Some(field) => {
       let (precision, tokens) = match tokens {
         [LParen, Number(n), RParen, .. tokens] => {
-          let p = @strconv.parse_int(n) catch {
-            StrConvError(e) =>
+          let p = @string.parse_int(n) catch {
+            _ =>
               raise ParserError::InternalBug(
-                "parse_primary_datetime_field: \{e}",
+                "parse_primary_datetime_field: invalid precision \{n}",
               )
           }
           (Some(p), tokens)
@@ -1809,8 +1814,8 @@ fn Parser::parse_top(
 ) -> ParserResult[Top?] raise ParserError {
   match tokens {
     [Keyword(Top), Number(n), .. tokens] => {
-      let n = @strconv.parse_int(n) catch {
-        StrConvError(e) => raise ParserError::InternalBug("parse_top: \{e}")
+      let n = @string.parse_int(n) catch {
+        _ => raise ParserError::InternalBug("parse_top: invalid TOP value \{n}")
       }
       (Some(Constant(n)), tokens)
     }
