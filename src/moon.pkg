@@ -1,4 +1,5 @@
 import {
   "Yoorkin/prettyprinter" @pp,
+  "moonbitlang/core/debug",
   "moonbitlang/core/string",
 }

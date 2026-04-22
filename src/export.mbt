@@ -2,7 +2,7 @@
 pub suberror SqlParserError {
   LexerError(LexerError)
   ParserError(ParserError)
-} derive(Show)
+} derive(Debug)
 
 ///|
 pub fn parse_sql(

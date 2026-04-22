@@ -2,7 +2,7 @@
 suberror LexerError {
   UnterminatedString
   UnknownCharacter(Char)
-} derive(Show)
+} derive(Debug)
 
 ///|
 pub(all) enum Token {
@@ -44,7 +44,7 @@ pub(all) enum Token {
   JsonContainedIn // <@
   Unknown(Char)
   Eof
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 priv struct Lexer {
