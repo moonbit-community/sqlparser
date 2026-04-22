@@ -83,12 +83,12 @@ fn Parser::parse_privilege_list(
   // Parse additional privileges separated by commas
   let tokens = for tokens = tokens {
     match tokens {
-    [Comma, .. rest_tokens] => {
-      let (privilege, tokens) = self.parse_privilege(rest_tokens)
-      privileges.push(privilege)
-      continue tokens
-    }
-    tokens => break tokens
+      [Comma, .. rest_tokens] => {
+        let (privilege, tokens) = self.parse_privilege(rest_tokens)
+        privileges.push(privilege)
+        continue tokens
+      }
+      tokens => break tokens
     }
   }
   (privileges, tokens)
@@ -150,20 +150,20 @@ fn Parser::parse_optional_column_list(
       let columns = []
       let tokens = for tokens = tokens {
         match tokens {
-        [Identifier(col), Comma, .. tokens] => {
-          columns.push(col)
-          continue tokens
-        }
-        [Identifier(col), RParen, .. tokens] => {
-          columns.push(col)
-          break tokens
-        }
-        [token, .. _tokens] =>
-          raise UnexpectedTokenMessageError(token, "expected column name")
-        [] =>
-          raise InternalBug(
-            "parse_optional_column_list: unexpected end of tokens",
-          )
+          [Identifier(col), Comma, .. tokens] => {
+            columns.push(col)
+            continue tokens
+          }
+          [Identifier(col), RParen, .. tokens] => {
+            columns.push(col)
+            break tokens
+          }
+          [token, .. _tokens] =>
+            raise UnexpectedTokenMessageError(token, "expected column name")
+          [] =>
+            raise InternalBug(
+              "parse_optional_column_list: unexpected end of tokens",
+            )
         }
       }
       (Some(columns), tokens)
@@ -186,12 +186,12 @@ fn Parser::parse_object_name_list(
   // Parse additional object names separated by commas
   let tokens = for tokens = tokens {
     match tokens {
-    [Comma, .. rest_tokens] => {
-      let (obj_name, tokens) = self.parse_object_name(rest_tokens)
-      objects.push(obj_name)
-      continue tokens
-    }
-    tokens => break tokens
+      [Comma, .. rest_tokens] => {
+        let (obj_name, tokens) = self.parse_object_name(rest_tokens)
+        objects.push(obj_name)
+        continue tokens
+      }
+      tokens => break tokens
     }
   }
   (objects, tokens)
@@ -217,21 +217,23 @@ fn Parser::parse_grantee_list(
   // Parse additional grantees separated by commas
   let tokens = for tokens = tokens {
     match tokens {
-    [Comma, .. rest_tokens] => {
-      let (grantee, tokens) = match rest_tokens {
-        [Identifier(name), .. tokens] => (name, tokens)
-        [StringLiteral(name), .. tokens] => (name, tokens)
-        [token, .. _tokens] =>
-          raise UnexpectedTokenMessageError(token, "expected user or role name")
-        [] =>
-          raise InternalBug(
-            "parse_grantee_list: unexpected end of tokens after comma",
-          )
+      [Comma, .. rest_tokens] => {
+        let (grantee, tokens) = match rest_tokens {
+          [Identifier(name), .. tokens] => (name, tokens)
+          [StringLiteral(name), .. tokens] => (name, tokens)
+          [token, .. _tokens] =>
+            raise UnexpectedTokenMessageError(
+              token, "expected user or role name",
+            )
+          [] =>
+            raise InternalBug(
+              "parse_grantee_list: unexpected end of tokens after comma",
+            )
+        }
+        grantees.push(grantee)
+        continue tokens
       }
-      grantees.push(grantee)
-      continue tokens
-    }
-    tokens => break tokens
+      tokens => break tokens
     }
   }
   (grantees, tokens)
