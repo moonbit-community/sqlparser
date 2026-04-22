@@ -126,7 +126,8 @@ fn Parser::parse_aliasing(
       let columns = []
       let tokens = match tokens {
         [LParen, .. tokens] =>
-          loop tokens {
+          for tokens = tokens {
+            match tokens {
             [Identifier(col_name), Comma, .. tokens] => {
               columns.push(col_name)
               continue tokens
@@ -143,6 +144,7 @@ fn Parser::parse_aliasing(
               raise ParserError::InternalBug(
                 "parse_aliasing: unexpected end of tokens",
               )
+            }
           }
         tokens => tokens
       }
@@ -161,7 +163,8 @@ fn Parser::parse_projections(
   if tokens is [Keyword(From), ..] {
     return (projections, tokens)
   }
-  loop tokens {
+  for tokens = tokens {
+    match tokens {
     [Mul, .. tokens] => {
       projections.push(Projection::Wildcard)
       match tokens {
@@ -186,6 +189,7 @@ fn Parser::parse_projections(
         [Comma, .. tokens] => continue tokens
         _ => break (projections, tokens)
       }
+    }
     }
   }
 }
@@ -382,7 +386,8 @@ fn Parser::parse_primary_expr(
         [Keyword(All), .. tokens] => (Some(DuplicateTreatment::All), tokens)
         tokens => (None, tokens)
       }
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         [RParen, .. tokens] => break tokens
         tokens => {
           let (arg, tokens) = self.parse_expr(tokens)
@@ -396,6 +401,7 @@ fn Parser::parse_primary_expr(
                 "expected ',' or ')'",
               )
           }
+        }
         }
       }
       // Parse optional FILTER clause
@@ -423,7 +429,8 @@ fn Parser::parse_primary_expr(
     }
     [Identifier(name), Period, .. tokens] => {
       let parts = [name]
-      loop tokens {
+      for tokens = tokens {
+        match tokens {
         [Identifier(part), Period, .. tokens] => {
           parts.push(part)
           continue tokens
@@ -440,6 +447,7 @@ fn Parser::parse_primary_expr(
           raise ParserError::InternalBug(
             "parse_primary_expr: unexpected end of tokens",
           )
+        }
       }
     }
     [Identifier(name), .. tokens] => (Identifier(name), tokens)
@@ -506,7 +514,8 @@ fn Parser::parse_postfix_expr(
   let remaining_tokens = tokens
 
   // Parse multiple postfix operations in sequence  
-  loop remaining_tokens {
+  for remaining_tokens = remaining_tokens {
+    match remaining_tokens {
     // Array/object indexing: expr[index] or expr[start:end]
     [LBracket, .. rest_tokens] => {
       let (subscript, next_tokens) = self.parse_subscript(rest_tokens)
@@ -522,6 +531,7 @@ fn Parser::parse_postfix_expr(
     }
     // No more postfix operations
     final_tokens => break (current_expr, final_tokens)
+    }
   }
 }
 
@@ -609,7 +619,8 @@ fn Parser::parse_table_refs(
 ) -> ParserResult[Array[TableRef]] raise ParserError {
   let tokens = self.expect_token(tokens, Keyword(From))
   let table_refs = []
-  loop tokens {
+  for tokens = tokens {
+    match tokens {
     tokens => {
       let (table_ref, tokens) = self.parse_table_ref(tokens)
       table_refs.push(table_ref)
@@ -617,6 +628,7 @@ fn Parser::parse_table_refs(
         [Comma, .. tokens] => continue tokens
         tokens => break (table_refs, tokens)
       }
+    }
     }
   }
 }
@@ -628,7 +640,8 @@ fn Parser::parse_table_ref(
 ) -> ParserResult[TableRef] raise ParserError {
   let (factor, tokens) = self.parse_table_factor(tokens)
   let joins = []
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     tokens if tokens[0] is Keyword(Join) ||
       tokens[0] is Keyword(Left) ||
       tokens[0] is Keyword(Right) ||
@@ -671,7 +684,8 @@ fn Parser::parse_table_ref(
           let columns = []
           let tokens = match tokens {
             [LParen, .. tokens] =>
-              loop tokens {
+              for tokens = tokens {
+                match tokens {
                 [Identifier(col_name), Comma, .. tokens] => {
                   columns.push(col_name)
                   continue tokens
@@ -688,6 +702,7 @@ fn Parser::parse_table_ref(
                   raise ParserError::InternalBug(
                     "parse_table_ref: unexpected end of tokens",
                   )
+                }
               }
             [token, .. _tokens] =>
               raise UnexpectedTokenMessageError(
@@ -716,6 +731,7 @@ fn Parser::parse_table_ref(
       continue tokens
     }
     tokens => break tokens
+    }
   }
   ({ factor, joins }, tokens)
 }
@@ -760,7 +776,8 @@ fn Parser::parse_group_by(
   tokens : ArrayView[Token],
 ) -> ParserResult[Array[Expr]] raise ParserError {
   let group_by = []
-  loop tokens {
+  for tokens = tokens {
+    match tokens {
     tokens => {
       let (expr, tokens) = self.parse_expr(tokens)
       group_by.push(expr)
@@ -768,6 +785,7 @@ fn Parser::parse_group_by(
         [Comma, .. tokens] => continue tokens
         _ => break (group_by, tokens)
       }
+    }
     }
   }
 }
@@ -778,7 +796,8 @@ fn Parser::parse_order_by(
   tokens : ArrayView[Token],
 ) -> ParserResult[Array[OrderByExpr]] raise ParserError {
   let order_by = []
-  loop tokens {
+  for tokens = tokens {
+    match tokens {
     tokens => {
       let (order_by_expr, tokens) = self.parse_order_by_expr(tokens)
       order_by.push(order_by_expr)
@@ -786,6 +805,7 @@ fn Parser::parse_order_by(
         [Comma, .. tokens] => continue tokens
         _ => break (order_by, tokens)
       }
+    }
     }
   }
 }
@@ -884,7 +904,8 @@ fn Parser::parse_case_expr(
       (Some(expr), tokens)
     }
   }
-  loop tokens {
+  for tokens = tokens {
+    match tokens {
     [Keyword(When), .. tokens] => {
       let (condition, tokens) = self.parse_expr(tokens)
       let tokens = self.expect_token(tokens, Keyword(Then))
@@ -912,6 +933,7 @@ fn Parser::parse_case_expr(
       raise ParserError::InternalBug(
         "parse_case_expr: unexpected end of tokens",
       )
+    }
   }
 }
 
@@ -1003,7 +1025,8 @@ fn Parser::parse_in_expr(
   try self.parse_query(tokens) catch {
     _ => {
       let items = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         tokens => {
           let (item, tokens) = self.parse_expr(tokens)
           items.push(item)
@@ -1017,6 +1040,7 @@ fn Parser::parse_in_expr(
                 "parse_in_expr: unexpected end of tokens",
               )
           }
+        }
         }
       }
       (Expr::InList(positive~, left, items), tokens)
@@ -1092,7 +1116,8 @@ fn Parser::parse_array_expr(
 ) -> ParserResult[Expr] raise ParserError {
   let tokens = self.expect_token(tokens, LBracket)
   let elements = []
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [RBracket, .. tokens] => break tokens
     tokens => {
       let (expr, tokens) = self.parse_expr(tokens)
@@ -1107,6 +1132,7 @@ fn Parser::parse_array_expr(
             "parse_array_expr: unexpected end of tokens",
           )
       }
+    }
     }
   }
   (Array(ArrayExpr::{ elem: elements, named }), tokens)
@@ -1743,7 +1769,8 @@ fn Parser::parse_object_name(
   tokens : ArrayView[Token],
 ) -> ParserResult[ObjectName] raise ParserError {
   let parts = []
-  loop tokens {
+  for tokens = tokens {
+    match tokens {
     [Identifier(part) | StringLiteral(part), Period, .. tokens] => {
       parts.push(part)
       continue tokens
@@ -1760,6 +1787,7 @@ fn Parser::parse_object_name(
       raise ParserError::InternalBug(
         "parse_object_name: unexpected end of tokens",
       )
+    }
   }
 }
 
@@ -1871,7 +1899,8 @@ fn Parser::parse_insert_statement(
   let (columns, tokens) = match tokens {
     [LParen, .. tokens] => {
       let columns = []
-      loop tokens {
+      for tokens = tokens {
+        match tokens {
         [Identifier(col), Comma, .. tokens] => {
           columns.push(col)
           continue tokens
@@ -1895,6 +1924,7 @@ fn Parser::parse_insert_statement(
           )
         [] =>
           raise InternalBug("parse_insert_statement: unexpected end of tokens")
+        }
       }
     }
     _ => ([], tokens)
@@ -1904,10 +1934,12 @@ fn Parser::parse_insert_statement(
   let (source, tokens) = match tokens {
     [Keyword(Values), .. tokens] => {
       let rows = []
-      loop tokens {
+      for tokens = tokens {
+        match tokens {
         [LParen, .. tokens] => {
           let row = []
-          let tokens = loop tokens {
+          let tokens = for tokens = tokens {
+            match tokens {
             [RParen, .. tokens] => break tokens
             tokens => {
               let (expr, tokens) = self.parse_expr(tokens)
@@ -1925,6 +1957,7 @@ fn Parser::parse_insert_statement(
                   )
               }
             }
+            }
           }
           rows.push(row)
           match tokens {
@@ -1936,6 +1969,7 @@ fn Parser::parse_insert_statement(
           raise UnexpectedTokenMessageError(token, "expected '(' after VALUES")
         [] =>
           raise InternalBug("parse_insert_statement: unexpected end of tokens")
+        }
       }
     }
     [Keyword(Select), .. _tokens] => {
@@ -2145,7 +2179,8 @@ fn Parser::parse_update_statement(
 
   // Parse assignments: col1 = expr1, col2 = expr2, ...
   let assignments = []
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [Identifier(column), Eq, .. tokens] => {
       let (value, tokens) = self.parse_expr(tokens)
       assignments.push({ column, value })
@@ -2157,6 +2192,7 @@ fn Parser::parse_update_statement(
     [token, .. _tokens] =>
       raise UnexpectedTokenMessageError(token, "expected column assignment")
     [] => raise InternalBug("parse_update_statement: unexpected end of tokens")
+    }
   }
 
   // Parse optional WHERE clause
@@ -2227,7 +2263,8 @@ fn Parser::parse_cte_list(
   tokens : ArrayView[Token],
 ) -> ParserResult[Array[Cte]] raise ParserError {
   let ctes = []
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     tokens => {
       let (cte, tokens) = self.parse_cte(tokens)
       ctes.push(cte)
@@ -2235,6 +2272,7 @@ fn Parser::parse_cte_list(
         [Comma, .. tokens] => continue tokens
         tokens => break tokens
       }
+    }
     }
   }
   (ctes, tokens)
@@ -2257,7 +2295,8 @@ fn Parser::parse_cte(
   let (columns, tokens) = match tokens {
     [LParen, .. tokens] => {
       let cols = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         [RParen, .. tokens] => break tokens
         [Identifier(col), .. tokens] => {
           cols.push(col)
@@ -2278,6 +2317,7 @@ fn Parser::parse_cte(
           raise ParserError::InternalBug(
             "parse_cte: unexpected end of tokens in column list",
           )
+        }
       }
       (Some(cols), tokens)
     }
@@ -2304,7 +2344,8 @@ fn Parser::parse_window_spec(
   let (partition_by, tokens) = match tokens {
     [Keyword(Partition), Keyword(By), .. tokens] => {
       let exprs = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         tokens => {
           let (expr, tokens) = self.parse_expr(tokens)
           exprs.push(expr)
@@ -2312,6 +2353,7 @@ fn Parser::parse_window_spec(
             [Comma, .. tokens] => continue tokens
             _ => break tokens
           }
+        }
         }
       }
       (exprs, tokens)
@@ -2323,7 +2365,8 @@ fn Parser::parse_window_spec(
   let (order_by, tokens) = match tokens {
     [Keyword(Order), Keyword(By), .. tokens] => {
       let order_exprs = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         tokens => {
           let (order_expr, tokens) = self.parse_order_by_expr(tokens)
           order_exprs.push(order_expr)
@@ -2331,6 +2374,7 @@ fn Parser::parse_window_spec(
             [Comma, .. tokens] => continue tokens
             _ => break tokens
           }
+        }
         }
       }
       (order_exprs, tokens)
@@ -2751,13 +2795,15 @@ fn Parser::parse_merge_statement(
 
   // Parse WHEN clauses
   let when_clauses = []
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [Keyword(When), .. rest_tokens] => {
       let (when_clause, rest_tokens) = self.parse_merge_when_clause(rest_tokens)
       when_clauses.push(when_clause)
       continue rest_tokens
     }
     rest_tokens => break rest_tokens
+    }
   }
   (
     {
@@ -2818,7 +2864,8 @@ fn Parser::parse_merge_action(
       let (columns, tokens) = match tokens {
         [Token::LParen, .. tokens] => {
           let columns = []
-          let tokens = loop tokens {
+          let tokens = for tokens = tokens {
+            match tokens {
             [Token::Identifier(col), Token::Comma, .. tokens] => {
               columns.push(col)
               continue tokens
@@ -2833,6 +2880,7 @@ fn Parser::parse_merge_action(
               raise ParserError::InternalBug(
                 "parse_merge_action: unexpected end of tokens",
               )
+            }
           }
           (columns, tokens)
         }
@@ -2849,7 +2897,8 @@ fn Parser::parse_merge_action(
     [Keyword(Update), Keyword(Set), .. tokens] => {
       // Parse assignments: col1 = expr1, col2 = expr2, ...
       let assignments = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         [Identifier(column), Eq, .. tokens] => {
           let (value, tokens) = self.parse_expr(tokens)
           assignments.push({ column, value })
@@ -2864,6 +2913,7 @@ fn Parser::parse_merge_action(
           raise ParserError::InternalBug(
             "parse_merge_action: unexpected end of tokens",
           )
+        }
       }
       (MergeAction::Update(assignments), tokens)
     }
