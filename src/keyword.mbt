@@ -220,4 +220,4 @@ pub(all) enum Keyword {
   Cycle
   Owned
   No
-} derive(Eq, Show)
+} derive(Eq, Debug)

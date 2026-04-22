@@ -6,7 +6,7 @@ suberror ParserError {
   UnimplementedError(String)
   InternalBug(String)
   InvalidDataTypeError(String)
-} derive(Show)
+} derive(Debug)
 
 ///|
 type ParserResult[T] = (T, ArrayView[Token])
