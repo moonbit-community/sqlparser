@@ -48,13 +48,13 @@ pub fn parse(
   let statements = []
   for tokens = tokens {
     match tokens {
-    [Token::Eof] => break
-    [] => break
-    tokens => {
-      let (stmt, tokens) = parser.parse_statement(tokens)
-      statements.push(stmt)
-      continue tokens
-    }
+      [Token::Eof] => break
+      [] => break
+      tokens => {
+        let (stmt, tokens) = parser.parse_statement(tokens)
+        statements.push(stmt)
+        continue tokens
+      }
     }
   }
   statements
@@ -368,23 +368,23 @@ fn Parser::parse_set_assignments(
   // Parse additional assignments
   for tokens = tokens {
     match tokens {
-    [Comma, .. rest] => {
-      let (variable, remaining_tokens) = match rest {
-        [Identifier(name), .. remaining] => (name, remaining)
-        [Token::Placeholder(name), .. remaining] => (name, remaining) // Support @variable syntax
-        [token, ..] =>
-          raise UnexpectedTokenMessageError(token, "expected variable name")
-        [] =>
-          raise InternalBug(
-            "parse_set_assignments: unexpected end of tokens after comma",
-          )
+      [Comma, .. rest] => {
+        let (variable, remaining_tokens) = match rest {
+          [Identifier(name), .. remaining] => (name, remaining)
+          [Token::Placeholder(name), .. remaining] => (name, remaining) // Support @variable syntax
+          [token, ..] =>
+            raise UnexpectedTokenMessageError(token, "expected variable name")
+          [] =>
+            raise InternalBug(
+              "parse_set_assignments: unexpected end of tokens after comma",
+            )
+        }
+        let remaining_tokens = self.expect_token(remaining_tokens, Eq)
+        let (value, remaining_tokens) = self.parse_expr(remaining_tokens)
+        assignments.push({ variable, value })
+        continue remaining_tokens
       }
-      let remaining_tokens = self.expect_token(remaining_tokens, Eq)
-      let (value, remaining_tokens) = self.parse_expr(remaining_tokens)
-      assignments.push({ variable, value })
-      continue remaining_tokens
-    }
-    tokens => break (assignments, tokens)
+      tokens => break (assignments, tokens)
     }
   }
 }
@@ -406,20 +406,22 @@ fn Parser::parse_replace_statement(
       let columns = []
       let tokens = for tokens = tokens {
         match tokens {
-        [Identifier(col), Comma, .. tokens] => {
-          columns.push(col)
-          continue tokens
-        }
-        [Identifier(col), RParen, .. tokens] => {
-          columns.push(col)
-          break tokens
-        }
-        [token, .. _tokens] =>
-          raise UnexpectedTokenMessageError(
-            token, "expected column name in REPLACE column list",
-          )
-        [] =>
-          raise InternalBug("parse_replace_statement: unexpected end of tokens")
+          [Identifier(col), Comma, .. tokens] => {
+            columns.push(col)
+            continue tokens
+          }
+          [Identifier(col), RParen, .. tokens] => {
+            columns.push(col)
+            break tokens
+          }
+          [token, .. _tokens] =>
+            raise UnexpectedTokenMessageError(
+              token, "expected column name in REPLACE column list",
+            )
+          [] =>
+            raise InternalBug(
+              "parse_replace_statement: unexpected end of tokens",
+            )
         }
       }
       (columns, tokens)
@@ -433,16 +435,16 @@ fn Parser::parse_replace_statement(
       let values = []
       let tokens = for tokens = tokens {
         match tokens {
-        [LParen, .. tokens] => {
-          let (exprs, tokens) = self.parse_comma_separated_exprs(tokens)
-          let tokens = self.expect_token(tokens, RParen)
-          values.push(exprs)
-          match tokens {
-            [Comma, .. tokens] => continue tokens
-            tokens => break tokens
+          [LParen, .. tokens] => {
+            let (exprs, tokens) = self.parse_comma_separated_exprs(tokens)
+            let tokens = self.expect_token(tokens, RParen)
+            values.push(exprs)
+            match tokens {
+              [Comma, .. tokens] => continue tokens
+              tokens => break tokens
+            }
           }
-        }
-        tokens => break tokens
+          tokens => break tokens
         }
       }
       (InsertSource::Values(values), tokens)
@@ -499,22 +501,22 @@ fn Parser::parse_copy_statement(
           let columns = []
           let tokens = for tokens = tokens {
             match tokens {
-            [Identifier(col), Comma, .. tokens] => {
-              columns.push(col)
-              continue tokens
-            }
-            [Identifier(col), RParen, .. tokens] => {
-              columns.push(col)
-              break tokens
-            }
-            [token, .. _tokens] =>
-              raise UnexpectedTokenMessageError(
-                token, "expected column name in COPY column list",
-              )
-            [] =>
-              raise InternalBug(
-                "parse_copy_statement: unexpected end of tokens in column list",
-              )
+              [Identifier(col), Comma, .. tokens] => {
+                columns.push(col)
+                continue tokens
+              }
+              [Identifier(col), RParen, .. tokens] => {
+                columns.push(col)
+                break tokens
+              }
+              [token, .. _tokens] =>
+                raise UnexpectedTokenMessageError(
+                  token, "expected column name in COPY column list",
+                )
+              [] =>
+                raise InternalBug(
+                  "parse_copy_statement: unexpected end of tokens in column list",
+                )
             }
           }
           (Some(columns), tokens)
@@ -572,167 +574,171 @@ fn Parser::parse_copy_options(
   let options = []
   let tokens = for tokens = tokens {
     match tokens {
-    [RParen, .. tokens] => break tokens
-    [Keyword(Format), Identifier("csv"), .. tokens] => {
-      options.push(CopyOption::Format(CopyFormat::Csv))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
-      }
-    }
-    [Keyword(Format), Identifier("text"), .. tokens] => {
-      options.push(CopyOption::Format(CopyFormat::Text))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
-      }
-    }
-    [Keyword(Format), Identifier("binary"), .. tokens] => {
-      options.push(CopyOption::Format(CopyFormat::Binary))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
-      }
-    }
-    [Identifier("delimiter"), StringLiteral(delim), .. tokens] => {
-      options.push(CopyOption::Delimiter(delim))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
-      }
-    }
-    [Identifier("quote"), StringLiteral(quote_char), .. tokens] => {
-      options.push(CopyOption::Quote(quote_char))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
-      }
-    }
-    [Identifier("escape"), StringLiteral(escape_char), .. tokens] => {
-      options.push(CopyOption::Escape(escape_char))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
-      }
-    }
-    [Keyword(Null), StringLiteral(null_str), .. tokens] => {
-      options.push(CopyOption::Null(null_str))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
-      }
-    }
-    [Keyword(Header), Boolean(value), .. tokens] => {
-      options.push(CopyOption::Header(Some(value)))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
-      }
-    }
-    [Keyword(Header), .. tokens] => {
-      options.push(CopyOption::Header(None))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
-      }
-    }
-    [Keyword(ForceQuote), Mul, .. tokens] => {
-      options.push(CopyOption::ForceQuote(CopyForceQuote::All))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
-      }
-    }
-    [Keyword(ForceQuote), LParen, .. tokens] => {
-      let columns = []
-      let tokens = for tokens = tokens {
+      [RParen, .. tokens] => break tokens
+      [Keyword(Format), Identifier("csv"), .. tokens] => {
+        options.push(CopyOption::Format(CopyFormat::Csv))
         match tokens {
-        [Identifier(col), Comma, .. tokens] => {
-          columns.push(col)
-          continue tokens
-        }
-        [Identifier(col), RParen, .. tokens] => {
-          columns.push(col)
-          break tokens
-        }
-        [token, .. _tokens] =>
-          raise UnexpectedTokenMessageError(
-            token, "expected column name in FORCE_QUOTE",
-          )
-        [] =>
-          raise InternalBug("parse_copy_options: unexpected end in FORCE_QUOTE")
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
         }
       }
-      options.push(CopyOption::ForceQuote(CopyForceQuote::Columns(columns)))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
-      }
-    }
-    [Keyword(ForceNotNull), LParen, .. tokens] => {
-      let columns = []
-      let tokens = for tokens = tokens {
+      [Keyword(Format), Identifier("text"), .. tokens] => {
+        options.push(CopyOption::Format(CopyFormat::Text))
         match tokens {
-        [Identifier(col), Comma, .. tokens] => {
-          columns.push(col)
-          continue tokens
-        }
-        [Identifier(col), RParen, .. tokens] => {
-          columns.push(col)
-          break tokens
-        }
-        [token, .. _tokens] =>
-          raise UnexpectedTokenMessageError(
-            token, "expected column name in FORCE_NOT_NULL",
-          )
-        [] =>
-          raise InternalBug(
-            "parse_copy_options: unexpected end in FORCE_NOT_NULL",
-          )
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
         }
       }
-      options.push(CopyOption::ForceNotNull(columns))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
-      }
-    }
-    [Keyword(ForceNull), LParen, .. tokens] => {
-      let columns = []
-      let tokens = for tokens = tokens {
+      [Keyword(Format), Identifier("binary"), .. tokens] => {
+        options.push(CopyOption::Format(CopyFormat::Binary))
         match tokens {
-        [Identifier(col), Comma, .. tokens] => {
-          columns.push(col)
-          continue tokens
-        }
-        [Identifier(col), RParen, .. tokens] => {
-          columns.push(col)
-          break tokens
-        }
-        [token, .. _tokens] =>
-          raise UnexpectedTokenMessageError(
-            token, "expected column name in FORCE_NULL",
-          )
-        [] =>
-          raise InternalBug("parse_copy_options: unexpected end in FORCE_NULL")
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
         }
       }
-      options.push(CopyOption::ForceNull(columns))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
+      [Identifier("delimiter"), StringLiteral(delim), .. tokens] => {
+        options.push(CopyOption::Delimiter(delim))
+        match tokens {
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
+        }
       }
-    }
-    [Keyword(Encoding), StringLiteral(encoding), .. tokens] => {
-      options.push(CopyOption::Encoding(encoding))
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => continue tokens
+      [Identifier("quote"), StringLiteral(quote_char), .. tokens] => {
+        options.push(CopyOption::Quote(quote_char))
+        match tokens {
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
+        }
       }
-    }
-    [token, .. _tokens] =>
-      raise UnexpectedTokenMessageError(token, "expected COPY option")
-    [] => raise InternalBug("parse_copy_options: unexpected end of tokens")
+      [Identifier("escape"), StringLiteral(escape_char), .. tokens] => {
+        options.push(CopyOption::Escape(escape_char))
+        match tokens {
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
+        }
+      }
+      [Keyword(Null), StringLiteral(null_str), .. tokens] => {
+        options.push(CopyOption::Null(null_str))
+        match tokens {
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
+        }
+      }
+      [Keyword(Header), Boolean(value), .. tokens] => {
+        options.push(CopyOption::Header(Some(value)))
+        match tokens {
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
+        }
+      }
+      [Keyword(Header), .. tokens] => {
+        options.push(CopyOption::Header(None))
+        match tokens {
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
+        }
+      }
+      [Keyword(ForceQuote), Mul, .. tokens] => {
+        options.push(CopyOption::ForceQuote(CopyForceQuote::All))
+        match tokens {
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
+        }
+      }
+      [Keyword(ForceQuote), LParen, .. tokens] => {
+        let columns = []
+        let tokens = for tokens = tokens {
+          match tokens {
+            [Identifier(col), Comma, .. tokens] => {
+              columns.push(col)
+              continue tokens
+            }
+            [Identifier(col), RParen, .. tokens] => {
+              columns.push(col)
+              break tokens
+            }
+            [token, .. _tokens] =>
+              raise UnexpectedTokenMessageError(
+                token, "expected column name in FORCE_QUOTE",
+              )
+            [] =>
+              raise InternalBug(
+                "parse_copy_options: unexpected end in FORCE_QUOTE",
+              )
+          }
+        }
+        options.push(CopyOption::ForceQuote(CopyForceQuote::Columns(columns)))
+        match tokens {
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
+        }
+      }
+      [Keyword(ForceNotNull), LParen, .. tokens] => {
+        let columns = []
+        let tokens = for tokens = tokens {
+          match tokens {
+            [Identifier(col), Comma, .. tokens] => {
+              columns.push(col)
+              continue tokens
+            }
+            [Identifier(col), RParen, .. tokens] => {
+              columns.push(col)
+              break tokens
+            }
+            [token, .. _tokens] =>
+              raise UnexpectedTokenMessageError(
+                token, "expected column name in FORCE_NOT_NULL",
+              )
+            [] =>
+              raise InternalBug(
+                "parse_copy_options: unexpected end in FORCE_NOT_NULL",
+              )
+          }
+        }
+        options.push(CopyOption::ForceNotNull(columns))
+        match tokens {
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
+        }
+      }
+      [Keyword(ForceNull), LParen, .. tokens] => {
+        let columns = []
+        let tokens = for tokens = tokens {
+          match tokens {
+            [Identifier(col), Comma, .. tokens] => {
+              columns.push(col)
+              continue tokens
+            }
+            [Identifier(col), RParen, .. tokens] => {
+              columns.push(col)
+              break tokens
+            }
+            [token, .. _tokens] =>
+              raise UnexpectedTokenMessageError(
+                token, "expected column name in FORCE_NULL",
+              )
+            [] =>
+              raise InternalBug(
+                "parse_copy_options: unexpected end in FORCE_NULL",
+              )
+          }
+        }
+        options.push(CopyOption::ForceNull(columns))
+        match tokens {
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
+        }
+      }
+      [Keyword(Encoding), StringLiteral(encoding), .. tokens] => {
+        options.push(CopyOption::Encoding(encoding))
+        match tokens {
+          [Comma, .. tokens] => continue tokens
+          _ => continue tokens
+        }
+      }
+      [token, .. _tokens] =>
+        raise UnexpectedTokenMessageError(token, "expected COPY option")
+      [] => raise InternalBug("parse_copy_options: unexpected end of tokens")
     }
   }
   (options, tokens)
@@ -760,12 +766,12 @@ fn Parser::parse_comma_separated_exprs(
   exprs.push(expr)
   let tokens = for tokens = tokens {
     match tokens {
-    [Comma, .. tokens] => {
-      let (expr, tokens) = self.parse_expr(tokens)
-      exprs.push(expr)
-      continue tokens
-    }
-    tokens => break tokens
+      [Comma, .. tokens] => {
+        let (expr, tokens) = self.parse_expr(tokens)
+        exprs.push(expr)
+        continue tokens
+      }
+      tokens => break tokens
     }
   }
   (exprs, tokens)
@@ -944,22 +950,22 @@ fn Parser::parse_duplicate_key_assignments(
   let assignments = []
   let tokens = for tokens = tokens {
     match tokens {
-    [Identifier(column), Eq, .. tokens] => {
-      let (value, tokens) = self.parse_expr(tokens)
-      assignments.push({ column, value })
-      match tokens {
-        [Comma, .. tokens] => continue tokens
-        _ => break tokens
+      [Identifier(column), Eq, .. tokens] => {
+        let (value, tokens) = self.parse_expr(tokens)
+        assignments.push({ column, value })
+        match tokens {
+          [Comma, .. tokens] => continue tokens
+          _ => break tokens
+        }
       }
-    }
-    [token, .. _tokens] =>
-      raise UnexpectedTokenMessageError(
-        token, "expected column assignment in ON DUPLICATE KEY UPDATE",
-      )
-    [] =>
-      raise InternalBug(
-        "parse_duplicate_key_assignments: unexpected end of tokens",
-      )
+      [token, .. _tokens] =>
+        raise UnexpectedTokenMessageError(
+          token, "expected column assignment in ON DUPLICATE KEY UPDATE",
+        )
+      [] =>
+        raise InternalBug(
+          "parse_duplicate_key_assignments: unexpected end of tokens",
+        )
     }
   }
   (assignments, tokens)
@@ -992,20 +998,20 @@ fn Parser::parse_on_conflict_clause(
           }
           let tokens = for tokens = tokens {
             match tokens {
-            [Identifier(col), Comma, .. tokens] => {
-              columns.push(col)
-              continue tokens
-            }
-            [Identifier(col), RParen, .. tokens] => {
-              columns.push(col)
-              break tokens
-            }
-            [token, ..] =>
-              raise UnexpectedTokenMessageError(token, "expected column name")
-            [] =>
-              raise InternalBug(
-                "parse_on_conflict_clause: unexpected end in column list",
-              )
+              [Identifier(col), Comma, .. tokens] => {
+                columns.push(col)
+                continue tokens
+              }
+              [Identifier(col), RParen, .. tokens] => {
+                columns.push(col)
+                break tokens
+              }
+              [token, ..] =>
+                raise UnexpectedTokenMessageError(token, "expected column name")
+              [] =>
+                raise InternalBug(
+                  "parse_on_conflict_clause: unexpected end in column list",
+                )
             }
           }
 
@@ -1192,55 +1198,55 @@ fn Parser::parse_load_data_statement(
       let columns = []
       let tokens = for tokens = tokens {
         match tokens {
-        [Identifier(col), Comma, .. tokens] => {
-          columns.push(col)
-          continue tokens
-        }
-        [Identifier(col), RParen, .. tokens] => {
-          columns.push(col)
-          break tokens
-        }
-        // Allow keywords to be used as column names
-        [Keyword(Date), Comma, .. tokens] => {
-          columns.push("date")
-          continue tokens
-        }
-        [Keyword(Date), RParen, .. tokens] => {
-          columns.push("date")
-          break tokens
-        }
-        [Keyword(Year), Comma, .. tokens] => {
-          columns.push("year")
-          continue tokens
-        }
-        [Keyword(Year), RParen, .. tokens] => {
-          columns.push("year")
-          break tokens
-        }
-        [Keyword(Month), Comma, .. tokens] => {
-          columns.push("month")
-          continue tokens
-        }
-        [Keyword(Month), RParen, .. tokens] => {
-          columns.push("month")
-          break tokens
-        }
-        [Keyword(Day), Comma, .. tokens] => {
-          columns.push("day")
-          continue tokens
-        }
-        [Keyword(Day), RParen, .. tokens] => {
-          columns.push("day")
-          break tokens
-        }
-        [token, ..] =>
-          raise UnexpectedTokenMessageError(
-            token, "expected column name in LOAD DATA column list",
-          )
-        [] =>
-          raise InternalBug(
-            "parse_load_data_statement: unexpected end in column list",
-          )
+          [Identifier(col), Comma, .. tokens] => {
+            columns.push(col)
+            continue tokens
+          }
+          [Identifier(col), RParen, .. tokens] => {
+            columns.push(col)
+            break tokens
+          }
+          // Allow keywords to be used as column names
+          [Keyword(Date), Comma, .. tokens] => {
+            columns.push("date")
+            continue tokens
+          }
+          [Keyword(Date), RParen, .. tokens] => {
+            columns.push("date")
+            break tokens
+          }
+          [Keyword(Year), Comma, .. tokens] => {
+            columns.push("year")
+            continue tokens
+          }
+          [Keyword(Year), RParen, .. tokens] => {
+            columns.push("year")
+            break tokens
+          }
+          [Keyword(Month), Comma, .. tokens] => {
+            columns.push("month")
+            continue tokens
+          }
+          [Keyword(Month), RParen, .. tokens] => {
+            columns.push("month")
+            break tokens
+          }
+          [Keyword(Day), Comma, .. tokens] => {
+            columns.push("day")
+            continue tokens
+          }
+          [Keyword(Day), RParen, .. tokens] => {
+            columns.push("day")
+            break tokens
+          }
+          [token, ..] =>
+            raise UnexpectedTokenMessageError(
+              token, "expected column name in LOAD DATA column list",
+            )
+          [] =>
+            raise InternalBug(
+              "parse_load_data_statement: unexpected end in column list",
+            )
         }
       }
       (Some(columns), tokens)
@@ -1284,31 +1290,31 @@ fn Parser::parse_load_data_fields_options(
   let mut escaped_by = None
   let tokens = for tokens = tokens {
     match tokens {
-    [Keyword(Terminated), Keyword(By), StringLiteral(term), .. tokens] => {
-      terminated_by = Some(term)
-      continue tokens
-    }
-    [
-      Keyword(Optionally),
-      Keyword(Enclosed),
-      Keyword(By),
-      StringLiteral(enc),
-      .. tokens,
-    ] => {
-      enclosed_by = Some(enc)
-      optionally_enclosed = true
-      continue tokens
-    }
-    [Keyword(Enclosed), Keyword(By), StringLiteral(enc), .. tokens] => {
-      enclosed_by = Some(enc)
-      optionally_enclosed = false
-      continue tokens
-    }
-    [Keyword(Escaped), Keyword(By), StringLiteral(esc), .. tokens] => {
-      escaped_by = Some(esc)
-      continue tokens
-    }
-    tokens => break tokens
+      [Keyword(Terminated), Keyword(By), StringLiteral(term), .. tokens] => {
+        terminated_by = Some(term)
+        continue tokens
+      }
+      [
+        Keyword(Optionally),
+        Keyword(Enclosed),
+        Keyword(By),
+        StringLiteral(enc),
+        .. tokens,
+      ] => {
+        enclosed_by = Some(enc)
+        optionally_enclosed = true
+        continue tokens
+      }
+      [Keyword(Enclosed), Keyword(By), StringLiteral(enc), .. tokens] => {
+        enclosed_by = Some(enc)
+        optionally_enclosed = false
+        continue tokens
+      }
+      [Keyword(Escaped), Keyword(By), StringLiteral(esc), .. tokens] => {
+        escaped_by = Some(esc)
+        continue tokens
+      }
+      tokens => break tokens
     }
   }
   ({ terminated_by, enclosed_by, optionally_enclosed, escaped_by }, tokens)
@@ -1323,15 +1329,15 @@ fn Parser::parse_load_data_lines_options(
   let mut terminated_by = None
   let tokens = for tokens = tokens {
     match tokens {
-    [Keyword(Starting), Keyword(By), StringLiteral(start), .. tokens] => {
-      starting_by = Some(start)
-      continue tokens
-    }
-    [Keyword(Terminated), Keyword(By), StringLiteral(term), .. tokens] => {
-      terminated_by = Some(term)
-      continue tokens
-    }
-    tokens => break tokens
+      [Keyword(Starting), Keyword(By), StringLiteral(start), .. tokens] => {
+        starting_by = Some(start)
+        continue tokens
+      }
+      [Keyword(Terminated), Keyword(By), StringLiteral(term), .. tokens] => {
+        terminated_by = Some(term)
+        continue tokens
+      }
+      tokens => break tokens
     }
   }
   ({ starting_by, terminated_by }, tokens)
@@ -1359,20 +1365,20 @@ fn Parser::parse_prepare_statement(
       let data_types = []
       let tokens = for tokens = rest_tokens {
         match tokens {
-        [RParen, .. rest_tokens] => break rest_tokens
-        rest_tokens => {
-          let (data_type, rest_tokens) = self.parse_data_type(rest_tokens)
-          data_types.push(data_type)
-          match rest_tokens {
-            [Comma, .. rest_tokens] => continue rest_tokens
-            [RParen, .. rest_tokens] => break rest_tokens
-            [token, ..] => raise UnexpectedTokenError(token, RParen)
-            [] =>
-              raise ParserError::InternalBug(
-                "parse_prepare_statement: unexpected end of tokens",
-              )
+          [RParen, .. rest_tokens] => break rest_tokens
+          rest_tokens => {
+            let (data_type, rest_tokens) = self.parse_data_type(rest_tokens)
+            data_types.push(data_type)
+            match rest_tokens {
+              [Comma, .. rest_tokens] => continue rest_tokens
+              [RParen, .. rest_tokens] => break rest_tokens
+              [token, ..] => raise UnexpectedTokenError(token, RParen)
+              [] =>
+                raise ParserError::InternalBug(
+                  "parse_prepare_statement: unexpected end of tokens",
+                )
+            }
           }
-        }
         }
       }
       (data_types, tokens)
@@ -1421,20 +1427,20 @@ fn Parser::parse_execute_statement(
       let parameters = []
       let tokens = for tokens = rest_tokens {
         match tokens {
-        [RParen, .. rest_tokens] => break rest_tokens
-        rest_tokens => {
-          let (expr, rest_tokens) = self.parse_expr(rest_tokens)
-          parameters.push(expr)
-          match rest_tokens {
-            [Comma, .. rest_tokens] => continue rest_tokens
-            [RParen, .. rest_tokens] => break rest_tokens
-            [token, ..] => raise UnexpectedTokenError(token, RParen)
-            [] =>
-              raise ParserError::InternalBug(
-                "parse_execute_statement: unexpected end of tokens",
-              )
+          [RParen, .. rest_tokens] => break rest_tokens
+          rest_tokens => {
+            let (expr, rest_tokens) = self.parse_expr(rest_tokens)
+            parameters.push(expr)
+            match rest_tokens {
+              [Comma, .. rest_tokens] => continue rest_tokens
+              [RParen, .. rest_tokens] => break rest_tokens
+              [token, ..] => raise UnexpectedTokenError(token, RParen)
+              [] =>
+                raise ParserError::InternalBug(
+                  "parse_execute_statement: unexpected end of tokens",
+                )
+            }
           }
-        }
         }
       }
       (parameters, true, tokens)
@@ -1455,11 +1461,11 @@ fn Parser::parse_execute_statement(
       }
       let tokens = for tokens = first {
         match tokens {
-        [Comma, Identifier(id), .. tokens] => {
-          into.push(id)
-          continue tokens
-        }
-        tokens => break tokens
+          [Comma, Identifier(id), .. tokens] => {
+            into.push(id)
+            continue tokens
+          }
+          tokens => break tokens
         }
       }
       (into, tokens)
@@ -1475,12 +1481,12 @@ fn Parser::parse_execute_statement(
       using_exprs.push(expr)
       let tokens = for tokens = rest_tokens {
         match tokens {
-        [Comma, .. rest_tokens] => {
-          let (expr, rest_tokens) = self.parse_expr(rest_tokens)
-          using_exprs.push(expr)
-          continue rest_tokens
-        }
-        tokens => break tokens
+          [Comma, .. rest_tokens] => {
+            let (expr, rest_tokens) = self.parse_expr(rest_tokens)
+            using_exprs.push(expr)
+            continue rest_tokens
+          }
+          tokens => break tokens
         }
       }
       (using_exprs, tokens)

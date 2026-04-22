@@ -103,36 +103,36 @@ fn Parser::parse_create_index_statement(
   let columns = []
   let tokens = for tokens = tokens {
     match tokens {
-    [RParen, .. rest_tokens] => break rest_tokens
-    rest_tokens => {
-      let (column_expr, rest_tokens) = self.parse_expr(rest_tokens)
+      [RParen, .. rest_tokens] => break rest_tokens
+      rest_tokens => {
+        let (column_expr, rest_tokens) = self.parse_expr(rest_tokens)
 
-      // Parse optional ASC/DESC
-      let (asc, rest_tokens) = match rest_tokens {
-        [Keyword(Asc), .. rest_tokens] => (Some(true), rest_tokens)
-        [Keyword(Desc), .. rest_tokens] => (Some(false), rest_tokens)
-        _ => (None, rest_tokens)
-      }
+        // Parse optional ASC/DESC
+        let (asc, rest_tokens) = match rest_tokens {
+          [Keyword(Asc), .. rest_tokens] => (Some(true), rest_tokens)
+          [Keyword(Desc), .. rest_tokens] => (Some(false), rest_tokens)
+          _ => (None, rest_tokens)
+        }
 
-      // Parse optional NULLS FIRST/LAST
-      let (nulls_first, rest_tokens) = match rest_tokens {
-        [Keyword(Nulls), Keyword(First), .. rest_tokens] =>
-          (Some(true), rest_tokens)
-        [Keyword(Nulls), Keyword(Last), .. rest_tokens] =>
-          (Some(false), rest_tokens)
-        _ => (None, rest_tokens)
+        // Parse optional NULLS FIRST/LAST
+        let (nulls_first, rest_tokens) = match rest_tokens {
+          [Keyword(Nulls), Keyword(First), .. rest_tokens] =>
+            (Some(true), rest_tokens)
+          [Keyword(Nulls), Keyword(Last), .. rest_tokens] =>
+            (Some(false), rest_tokens)
+          _ => (None, rest_tokens)
+        }
+        columns.push({ name: column_expr, asc, nulls_first })
+        match rest_tokens {
+          [Comma, .. rest_tokens] => continue rest_tokens
+          [RParen, .. rest_tokens] => break rest_tokens
+          [token, ..] => raise UnexpectedTokenError(token, RParen)
+          [] =>
+            raise ParserError::InternalBug(
+              "parse_create_index_statement: unexpected end of tokens",
+            )
+        }
       }
-      columns.push({ name: column_expr, asc, nulls_first })
-      match rest_tokens {
-        [Comma, .. rest_tokens] => continue rest_tokens
-        [RParen, .. rest_tokens] => break rest_tokens
-        [token, ..] => raise UnexpectedTokenError(token, RParen)
-        [] =>
-          raise ParserError::InternalBug(
-            "parse_create_index_statement: unexpected end of tokens",
-          )
-      }
-    }
     }
   }
 
@@ -351,34 +351,36 @@ fn Parser::parse_column_defs(
   let tokens = if tokens is [Token::LParen, .. tokens] {
     for tokens = tokens {
       match tokens {
-      [Identifier(name), .. tokens] => {
-        let (data_type, tokens) = self.parse_data_type(tokens)
-        let (options, tokens) = self.parse_column_def_option(tokens)
-        columns.push({ name, data_type, options })
-        match tokens {
-          [Comma, .. tokens] => continue tokens
-          [RParen, .. tokens] => break tokens
-          [token, ..] =>
-            raise UnexpectedTokenMessageError(
-              token, "expected ',' or ')', found",
-            )
-          [] => raise InternalBug("parse_column_defs: unexpected end of tokens")
+        [Identifier(name), .. tokens] => {
+          let (data_type, tokens) = self.parse_data_type(tokens)
+          let (options, tokens) = self.parse_column_def_option(tokens)
+          columns.push({ name, data_type, options })
+          match tokens {
+            [Comma, .. tokens] => continue tokens
+            [RParen, .. tokens] => break tokens
+            [token, ..] =>
+              raise UnexpectedTokenMessageError(
+                token, "expected ',' or ')', found",
+              )
+            [] =>
+              raise InternalBug("parse_column_defs: unexpected end of tokens")
+          }
+          continue tokens
         }
-        continue tokens
-      }
-      tokens => {
-        let (constraint, tokens) = self.parse_table_constraint(tokens)
-        constraints.push(constraint)
-        match tokens {
-          [Comma, .. tokens] => continue tokens
-          [RParen, .. tokens] => break tokens
-          [token, .. _tokens] =>
-            raise UnexpectedTokenMessageError(
-              token, "expected ',' or ')', found",
-            )
-          [] => raise InternalBug("parse_column_defs: unexpected end of tokens")
+        tokens => {
+          let (constraint, tokens) = self.parse_table_constraint(tokens)
+          constraints.push(constraint)
+          match tokens {
+            [Comma, .. tokens] => continue tokens
+            [RParen, .. tokens] => break tokens
+            [token, .. _tokens] =>
+              raise UnexpectedTokenMessageError(
+                token, "expected ',' or ')', found",
+              )
+            [] =>
+              raise InternalBug("parse_column_defs: unexpected end of tokens")
+          }
         }
-      }
       }
     }
   } else {
@@ -483,24 +485,24 @@ fn Parser::parse_column_def_option(
   let options = []
   let tokens = for tokens = tokens {
     match tokens {
-    [Keyword(Primary), Keyword(Key), .. tokens] => {
-      options.push(ColumnDefOption::PrimaryKey)
-      continue tokens
-    }
-    [Keyword(Unique), .. tokens] => {
-      options.push(ColumnDefOption::Unique)
-      continue tokens
-    }
-    [Keyword(Not), Keyword(Null), .. tokens] => {
-      options.push(NotNull)
-      continue tokens
-    }
-    [Keyword(Default), .. tokens] => {
-      let (expr, tokens) = self.parse_expr(tokens)
-      options.push(Default(expr))
-      continue tokens
-    }
-    tokens => break tokens
+      [Keyword(Primary), Keyword(Key), .. tokens] => {
+        options.push(ColumnDefOption::PrimaryKey)
+        continue tokens
+      }
+      [Keyword(Unique), .. tokens] => {
+        options.push(ColumnDefOption::Unique)
+        continue tokens
+      }
+      [Keyword(Not), Keyword(Null), .. tokens] => {
+        options.push(NotNull)
+        continue tokens
+      }
+      [Keyword(Default), .. tokens] => {
+        let (expr, tokens) = self.parse_expr(tokens)
+        options.push(Default(expr))
+        continue tokens
+      }
+      tokens => break tokens
     }
   }
   (options, tokens)
@@ -538,22 +540,22 @@ fn Parser::parse_create_view_statement(
   let tokens = if tokens is [LParen, .. tokens] {
     for tokens = tokens {
       match tokens {
-      tokens => {
-        let (column, tokens) = self.parse_view_column_def(tokens)
-        columns.push(column)
-        match tokens {
-          [Comma, .. tokens] => continue tokens
-          [RParen, .. tokens] => break tokens
-          [token, .. _tokens] =>
-            raise UnexpectedTokenMessageError(
-              token, "expected ',' or ')', found",
-            )
-          [] =>
-            raise InternalBug(
-              "parse_create_view_statement: unexpected end of tokens",
-            )
+        tokens => {
+          let (column, tokens) = self.parse_view_column_def(tokens)
+          columns.push(column)
+          match tokens {
+            [Comma, .. tokens] => continue tokens
+            [RParen, .. tokens] => break tokens
+            [token, .. _tokens] =>
+              raise UnexpectedTokenMessageError(
+                token, "expected ',' or ')', found",
+              )
+            [] =>
+              raise InternalBug(
+                "parse_create_view_statement: unexpected end of tokens",
+              )
+          }
         }
-      }
       }
     }
   } else {
@@ -694,22 +696,22 @@ fn Parser::parse_foreign_key_constraint(
   let tokens = if tokens is [LParen, .. tokens] {
     for tokens = tokens {
       match tokens {
-      [Identifier(col), Comma, .. tokens] => {
-        foreign_columns.push(col)
-        continue tokens
-      }
-      [Identifier(col), RParen, .. tokens] => {
-        foreign_columns.push(col)
-        break tokens
-      }
-      [token, .. _tokens] =>
-        raise UnexpectedTokenMessageError(
-          token, "expected foreign key column definition",
-        )
-      [] =>
-        raise InternalBug(
-          "parse_foreign_key_constraint: unexpected end of tokens",
-        )
+        [Identifier(col), Comma, .. tokens] => {
+          foreign_columns.push(col)
+          continue tokens
+        }
+        [Identifier(col), RParen, .. tokens] => {
+          foreign_columns.push(col)
+          break tokens
+        }
+        [token, .. _tokens] =>
+          raise UnexpectedTokenMessageError(
+            token, "expected foreign key column definition",
+          )
+        [] =>
+          raise InternalBug(
+            "parse_foreign_key_constraint: unexpected end of tokens",
+          )
       }
     }
   } else {
@@ -1041,23 +1043,23 @@ fn Parser::parse_alter_index_statement(
       let params = []
       let tokens = for tokens = tokens {
         match tokens {
-        [Identifier(param), Comma, .. tokens] => {
-          params.push(param)
-          continue tokens
-        }
-        [Identifier(param), RParen, .. tokens] => {
-          params.push(param)
-          break tokens
-        }
-        [token, ..] =>
-          raise UnexpectedTokenError(
-            token,
-            Token::Identifier("parameter_name".to_string()),
-          )
-        [] =>
-          raise ParserError::InternalBug(
-            "parse_alter_index_statement: unexpected end in RESET parameters",
-          )
+          [Identifier(param), Comma, .. tokens] => {
+            params.push(param)
+            continue tokens
+          }
+          [Identifier(param), RParen, .. tokens] => {
+            params.push(param)
+            break tokens
+          }
+          [token, ..] =>
+            raise UnexpectedTokenError(
+              token,
+              Token::Identifier("parameter_name".to_string()),
+            )
+          [] =>
+            raise ParserError::InternalBug(
+              "parse_alter_index_statement: unexpected end in RESET parameters",
+            )
         }
       }
       (AlterIndexOperation::Reset(params), tokens)
@@ -1066,41 +1068,41 @@ fn Parser::parse_alter_index_statement(
       let params = []
       let tokens = for tokens = tokens {
         match tokens {
-        [Identifier(param_name), Eq, .. tokens] => {
-          let (value, tokens) = match tokens {
-            [Identifier(val), .. tokens] => (val, tokens)
-            [StringLiteral(val), .. tokens] => (val, tokens)
-            [Number(val), .. tokens] => (val, tokens)
-            [token, ..] =>
-              raise UnexpectedTokenError(
-                token,
-                Token::Identifier("parameter_value".to_string()),
-              )
-            [] =>
-              raise ParserError::InternalBug(
-                "parse_alter_index_statement: expected parameter value",
-              )
+          [Identifier(param_name), Eq, .. tokens] => {
+            let (value, tokens) = match tokens {
+              [Identifier(val), .. tokens] => (val, tokens)
+              [StringLiteral(val), .. tokens] => (val, tokens)
+              [Number(val), .. tokens] => (val, tokens)
+              [token, ..] =>
+                raise UnexpectedTokenError(
+                  token,
+                  Token::Identifier("parameter_value".to_string()),
+                )
+              [] =>
+                raise ParserError::InternalBug(
+                  "parse_alter_index_statement: expected parameter value",
+                )
+            }
+            params.push({ name: param_name, value })
+            match tokens {
+              [Comma, .. tokens] => continue tokens
+              [RParen, .. tokens] => break tokens
+              [token, ..] => raise UnexpectedTokenError(token, RParen)
+              [] =>
+                raise ParserError::InternalBug(
+                  "parse_alter_index_statement: unexpected end in SET parameters",
+                )
+            }
           }
-          params.push({ name: param_name, value })
-          match tokens {
-            [Comma, .. tokens] => continue tokens
-            [RParen, .. tokens] => break tokens
-            [token, ..] => raise UnexpectedTokenError(token, RParen)
-            [] =>
-              raise ParserError::InternalBug(
-                "parse_alter_index_statement: unexpected end in SET parameters",
-              )
-          }
-        }
-        [token, ..] =>
-          raise UnexpectedTokenError(
-            token,
-            Token::Identifier("parameter_name".to_string()),
-          )
-        [] =>
-          raise ParserError::InternalBug(
-            "parse_alter_index_statement: unexpected end in SET parameters",
-          )
+          [token, ..] =>
+            raise UnexpectedTokenError(
+              token,
+              Token::Identifier("parameter_name".to_string()),
+            )
+          [] =>
+            raise ParserError::InternalBug(
+              "parse_alter_index_statement: unexpected end in SET parameters",
+            )
         }
       }
       (AlterIndexOperation::Set(params), tokens)
@@ -1441,20 +1443,20 @@ fn Parser::parse_create_function_statement(
   let parameters = []
   let tokens = for tokens = tokens {
     match tokens {
-    [RParen, .. rest_tokens] => break rest_tokens
-    rest_tokens => {
-      let (param, rest_tokens) = self.parse_function_parameter(rest_tokens)
-      parameters.push(param)
-      match rest_tokens {
-        [Comma, .. rest_tokens] => continue rest_tokens
-        [RParen, .. rest_tokens] => break rest_tokens
-        [token, ..] => raise UnexpectedTokenError(token, RParen)
-        [] =>
-          raise ParserError::InternalBug(
-            "parse_create_function_statement: unexpected end of tokens",
-          )
+      [RParen, .. rest_tokens] => break rest_tokens
+      rest_tokens => {
+        let (param, rest_tokens) = self.parse_function_parameter(rest_tokens)
+        parameters.push(param)
+        match rest_tokens {
+          [Comma, .. rest_tokens] => continue rest_tokens
+          [RParen, .. rest_tokens] => break rest_tokens
+          [token, ..] => raise UnexpectedTokenError(token, RParen)
+          [] =>
+            raise ParserError::InternalBug(
+              "parse_create_function_statement: unexpected end of tokens",
+            )
+        }
       }
-    }
     }
   }
 
@@ -1536,20 +1538,20 @@ fn Parser::parse_create_procedure_statement(
   let parameters = []
   let tokens = for tokens = tokens {
     match tokens {
-    [RParen, .. rest_tokens] => break rest_tokens
-    rest_tokens => {
-      let (param, rest_tokens) = self.parse_function_parameter(rest_tokens)
-      parameters.push(param)
-      match rest_tokens {
-        [Comma, .. rest_tokens] => continue rest_tokens
-        [RParen, .. rest_tokens] => break rest_tokens
-        [token, ..] => raise UnexpectedTokenError(token, RParen)
-        [] =>
-          raise ParserError::InternalBug(
-            "parse_create_procedure_statement: unexpected end of tokens",
-          )
+      [RParen, .. rest_tokens] => break rest_tokens
+      rest_tokens => {
+        let (param, rest_tokens) = self.parse_function_parameter(rest_tokens)
+        parameters.push(param)
+        match rest_tokens {
+          [Comma, .. rest_tokens] => continue rest_tokens
+          [RParen, .. rest_tokens] => break rest_tokens
+          [token, ..] => raise UnexpectedTokenError(token, RParen)
+          [] =>
+            raise ParserError::InternalBug(
+              "parse_create_procedure_statement: unexpected end of tokens",
+            )
+        }
       }
-    }
     }
   }
 
@@ -1746,94 +1748,94 @@ fn Parser::parse_create_sequence_statement(
   let mut owned_by = None
   let tokens = for tokens = tokens {
     match tokens {
-    [Keyword(Increment), Keyword(By), Number(inc_str), .. rest_tokens] => {
-      let inc_val = @string.parse_int(inc_str) catch {
-        _ => raise ParserError::InvalidDataTypeError(inc_str)
+      [Keyword(Increment), Keyword(By), Number(inc_str), .. rest_tokens] => {
+        let inc_val = @string.parse_int(inc_str) catch {
+          _ => raise ParserError::InvalidDataTypeError(inc_str)
+        }
+        increment = Some(inc_val)
+        continue rest_tokens
       }
-      increment = Some(inc_val)
-      continue rest_tokens
-    }
-    [Keyword(Increment), Number(inc_str), .. rest_tokens] => {
-      let inc_val = @string.parse_int(inc_str) catch {
-        _ => raise ParserError::InvalidDataTypeError(inc_str)
+      [Keyword(Increment), Number(inc_str), .. rest_tokens] => {
+        let inc_val = @string.parse_int(inc_str) catch {
+          _ => raise ParserError::InvalidDataTypeError(inc_str)
+        }
+        increment = Some(inc_val)
+        continue rest_tokens
       }
-      increment = Some(inc_val)
-      continue rest_tokens
-    }
-    [Keyword(Minvalue), Number(min_str), .. rest_tokens] => {
-      let min_val = @string.parse_int(min_str) catch {
-        _ => raise ParserError::InvalidDataTypeError(min_str)
+      [Keyword(Minvalue), Number(min_str), .. rest_tokens] => {
+        let min_val = @string.parse_int(min_str) catch {
+          _ => raise ParserError::InvalidDataTypeError(min_str)
+        }
+        minvalue = Some(SequenceLimit::Value(min_val))
+        continue rest_tokens
       }
-      minvalue = Some(SequenceLimit::Value(min_val))
-      continue rest_tokens
-    }
-    [Keyword(No), Keyword(Minvalue), .. rest_tokens] => {
-      minvalue = Some(SequenceLimit::NoLimit)
-      continue rest_tokens
-    }
-    [Keyword(Maxvalue), Number(max_str), .. rest_tokens] => {
-      let max_val = @string.parse_int(max_str) catch {
-        _ => raise ParserError::InvalidDataTypeError(max_str)
+      [Keyword(No), Keyword(Minvalue), .. rest_tokens] => {
+        minvalue = Some(SequenceLimit::NoLimit)
+        continue rest_tokens
       }
-      maxvalue = Some(SequenceLimit::Value(max_val))
-      continue rest_tokens
-    }
-    [Keyword(No), Keyword(Maxvalue), .. rest_tokens] => {
-      maxvalue = Some(SequenceLimit::NoLimit)
-      continue rest_tokens
-    }
-    [Keyword(Start), Keyword(With), Number(start_str), .. rest_tokens] => {
-      let start_val = @string.parse_int(start_str) catch {
-        _ => raise ParserError::InvalidDataTypeError(start_str)
+      [Keyword(Maxvalue), Number(max_str), .. rest_tokens] => {
+        let max_val = @string.parse_int(max_str) catch {
+          _ => raise ParserError::InvalidDataTypeError(max_str)
+        }
+        maxvalue = Some(SequenceLimit::Value(max_val))
+        continue rest_tokens
       }
-      start_with = Some(start_val)
-      continue rest_tokens
-    }
-    [Keyword(Start), Number(start_str), .. rest_tokens] => {
-      let start_val = @string.parse_int(start_str) catch {
-        _ => raise ParserError::InvalidDataTypeError(start_str)
+      [Keyword(No), Keyword(Maxvalue), .. rest_tokens] => {
+        maxvalue = Some(SequenceLimit::NoLimit)
+        continue rest_tokens
       }
-      start_with = Some(start_val)
-      continue rest_tokens
-    }
-    [Keyword(Cache), Number(cache_str), .. rest_tokens] => {
-      let cache_val = @string.parse_int(cache_str) catch {
-        _ => raise ParserError::InvalidDataTypeError(cache_str)
+      [Keyword(Start), Keyword(With), Number(start_str), .. rest_tokens] => {
+        let start_val = @string.parse_int(start_str) catch {
+          _ => raise ParserError::InvalidDataTypeError(start_str)
+        }
+        start_with = Some(start_val)
+        continue rest_tokens
       }
-      cache = Some(cache_val)
-      continue rest_tokens
-    }
-    [Keyword(Cycle), .. rest_tokens] => {
-      cycle = Some(true)
-      continue rest_tokens
-    }
-    [Keyword(No), Keyword(Cycle), .. rest_tokens] => {
-      cycle = Some(false)
-      continue rest_tokens
-    }
-    // More specific OWNED BY patterns first
-    [Keyword(Owned), Keyword(By), Identifier("NONE"), .. rest_tokens] => {
-      owned_by = Some(SequenceOwnedBy::ByNone)
-      continue rest_tokens
-    }
-    [Keyword(Owned), Keyword(By), Identifier("none"), .. rest_tokens] => {
-      owned_by = Some(SequenceOwnedBy::ByNone)
-      continue rest_tokens
-    }
-    // General OWNED BY table.column pattern
-    [
-      Keyword(Owned),
-      Keyword(By),
-      Identifier(table_name),
-      Period,
-      Identifier(column_name),
-      .. rest_tokens,
-    ] => {
-      let table_obj = ObjectName::{ parts: [table_name] }
-      owned_by = Some(SequenceOwnedBy::Column(table_obj, column_name))
-      continue rest_tokens
-    }
-    rest_tokens => break rest_tokens
+      [Keyword(Start), Number(start_str), .. rest_tokens] => {
+        let start_val = @string.parse_int(start_str) catch {
+          _ => raise ParserError::InvalidDataTypeError(start_str)
+        }
+        start_with = Some(start_val)
+        continue rest_tokens
+      }
+      [Keyword(Cache), Number(cache_str), .. rest_tokens] => {
+        let cache_val = @string.parse_int(cache_str) catch {
+          _ => raise ParserError::InvalidDataTypeError(cache_str)
+        }
+        cache = Some(cache_val)
+        continue rest_tokens
+      }
+      [Keyword(Cycle), .. rest_tokens] => {
+        cycle = Some(true)
+        continue rest_tokens
+      }
+      [Keyword(No), Keyword(Cycle), .. rest_tokens] => {
+        cycle = Some(false)
+        continue rest_tokens
+      }
+      // More specific OWNED BY patterns first
+      [Keyword(Owned), Keyword(By), Identifier("NONE"), .. rest_tokens] => {
+        owned_by = Some(SequenceOwnedBy::ByNone)
+        continue rest_tokens
+      }
+      [Keyword(Owned), Keyword(By), Identifier("none"), .. rest_tokens] => {
+        owned_by = Some(SequenceOwnedBy::ByNone)
+        continue rest_tokens
+      }
+      // General OWNED BY table.column pattern
+      [
+        Keyword(Owned),
+        Keyword(By),
+        Identifier(table_name),
+        Period,
+        Identifier(column_name),
+        .. rest_tokens,
+      ] => {
+        let table_obj = ObjectName::{ parts: [table_name] }
+        owned_by = Some(SequenceOwnedBy::Column(table_obj, column_name))
+        continue rest_tokens
+      }
+      rest_tokens => break rest_tokens
     }
   }
   (

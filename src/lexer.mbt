@@ -60,12 +60,12 @@ pub fn tokenize(
   let tokens = []
   for input = input[:] {
     match input {
-    [] => break
-    input => {
-      let (token, input) = lexer.next_token(input)
-      tokens.push(token)
-      continue input
-    }
+      [] => break
+      input => {
+        let (token, input) = lexer.next_token(input)
+        tokens.push(token)
+        continue input
+      }
     }
   }
   tokens
@@ -136,8 +136,8 @@ fn Lexer::next_token(
 fn skip_whitespace(input : StringView) -> StringView {
   for input = input {
     match input {
-    [c, .. rest] if c.is_ascii_whitespace() => continue rest
-    input => break input
+      [c, .. rest] if c.is_ascii_whitespace() => continue rest
+      input => break input
     }
   }
 }
@@ -150,8 +150,8 @@ fn read_while(
 ) -> (Int, StringView) {
   for input = input, idx = idx {
     match input {
-    [c, .. rest] if predicate(c) => continue rest, idx + 1
-    rest => break (idx, rest)
+      [c, .. rest] if predicate(c) => continue rest, idx + 1
+      rest => break (idx, rest)
     }
   }
 }
@@ -477,40 +477,40 @@ fn Lexer::read_single_quoted_string(
   let result = StringBuilder::new()
   let rest = for rest = input {
     match rest {
-    [.. "''", .. rest] => {
-      result.write_char('\'')
-      continue rest
-    }
-    ['\'', .. rest] => break rest
-    [.. "\\'", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\'')
-      continue rest
-    }
-    [.. "\\\"", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\"')
-      continue rest
-    }
-    [.. "\\\\", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\\')
-      continue rest
-    }
-    [.. "\\n", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\n')
-      continue rest
-    }
-    [.. "\\t", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\t')
-      continue rest
-    }
-    [.. "\\r", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\r')
-      continue rest
-    }
-    [c, .. rest] => {
-      result.write_char(c)
-      continue rest
-    }
-    [] => raise LexerError::UnterminatedString
+      [.. "''", .. rest] => {
+        result.write_char('\'')
+        continue rest
+      }
+      ['\'', .. rest] => break rest
+      [.. "\\'", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\'')
+        continue rest
+      }
+      [.. "\\\"", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\"')
+        continue rest
+      }
+      [.. "\\\\", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\\')
+        continue rest
+      }
+      [.. "\\n", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\n')
+        continue rest
+      }
+      [.. "\\t", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\t')
+        continue rest
+      }
+      [.. "\\r", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\r')
+        continue rest
+      }
+      [c, .. rest] => {
+        result.write_char(c)
+        continue rest
+      }
+      [] => raise LexerError::UnterminatedString
     }
   }
   (StringLiteral(result.to_string()), rest)
@@ -524,36 +524,36 @@ fn Lexer::read_double_quoted_string(
   let result = StringBuilder::new()
   let rest = for rest = input {
     match rest {
-    [.. "\\\"", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\"')
-      continue rest
-    }
-    [.. "\\'", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\'')
-      continue rest
-    }
-    [.. "\\\\", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\\')
-      continue rest
-    }
-    [.. "\\n", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\n')
-      continue rest
-    }
-    [.. "\\t", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\t')
-      continue rest
-    }
-    [.. "\\r", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\r')
-      continue rest
-    }
-    ['"', .. rest] => break rest
-    [c, .. rest] => {
-      result.write_char(c)
-      continue rest
-    }
-    [] => raise LexerError::UnterminatedString
+      [.. "\\\"", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\"')
+        continue rest
+      }
+      [.. "\\'", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\'')
+        continue rest
+      }
+      [.. "\\\\", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\\')
+        continue rest
+      }
+      [.. "\\n", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\n')
+        continue rest
+      }
+      [.. "\\t", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\t')
+        continue rest
+      }
+      [.. "\\r", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\r')
+        continue rest
+      }
+      ['"', .. rest] => break rest
+      [c, .. rest] => {
+        result.write_char(c)
+        continue rest
+      }
+      [] => raise LexerError::UnterminatedString
     }
   }
   (StringLiteral(result.to_string()), rest)
@@ -567,24 +567,24 @@ fn Lexer::read_backtick_quoted_identifier(
   let result = StringBuilder::new()
   let rest = for rest = input {
     match rest {
-    [.. "``", .. rest] => {
-      result.write_char('`')
-      continue rest
-    }
-    [.. "\\`", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('`')
-      continue rest
-    }
-    [.. "\\\\", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
-      result.write_char('\\')
-      continue rest
-    }
-    ['`', .. rest] => break rest
-    [c, .. rest] => {
-      result.write_char(c)
-      continue rest
-    }
-    [] => raise LexerError::UnterminatedString
+      [.. "``", .. rest] => {
+        result.write_char('`')
+        continue rest
+      }
+      [.. "\\`", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('`')
+        continue rest
+      }
+      [.. "\\\\", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
+        result.write_char('\\')
+        continue rest
+      }
+      ['`', .. rest] => break rest
+      [c, .. rest] => {
+        result.write_char(c)
+        continue rest
+      }
+      [] => raise LexerError::UnterminatedString
     }
   }
   (Identifier(result.to_string()), rest)
@@ -606,9 +606,9 @@ test "Double quoted string" {
 fn skip_line_comment(input : StringView) -> StringView {
   for input = input {
     match input {
-    ['\r' | '\n', .. rest] => break rest
-    [_c, .. rest] => continue rest
-    [] => break []
+      ['\r' | '\n', .. rest] => break rest
+      [_c, .. rest] => continue rest
+      [] => break []
     }
   }
 }
