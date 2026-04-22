@@ -3,6 +3,7 @@ package "moonbit-community/sqlparser"
 
 import {
   "Yoorkin/prettyprinter",
+  "moonbitlang/core/debug",
 }
 
 // Values
@@ -17,14 +18,17 @@ pub fn[T : Show] structural_print(T) -> String
 pub fn tokenize(dialect? : &Dialect, String) -> Array[Token] raise LexerError
 
 // Errors
-type LexerError derive(Show)
+type LexerError derive(@debug.Debug)
+pub impl Show for LexerError
 
-type ParserError derive(Show)
+type ParserError derive(@debug.Debug)
+pub impl Show for ParserError
 
 pub suberror SqlParserError {
   LexerError(LexerError)
   ParserError(ParserError)
-} derive(Show)
+} derive(@debug.Debug)
+pub impl Show for SqlParserError
 
 // Types and methods
 pub(all) struct ANSI {
@@ -34,53 +38,61 @@ pub impl Dialect for ANSI
 pub(all) enum AccessExpr {
   Dot(Expr)
   Subscript(Subscript)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for AccessExpr
+pub impl Show for AccessExpr
 
 pub(all) enum AlterIndexOperation {
   RenameTo(String)
   SetTablespace(String)
   Reset(Array[String])
   Set(Array[IndexParameter])
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for AlterIndexOperation
+pub impl Show for AlterIndexOperation
 
 pub(all) struct AlterIndexStmt {
   name : String
   if_exists : Bool
   operation : AlterIndexOperation
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for AlterIndexStmt
+pub impl Show for AlterIndexStmt
 
 pub(all) enum AlterTableOperation {
   DropColumn(String, Bool)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for AlterTableOperation
+pub impl Show for AlterTableOperation
 
 pub(all) struct AlterTableStmt {
   table_name : ObjectName
   if_exists : Bool
   operation : AlterTableOperation
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for AlterTableStmt
+pub impl Show for AlterTableStmt
 
 pub(all) struct ArrayExpr {
   elem : Array[Expr]
   named : Bool
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ArrayExpr
+pub impl Show for ArrayExpr
 
 pub(all) struct Assignment {
   column : String
   value : Expr
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for Assignment
+pub impl Show for Assignment
 
 pub(all) struct BeginStmt {
   work : Bool
   transaction : Bool
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for BeginStmt
+pub impl Show for BeginStmt
 
 pub(all) struct BigQuery {
 }
@@ -108,16 +120,18 @@ pub(all) enum BinaryOperator {
   JsonExtractPathText
   JsonContains
   JsonContainedIn
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub fn BinaryOperator::get_precedence(Self) -> Precedence
 pub impl @prettyprinter.Pretty for BinaryOperator
+pub impl Show for BinaryOperator
 
 pub(all) struct CaseExpr {
   operand : Expr?
   when_then_clauses : Array[(Expr, Expr)]
   else_expr : Expr?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CaseExpr
+pub impl Show for CaseExpr
 
 pub(all) struct ClickHouse {
 }
@@ -127,54 +141,62 @@ pub(all) struct ColumnDef {
   name : String
   data_type : DataType
   options : Array[ColumnDefOption]
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ColumnDef
+pub impl Show for ColumnDef
 
 pub(all) enum ColumnDefOption {
   NotNull
   Unique
   Default(Expr)
   PrimaryKey
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ColumnDefOption
+pub impl Show for ColumnDefOption
 
 pub(all) struct CommitStmt {
   work : Bool
   transaction : Bool
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CommitStmt
+pub impl Show for CommitStmt
 
 pub(all) enum ConflictAction {
   DoNothing
   DoUpdate(Array[Assignment], Expr?)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ConflictAction
+pub impl Show for ConflictAction
 
 pub(all) enum ConflictTarget {
   Columns(Array[String])
   OnConstraint(String)
   OnExpression(Expr, Expr?)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ConflictTarget
+pub impl Show for ConflictTarget
 
 pub(all) enum CopyDirection {
   To
   From
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CopyDirection
+pub impl Show for CopyDirection
 
 pub(all) enum CopyForceQuote {
   All
   Columns(Array[String])
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CopyForceQuote
+pub impl Show for CopyForceQuote
 
 pub(all) enum CopyFormat {
   Csv
   Text
   Binary
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CopyFormat
+pub impl Show for CopyFormat
 
 pub(all) enum CopyOption {
   Format(CopyFormat)
@@ -187,38 +209,43 @@ pub(all) enum CopyOption {
   ForceNotNull(Array[String])
   ForceNull(Array[String])
   Encoding(String)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CopyOption
+pub impl Show for CopyOption
 
 pub(all) enum CopySource {
   Table(ObjectName, Array[String]?)
   Query(QueryStmt)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CopySource
+pub impl Show for CopySource
 
 pub(all) struct CopyStmt {
   source : CopySource
   direction : CopyDirection
   target : CopyTarget
   format_options : Array[CopyOption]
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CopyStmt
+pub impl Show for CopyStmt
 
 pub(all) enum CopyTarget {
   File(String)
   Stdin
   Stdout
   Program(String)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CopyTarget
+pub impl Show for CopyTarget
 
 pub(all) struct CreateDatabaseStmt {
   name : String
   if_not_exists : Bool
   character_set : String?
   collate : String?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CreateDatabaseStmt
+pub impl Show for CreateDatabaseStmt
 
 pub(all) struct CreateFunctionStmt {
   name : String
@@ -228,8 +255,9 @@ pub(all) struct CreateFunctionStmt {
   body : String?
   deterministic : Bool
   if_not_exists : Bool
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CreateFunctionStmt
+pub impl Show for CreateFunctionStmt
 
 pub(all) struct CreateIndexStmt {
   unique : Bool
@@ -240,8 +268,9 @@ pub(all) struct CreateIndexStmt {
   index_method : IndexMethod?
   columns : Array[IndexColumn]
   where_clause : Expr?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CreateIndexStmt
+pub impl Show for CreateIndexStmt
 
 pub(all) struct CreateProcedureStmt {
   name : String
@@ -249,15 +278,17 @@ pub(all) struct CreateProcedureStmt {
   language : String?
   body : String?
   if_not_exists : Bool
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CreateProcedureStmt
+pub impl Show for CreateProcedureStmt
 
 pub(all) struct CreateSchemaStmt {
   name : String
   if_not_exists : Bool
   authorization : String?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CreateSchemaStmt
+pub impl Show for CreateSchemaStmt
 
 pub(all) struct CreateSequenceStmt {
   name : String
@@ -270,31 +301,36 @@ pub(all) struct CreateSequenceStmt {
   cache : Int?
   cycle : Bool?
   owned_by : SequenceOwnedBy?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CreateSequenceStmt
+pub impl Show for CreateSequenceStmt
 
 pub(all) enum CreateTableDefinition {
   Columns(Array[ColumnDef], Array[TableConstraint])
   AsQuery(QueryStmt)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CreateTableDefinition
+pub impl Show for CreateTableDefinition
 
 pub(all) struct CreateTableStmt {
   name : String
   if_not_exists : Bool
   definition : CreateTableDefinition
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CreateTableStmt
+pub impl Show for CreateTableStmt
 
-type CreateViewStmt derive(Eq, Show)
+type CreateViewStmt derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for CreateViewStmt
+pub impl Show for CreateViewStmt
 
 pub(all) struct Cte {
   name : String
   query : QueryStmt
   columns : Array[String]?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for Cte
+pub impl Show for Cte
 
 pub(all) enum DataType {
   Integer
@@ -309,8 +345,9 @@ pub(all) enum DataType {
   Boolean
   Timestamp
   Blob
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for DataType
+pub impl Show for DataType
 
 pub(all) enum DatetimeUnit {
   Year
@@ -319,39 +356,45 @@ pub(all) enum DatetimeUnit {
   Hour
   Minute
   Second
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for DatetimeUnit
+pub impl Show for DatetimeUnit
 
 pub(all) struct DeallocateStmt {
   name : String
   prepare : Bool
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for DeallocateStmt
+pub impl Show for DeallocateStmt
 
 pub(all) struct DeleteStmt {
   table_name : ObjectName
   where_clause : Expr?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for DeleteStmt
+pub impl Show for DeleteStmt
 
 pub(all) struct DropIndexStmt {
   name : String
   if_exists : Bool
   concurrently : Bool
   table_name : ObjectName?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for DropIndexStmt
+pub impl Show for DropIndexStmt
 
 pub(all) struct DropTableStmt {
   table_name : ObjectName
   if_exists : Bool
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for DropTableStmt
+pub impl Show for DropTableStmt
 
 pub(all) struct DropViewStmt {
   name : String
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for DropViewStmt
+pub impl Show for DropViewStmt
 
 pub(all) struct DuckDB {
 }
@@ -360,8 +403,9 @@ pub impl Dialect for DuckDB
 pub(all) enum DuplicateTreatment {
   Distinct
   All
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for DuplicateTreatment
+pub impl Show for DuplicateTreatment
 
 pub(all) struct ExecuteStmt {
   name : ObjectName?
@@ -369,8 +413,9 @@ pub(all) struct ExecuteStmt {
   has_parentheses : Bool
   into : Array[String]
   using_exprs : Array[Expr]
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ExecuteStmt
+pub impl Show for ExecuteStmt
 
 pub(all) enum Expr {
   Identifier(String)
@@ -396,15 +441,17 @@ pub(all) enum Expr {
   Array(ArrayExpr)
   CompoundFieldAccess(Expr, Array[AccessExpr])
   WindowFunction(String, DuplicateTreatment?, Array[Expr], WindowSpec)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for Expr
+pub impl Show for Expr
 
 pub(all) struct FunctionParameter {
   name : String
   param_type : DataType
   mode : ParameterMode?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for FunctionParameter
+pub impl Show for FunctionParameter
 
 pub(all) struct Generic {
 }
@@ -415,15 +462,17 @@ pub(all) struct GrantStmt {
   objects : Array[ObjectName]
   grantees : Array[String]
   with_grant_option : Bool
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for GrantStmt
+pub impl Show for GrantStmt
 
 pub(all) struct IndexColumn {
   name : Expr
   asc : Bool?
   nulls_first : Bool?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for IndexColumn
+pub impl Show for IndexColumn
 
 pub(all) enum IndexMethod {
   Btree
@@ -432,20 +481,23 @@ pub(all) enum IndexMethod {
   Gist
   Spgist
   Brin
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for IndexMethod
+pub impl Show for IndexMethod
 
 pub(all) struct IndexParameter {
   name : String
   value : String
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for IndexParameter
+pub impl Show for IndexParameter
 
 pub(all) enum InsertSource {
   Values(Array[Array[Expr]])
   Query(QueryStmt)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for InsertSource
+pub impl Show for InsertSource
 
 pub(all) struct InsertStmt {
   table_name : ObjectName
@@ -453,27 +505,31 @@ pub(all) struct InsertStmt {
   source : InsertSource
   or : SqliteOnConflict?
   on : OnInsert?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for InsertStmt
+pub impl Show for InsertStmt
 
 pub(all) enum IntervalQualifier {
   Single(PrimaryDatetimeField)
   Range(PrimaryDatetimeField, PrimaryDatetimeField)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for IntervalQualifier
+pub impl Show for IntervalQualifier
 
 pub(all) struct Join {
   table_ref : TableRef
   join_operator : JoinOperator
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for Join
+pub impl Show for Join
 
 pub(all) enum JoinConstraint {
   On(Expr)
   Using(Array[String])
   Non
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for JoinConstraint
+pub impl Show for JoinConstraint
 
 pub(all) enum JoinOperator {
   Join(JoinConstraint)
@@ -485,8 +541,9 @@ pub(all) enum JoinOperator {
   FullOuter(JoinConstraint)
   Inner(JoinConstraint)
   Cross
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for JoinOperator
+pub impl Show for JoinOperator
 
 pub(all) enum Keyword {
   Select
@@ -702,7 +759,8 @@ pub(all) enum Keyword {
   Cycle
   Owned
   No
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
+pub impl Show for Keyword
 
 pub(all) enum Literal {
   Integer(Int)
@@ -710,28 +768,32 @@ pub(all) enum Literal {
   String(String)
   Boolean(Bool)
   Null
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for Literal
+pub impl Show for Literal
 
 pub(all) enum LoadDataDuplicateHandling {
   Replace
   Ignore
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for LoadDataDuplicateHandling
+pub impl Show for LoadDataDuplicateHandling
 
 pub(all) struct LoadDataFieldsOptions {
   terminated_by : String?
   enclosed_by : String?
   optionally_enclosed : Bool
   escaped_by : String?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for LoadDataFieldsOptions
+pub impl Show for LoadDataFieldsOptions
 
 pub(all) struct LoadDataLinesOptions {
   starting_by : String?
   terminated_by : String?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for LoadDataLinesOptions
+pub impl Show for LoadDataLinesOptions
 
 pub(all) struct LoadDataStmt {
   is_local : Bool
@@ -744,27 +806,31 @@ pub(all) struct LoadDataStmt {
   ignore_lines : Int?
   columns : Array[String]?
   set_assignments : Array[Assignment]?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for LoadDataStmt
+pub impl Show for LoadDataStmt
 
 pub(all) enum MergeAction {
   Insert(Array[String], Array[Expr])
   Update(Array[Assignment])
   Delete
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for MergeAction
+pub impl Show for MergeAction
 
 pub(all) enum MergeMatchType {
   Matched
   NotMatched
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for MergeMatchType
+pub impl Show for MergeMatchType
 
 pub(all) enum MergeSource {
   Table(ObjectName)
   Query(QueryStmt)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for MergeSource
+pub impl Show for MergeSource
 
 pub(all) struct MergeStmt {
   target_table : ObjectName
@@ -773,15 +839,17 @@ pub(all) struct MergeStmt {
   source_alias : String?
   join_condition : Expr
   when_clauses : Array[MergeWhenClause]
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for MergeStmt
+pub impl Show for MergeStmt
 
 pub(all) struct MergeWhenClause {
   match_type : MergeMatchType
   condition : Expr?
   action : MergeAction
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for MergeWhenClause
+pub impl Show for MergeWhenClause
 
 pub(all) struct MySQL {
 }
@@ -789,34 +857,39 @@ pub impl Dialect for MySQL
 
 pub(all) struct ObjectName {
   parts : Array[String]
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ObjectName
+pub impl Show for ObjectName
 
 pub(all) struct OnConflictClause {
   conflict_target : ConflictTarget?
   conflict_action : ConflictAction
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for OnConflictClause
+pub impl Show for OnConflictClause
 
 pub(all) enum OnInsert {
   DuplicateKeyUpdate(Array[Assignment])
   OnConflict(OnConflictClause)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for OnInsert
+pub impl Show for OnInsert
 
 pub(all) struct OrderByExpr {
   expr : Expr
   asc : Bool?
   nulls_first : Bool?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for OrderByExpr
+pub impl Show for OrderByExpr
 
 pub(all) enum ParameterMode {
   In
   Out
   InOut
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ParameterMode
+pub impl Show for ParameterMode
 
 pub struct Parser {
   dialect : &Dialect
@@ -843,11 +916,13 @@ pub(all) struct PrepareStmt {
   name : String
   data_types : Array[DataType]
   statement : Statement
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for PrepareStmt
+pub impl Show for PrepareStmt
 
-type PrimaryDatetimeField derive(Eq, Show)
+type PrimaryDatetimeField derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for PrimaryDatetimeField
+pub impl Show for PrimaryDatetimeField
 
 pub(all) enum Privilege {
   Select(Array[String]?)
@@ -864,15 +939,17 @@ pub(all) enum Privilege {
   Execute
   Connect
   Temporary
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for Privilege
+pub impl Show for Privilege
 
 pub(all) enum Projection {
   Wildcard
   UnamedExpr(Expr)
   AliasedExpr(Expr, String)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for Projection
+pub impl Show for Projection
 
 pub(all) struct QueryStmt {
   with_clause : Array[Cte]?
@@ -880,8 +957,9 @@ pub(all) struct QueryStmt {
   order_by : Array[OrderByExpr]
   limit : Expr?
   offset : Expr?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for QueryStmt
+pub impl Show for QueryStmt
 
 pub(all) struct Redshift {
 }
@@ -890,14 +968,16 @@ pub impl Dialect for Redshift
 pub(all) struct ReleaseSavepointStmt {
   savepoint_keyword : Bool
   name : String
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ReleaseSavepointStmt
+pub impl Show for ReleaseSavepointStmt
 
 pub(all) enum RevokeOption {
   Restrict
   Cascade
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for RevokeOption
+pub impl Show for RevokeOption
 
 pub(all) struct RevokeStmt {
   grant_option_for : Bool
@@ -905,15 +985,17 @@ pub(all) struct RevokeStmt {
   objects : Array[ObjectName]
   grantees : Array[String]
   cascade : RevokeOption?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for RevokeStmt
+pub impl Show for RevokeStmt
 
 pub(all) struct RollbackStmt {
   work : Bool
   transaction : Bool
   savepoint : String?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for RollbackStmt
+pub impl Show for RollbackStmt
 
 pub(all) struct SQLite {
 }
@@ -921,53 +1003,63 @@ pub impl Dialect for SQLite
 
 pub(all) struct SavepointStmt {
   name : String
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for SavepointStmt
+pub impl Show for SavepointStmt
 
-type SelectStmt derive(Eq, Show)
+type SelectStmt derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for SelectStmt
+pub impl Show for SelectStmt
 
 pub(all) enum SequenceLimit {
   Value(Int)
   NoLimit
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for SequenceLimit
+pub impl Show for SequenceLimit
 
 pub(all) enum SequenceOwnedBy {
   Column(ObjectName, String)
   ByNone
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for SequenceOwnedBy
+pub impl Show for SequenceOwnedBy
 
 pub(all) struct SetAssignment {
   variable : String
   value : Expr
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for SetAssignment
+pub impl Show for SetAssignment
 
-type SetExpr derive(Eq, Show)
+type SetExpr derive(Eq, @debug.Debug)
+pub impl Show for SetExpr
 
-type SetOperator derive(Eq, Show)
+type SetOperator derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for SetOperator
+pub impl Show for SetOperator
 
 pub(all) enum SetScope {
   Global
   Session
   UserVar
   Local
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
+pub impl Show for SetScope
 
 pub(all) struct SetStmt {
   scope : SetScope
   assignments : Array[SetAssignment]
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for SetStmt
+pub impl Show for SetStmt
 
 pub(all) enum ShowFilter {
   Like(String)
   Where(Expr)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ShowFilter
+pub impl Show for ShowFilter
 
 pub(all) struct ShowStmt {
   show_type : ShowType
@@ -976,8 +1068,9 @@ pub(all) struct ShowStmt {
   extended : Bool
   full : Bool
   global_scope : Bool
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ShowStmt
+pub impl Show for ShowStmt
 
 pub(all) enum ShowType {
   Tables
@@ -995,8 +1088,9 @@ pub(all) enum ShowType {
   CreateProcedure
   CreateEvent
   CreateTrigger
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ShowType
+pub impl Show for ShowType
 
 pub(all) struct Snowflake {
 }
@@ -1008,8 +1102,9 @@ pub(all) enum SqliteOnConflict {
   Fail
   Ignore
   Replace
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for SqliteOnConflict
+pub impl Show for SqliteOnConflict
 
 pub(all) enum Statement {
   Query(QueryStmt)
@@ -1050,46 +1145,53 @@ pub(all) enum Statement {
   ReleaseSavepoint(ReleaseSavepointStmt)
   Grant(GrantStmt)
   Revoke(RevokeStmt)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for Statement
+pub impl Show for Statement
 
 pub(all) struct Statements {
   stmts : Array[Statement]
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub fn Statements::op_get(Self, Int) -> Statement
 pub impl @prettyprinter.Pretty for Statements
+pub impl Show for Statements
 
 pub(all) enum Subscript {
   Index(Expr)
   Slice(Expr?, Expr?, Expr?)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for Subscript
+pub impl Show for Subscript
 
 pub(all) struct TableAlias {
   name : String
   columns : Array[String]
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for TableAlias
+pub impl Show for TableAlias
 
 pub(all) enum TableConstraint {
   Unique(Array[OrderByExpr])
   PrimaryKey(Array[OrderByExpr])
   ForeignKey(columns~ : Array[OrderByExpr], foreign_table~ : ObjectName, foreign_columns~ : Array[String])
   Check(Expr)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for TableConstraint
+pub impl Show for TableConstraint
 
 pub(all) enum TableFactor {
   Column(ObjectName, TableAlias?)
   SubQuery(QueryStmt, TableAlias?)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for TableFactor
+pub impl Show for TableFactor
 
 pub(all) struct TableRef {
   factor : TableFactor
   joins : Array[Join]
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for TableRef
+pub impl Show for TableRef
 
 pub(all) enum Token {
   Keyword(Keyword)
@@ -1129,42 +1231,49 @@ pub(all) enum Token {
   JsonContainedIn
   Unknown(Char)
   Eof
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
+pub impl Show for Token
 
 pub(all) enum Top {
   Constant(Int)
   Expr(Expr)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for Top
+pub impl Show for Top
 
 pub(all) struct TruncateStmt {
   table_name : ObjectName
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for TruncateStmt
+pub impl Show for TruncateStmt
 
 pub(all) enum UnaryOperator {
   Plus
   Minus
   Not
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for UnaryOperator
+pub impl Show for UnaryOperator
 
 pub(all) struct UpdateStmt {
   table_name : ObjectName
   assignments : Array[Assignment]
   where_clause : Expr?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for UpdateStmt
+pub impl Show for UpdateStmt
 
 pub(all) struct UseStmt {
   database_name : ObjectName
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for UseStmt
+pub impl Show for UseStmt
 
 pub(all) struct ViewColumnDef {
   name : String
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for ViewColumnDef
+pub impl Show for ViewColumnDef
 
 pub(all) enum WindowFrameBound {
   UnboundedPreceding
@@ -1172,27 +1281,31 @@ pub(all) enum WindowFrameBound {
   CurrentRow
   Preceding(Expr)
   Following(Expr)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for WindowFrameBound
+pub impl Show for WindowFrameBound
 
 pub(all) struct WindowFrameClause {
   frame_units : WindowFrameUnits
   frame_start : WindowFrameBound
   frame_end : WindowFrameBound?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for WindowFrameClause
+pub impl Show for WindowFrameClause
 
 pub(all) enum WindowFrameUnits {
   Rows
   Range
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
+pub impl Show for WindowFrameUnits
 
 pub(all) struct WindowSpec {
   partition_by : Array[Expr]
   order_by : Array[OrderByExpr]
   frame_clause : WindowFrameClause?
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 pub impl @prettyprinter.Pretty for WindowSpec
+pub impl Show for WindowSpec
 
 // Type aliases
 
