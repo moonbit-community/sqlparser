@@ -46,13 +46,15 @@ pub fn parse(
 ) -> Array[Statement] raise ParserError {
   let parser = Parser::{ dialect, }
   let statements = []
-  loop tokens {
+  for tokens = tokens {
+    match tokens {
     [Token::Eof] => break
     [] => break
     tokens => {
       let (stmt, tokens) = parser.parse_statement(tokens)
       statements.push(stmt)
       continue tokens
+    }
     }
   }
   statements
@@ -364,7 +366,8 @@ fn Parser::parse_set_assignments(
   assignments.push({ variable, value })
 
   // Parse additional assignments
-  loop tokens {
+  for tokens = tokens {
+    match tokens {
     [Comma, .. rest] => {
       let (variable, remaining_tokens) = match rest {
         [Identifier(name), .. remaining] => (name, remaining)
@@ -382,6 +385,7 @@ fn Parser::parse_set_assignments(
       continue remaining_tokens
     }
     tokens => break (assignments, tokens)
+    }
   }
 }
 
@@ -400,7 +404,8 @@ fn Parser::parse_replace_statement(
   let (columns, tokens) = match tokens {
     [LParen, .. tokens] => {
       let columns = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         [Identifier(col), Comma, .. tokens] => {
           columns.push(col)
           continue tokens
@@ -415,6 +420,7 @@ fn Parser::parse_replace_statement(
           )
         [] =>
           raise InternalBug("parse_replace_statement: unexpected end of tokens")
+        }
       }
       (columns, tokens)
     }
@@ -425,7 +431,8 @@ fn Parser::parse_replace_statement(
   let (source, tokens) = match tokens {
     [Keyword(Values), .. tokens] => {
       let values = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         [LParen, .. tokens] => {
           let (exprs, tokens) = self.parse_comma_separated_exprs(tokens)
           let tokens = self.expect_token(tokens, RParen)
@@ -436,6 +443,7 @@ fn Parser::parse_replace_statement(
           }
         }
         tokens => break tokens
+        }
       }
       (InsertSource::Values(values), tokens)
     }
@@ -489,7 +497,8 @@ fn Parser::parse_copy_statement(
       let (columns, tokens) = match tokens {
         [LParen, .. tokens] => {
           let columns = []
-          let tokens = loop tokens {
+          let tokens = for tokens = tokens {
+            match tokens {
             [Identifier(col), Comma, .. tokens] => {
               columns.push(col)
               continue tokens
@@ -506,6 +515,7 @@ fn Parser::parse_copy_statement(
               raise InternalBug(
                 "parse_copy_statement: unexpected end of tokens in column list",
               )
+            }
           }
           (Some(columns), tokens)
         }
@@ -560,7 +570,8 @@ fn Parser::parse_copy_options(
   tokens : ArrayView[Token],
 ) -> ParserResult[Array[CopyOption]] raise ParserError {
   let options = []
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [RParen, .. tokens] => break tokens
     [Keyword(Format), Identifier("csv"), .. tokens] => {
       options.push(CopyOption::Format(CopyFormat::Csv))
@@ -634,7 +645,8 @@ fn Parser::parse_copy_options(
     }
     [Keyword(ForceQuote), LParen, .. tokens] => {
       let columns = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         [Identifier(col), Comma, .. tokens] => {
           columns.push(col)
           continue tokens
@@ -649,6 +661,7 @@ fn Parser::parse_copy_options(
           )
         [] =>
           raise InternalBug("parse_copy_options: unexpected end in FORCE_QUOTE")
+        }
       }
       options.push(CopyOption::ForceQuote(CopyForceQuote::Columns(columns)))
       match tokens {
@@ -658,7 +671,8 @@ fn Parser::parse_copy_options(
     }
     [Keyword(ForceNotNull), LParen, .. tokens] => {
       let columns = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         [Identifier(col), Comma, .. tokens] => {
           columns.push(col)
           continue tokens
@@ -675,6 +689,7 @@ fn Parser::parse_copy_options(
           raise InternalBug(
             "parse_copy_options: unexpected end in FORCE_NOT_NULL",
           )
+        }
       }
       options.push(CopyOption::ForceNotNull(columns))
       match tokens {
@@ -684,7 +699,8 @@ fn Parser::parse_copy_options(
     }
     [Keyword(ForceNull), LParen, .. tokens] => {
       let columns = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         [Identifier(col), Comma, .. tokens] => {
           columns.push(col)
           continue tokens
@@ -699,6 +715,7 @@ fn Parser::parse_copy_options(
           )
         [] =>
           raise InternalBug("parse_copy_options: unexpected end in FORCE_NULL")
+        }
       }
       options.push(CopyOption::ForceNull(columns))
       match tokens {
@@ -716,6 +733,7 @@ fn Parser::parse_copy_options(
     [token, .. _tokens] =>
       raise UnexpectedTokenMessageError(token, "expected COPY option")
     [] => raise InternalBug("parse_copy_options: unexpected end of tokens")
+    }
   }
   (options, tokens)
 }
@@ -740,13 +758,15 @@ fn Parser::parse_comma_separated_exprs(
   let exprs = []
   let (expr, tokens) = self.parse_expr(tokens)
   exprs.push(expr)
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [Comma, .. tokens] => {
       let (expr, tokens) = self.parse_expr(tokens)
       exprs.push(expr)
       continue tokens
     }
     tokens => break tokens
+    }
   }
   (exprs, tokens)
 }
@@ -922,7 +942,8 @@ fn Parser::parse_duplicate_key_assignments(
   tokens : ArrayView[Token],
 ) -> ParserResult[Array[Assignment]] raise ParserError {
   let assignments = []
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [Identifier(column), Eq, .. tokens] => {
       let (value, tokens) = self.parse_expr(tokens)
       assignments.push({ column, value })
@@ -939,6 +960,7 @@ fn Parser::parse_duplicate_key_assignments(
       raise InternalBug(
         "parse_duplicate_key_assignments: unexpected end of tokens",
       )
+    }
   }
   (assignments, tokens)
 }
@@ -968,7 +990,8 @@ fn Parser::parse_on_conflict_clause(
                 "expected column name in conflict target",
               )
           }
-          let tokens = loop tokens {
+          let tokens = for tokens = tokens {
+            match tokens {
             [Identifier(col), Comma, .. tokens] => {
               columns.push(col)
               continue tokens
@@ -983,6 +1006,7 @@ fn Parser::parse_on_conflict_clause(
               raise InternalBug(
                 "parse_on_conflict_clause: unexpected end in column list",
               )
+            }
           }
 
           // Check for optional WHERE condition after parentheses
@@ -1166,7 +1190,8 @@ fn Parser::parse_load_data_statement(
   let (columns, tokens) = match tokens {
     [LParen, .. tokens] => {
       let columns = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         [Identifier(col), Comma, .. tokens] => {
           columns.push(col)
           continue tokens
@@ -1216,6 +1241,7 @@ fn Parser::parse_load_data_statement(
           raise InternalBug(
             "parse_load_data_statement: unexpected end in column list",
           )
+        }
       }
       (Some(columns), tokens)
     }
@@ -1256,7 +1282,8 @@ fn Parser::parse_load_data_fields_options(
   let mut enclosed_by = None
   let mut optionally_enclosed = false
   let mut escaped_by = None
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [Keyword(Terminated), Keyword(By), StringLiteral(term), .. tokens] => {
       terminated_by = Some(term)
       continue tokens
@@ -1282,6 +1309,7 @@ fn Parser::parse_load_data_fields_options(
       continue tokens
     }
     tokens => break tokens
+    }
   }
   ({ terminated_by, enclosed_by, optionally_enclosed, escaped_by }, tokens)
 }
@@ -1293,7 +1321,8 @@ fn Parser::parse_load_data_lines_options(
 ) -> ParserResult[LoadDataLinesOptions] {
   let mut starting_by = None
   let mut terminated_by = None
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [Keyword(Starting), Keyword(By), StringLiteral(start), .. tokens] => {
       starting_by = Some(start)
       continue tokens
@@ -1303,6 +1332,7 @@ fn Parser::parse_load_data_lines_options(
       continue tokens
     }
     tokens => break tokens
+    }
   }
   ({ starting_by, terminated_by }, tokens)
 }
@@ -1327,7 +1357,8 @@ fn Parser::parse_prepare_statement(
   let (data_types, tokens) = match tokens {
     [LParen, .. rest_tokens] => {
       let data_types = []
-      let tokens = loop rest_tokens {
+      let tokens = for tokens = rest_tokens {
+        match tokens {
         [RParen, .. rest_tokens] => break rest_tokens
         rest_tokens => {
           let (data_type, rest_tokens) = self.parse_data_type(rest_tokens)
@@ -1341,6 +1372,7 @@ fn Parser::parse_prepare_statement(
                 "parse_prepare_statement: unexpected end of tokens",
               )
           }
+        }
         }
       }
       (data_types, tokens)
@@ -1387,7 +1419,8 @@ fn Parser::parse_execute_statement(
   let (parameters, has_parentheses, tokens) = match tokens {
     [LParen, .. rest_tokens] => {
       let parameters = []
-      let tokens = loop rest_tokens {
+      let tokens = for tokens = rest_tokens {
+        match tokens {
         [RParen, .. rest_tokens] => break rest_tokens
         rest_tokens => {
           let (expr, rest_tokens) = self.parse_expr(rest_tokens)
@@ -1401,6 +1434,7 @@ fn Parser::parse_execute_statement(
                 "parse_execute_statement: unexpected end of tokens",
               )
           }
+        }
         }
       }
       (parameters, true, tokens)
@@ -1419,12 +1453,14 @@ fn Parser::parse_execute_statement(
         }
         _ => rest_tokens
       }
-      let tokens = loop first {
+      let tokens = for tokens = first {
+        match tokens {
         [Comma, Identifier(id), .. tokens] => {
           into.push(id)
           continue tokens
         }
         tokens => break tokens
+        }
       }
       (into, tokens)
     }
@@ -1437,13 +1473,15 @@ fn Parser::parse_execute_statement(
       let using_exprs = []
       let (expr, rest_tokens) = self.parse_expr(rest_tokens)
       using_exprs.push(expr)
-      let tokens = loop rest_tokens {
+      let tokens = for tokens = rest_tokens {
+        match tokens {
         [Comma, .. rest_tokens] => {
           let (expr, rest_tokens) = self.parse_expr(rest_tokens)
           using_exprs.push(expr)
           continue rest_tokens
         }
         tokens => break tokens
+        }
       }
       (using_exprs, tokens)
     }

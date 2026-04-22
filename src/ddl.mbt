@@ -101,7 +101,8 @@ fn Parser::parse_create_index_statement(
   // Parse column list
   let tokens = self.expect_token(tokens, LParen)
   let columns = []
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [RParen, .. rest_tokens] => break rest_tokens
     rest_tokens => {
       let (column_expr, rest_tokens) = self.parse_expr(rest_tokens)
@@ -131,6 +132,7 @@ fn Parser::parse_create_index_statement(
             "parse_create_index_statement: unexpected end of tokens",
           )
       }
+    }
     }
   }
 
@@ -347,7 +349,8 @@ fn Parser::parse_column_defs(
   let columns = []
   let constraints = []
   let tokens = if tokens is [Token::LParen, .. tokens] {
-    loop tokens {
+    for tokens = tokens {
+      match tokens {
       [Identifier(name), .. tokens] => {
         let (data_type, tokens) = self.parse_data_type(tokens)
         let (options, tokens) = self.parse_column_def_option(tokens)
@@ -375,6 +378,7 @@ fn Parser::parse_column_defs(
             )
           [] => raise InternalBug("parse_column_defs: unexpected end of tokens")
         }
+      }
       }
     }
   } else {
@@ -477,7 +481,8 @@ fn Parser::parse_column_def_option(
   tokens : ArrayView[Token],
 ) -> ParserResult[Array[ColumnDefOption]] raise ParserError {
   let options = []
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [Keyword(Primary), Keyword(Key), .. tokens] => {
       options.push(ColumnDefOption::PrimaryKey)
       continue tokens
@@ -496,6 +501,7 @@ fn Parser::parse_column_def_option(
       continue tokens
     }
     tokens => break tokens
+    }
   }
   (options, tokens)
 }
@@ -530,7 +536,8 @@ fn Parser::parse_create_view_statement(
   }
   let columns = []
   let tokens = if tokens is [LParen, .. tokens] {
-    loop tokens {
+    for tokens = tokens {
+      match tokens {
       tokens => {
         let (column, tokens) = self.parse_view_column_def(tokens)
         columns.push(column)
@@ -546,6 +553,7 @@ fn Parser::parse_create_view_statement(
               "parse_create_view_statement: unexpected end of tokens",
             )
         }
+      }
       }
     }
   } else {
@@ -684,7 +692,8 @@ fn Parser::parse_foreign_key_constraint(
   let (foreign_table, tokens) = self.parse_object_name(tokens)
   let foreign_columns = []
   let tokens = if tokens is [LParen, .. tokens] {
-    loop tokens {
+    for tokens = tokens {
+      match tokens {
       [Identifier(col), Comma, .. tokens] => {
         foreign_columns.push(col)
         continue tokens
@@ -701,6 +710,7 @@ fn Parser::parse_foreign_key_constraint(
         raise InternalBug(
           "parse_foreign_key_constraint: unexpected end of tokens",
         )
+      }
     }
   } else {
     tokens
@@ -1029,7 +1039,8 @@ fn Parser::parse_alter_index_statement(
       }
     [Keyword(Reset), LParen, .. tokens] => {
       let params = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         [Identifier(param), Comma, .. tokens] => {
           params.push(param)
           continue tokens
@@ -1047,12 +1058,14 @@ fn Parser::parse_alter_index_statement(
           raise ParserError::InternalBug(
             "parse_alter_index_statement: unexpected end in RESET parameters",
           )
+        }
       }
       (AlterIndexOperation::Reset(params), tokens)
     }
     [Keyword(Set), LParen, .. tokens] => {
       let params = []
-      let tokens = loop tokens {
+      let tokens = for tokens = tokens {
+        match tokens {
         [Identifier(param_name), Eq, .. tokens] => {
           let (value, tokens) = match tokens {
             [Identifier(val), .. tokens] => (val, tokens)
@@ -1088,6 +1101,7 @@ fn Parser::parse_alter_index_statement(
           raise ParserError::InternalBug(
             "parse_alter_index_statement: unexpected end in SET parameters",
           )
+        }
       }
       (AlterIndexOperation::Set(params), tokens)
     }
@@ -1425,7 +1439,8 @@ fn Parser::parse_create_function_statement(
   // Parse parameter list
   let tokens = self.expect_token(tokens, LParen)
   let parameters = []
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [RParen, .. rest_tokens] => break rest_tokens
     rest_tokens => {
       let (param, rest_tokens) = self.parse_function_parameter(rest_tokens)
@@ -1439,6 +1454,7 @@ fn Parser::parse_create_function_statement(
             "parse_create_function_statement: unexpected end of tokens",
           )
       }
+    }
     }
   }
 
@@ -1518,7 +1534,8 @@ fn Parser::parse_create_procedure_statement(
   // Parse parameter list
   let tokens = self.expect_token(tokens, LParen)
   let parameters = []
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [RParen, .. rest_tokens] => break rest_tokens
     rest_tokens => {
       let (param, rest_tokens) = self.parse_function_parameter(rest_tokens)
@@ -1532,6 +1549,7 @@ fn Parser::parse_create_procedure_statement(
             "parse_create_procedure_statement: unexpected end of tokens",
           )
       }
+    }
     }
   }
 
@@ -1726,7 +1744,8 @@ fn Parser::parse_create_sequence_statement(
   let mut cache = None
   let mut cycle = None
   let mut owned_by = None
-  let tokens = loop tokens {
+  let tokens = for tokens = tokens {
+    match tokens {
     [Keyword(Increment), Keyword(By), Number(inc_str), .. rest_tokens] => {
       let inc_val = @string.parse_int(inc_str) catch {
         _ => raise ParserError::InvalidDataTypeError(inc_str)
@@ -1815,6 +1834,7 @@ fn Parser::parse_create_sequence_statement(
       continue rest_tokens
     }
     rest_tokens => break rest_tokens
+    }
   }
   (
     {

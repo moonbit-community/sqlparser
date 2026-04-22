@@ -58,12 +58,14 @@ pub fn tokenize(
 ) -> Array[Token] raise LexerError {
   let lexer = Lexer::{ dialect, }
   let tokens = []
-  loop input[:] {
+  for input = input[:] {
+    match input {
     [] => break
     input => {
       let (token, input) = lexer.next_token(input)
       tokens.push(token)
       continue input
+    }
     }
   }
   tokens
@@ -132,18 +134,31 @@ fn Lexer::next_token(
 
 ///|
 fn skip_whitespace(input : StringView) -> StringView {
-  loop input {
+  for input = input {
+    match input {
     [c, .. rest] if c.is_ascii_whitespace() => continue rest
     input => break input
+    }
+  }
+}
+
+///|
+fn read_while(
+  input : StringView,
+  idx : Int,
+  predicate : (Char) -> Bool,
+) -> (Int, StringView) {
+  for input = input, idx = idx {
+    match input {
+    [c, .. rest] if predicate(c) => continue rest, idx + 1
+    rest => break (idx, rest)
+    }
   }
 }
 
 ///|
 fn read_frac(input : StringView) -> (Token, StringView) {
-  let (idx, rest) = loop (input, 0) {
-    ([c, .. rest], n) if c.is_ascii_digit() => continue (rest, n + 1)
-    (rest, n) => break (n, rest)
-  }
+  let (idx, rest) = read_while(input, 0, c => c.is_ascii_digit())
   if idx == 0 {
     (Period, rest)
   } else {
@@ -153,16 +168,9 @@ fn read_frac(input : StringView) -> (Token, StringView) {
 
 ///|
 fn read_number(input : StringView) -> (Token, StringView) {
-  let (idx, rest) = loop (input, 0) {
-    ([c, .. rest], n) if c.is_ascii_digit() => continue (rest, n + 1)
-    (rest, n) => break (n, rest)
-  }
+  let (idx, rest) = read_while(input, 0, c => c.is_ascii_digit())
   let (idx, rest) = match rest {
-    ['.', .. rest] =>
-      loop (rest, idx + 1) {
-        ([c, .. rest], n) if c.is_ascii_digit() => continue (rest, n + 1)
-        (rest, n) => break (n, rest)
-      }
+    ['.', .. rest] => read_while(rest, idx + 1, c => c.is_ascii_digit())
     rest => (idx, rest)
   }
   (Number(input.view(start_offset=0, end_offset=idx).to_string()), rest)
@@ -173,11 +181,7 @@ fn Lexer::read_identifier_or_keyword(
   self : Lexer,
   input : StringView,
 ) -> (Token, StringView) {
-  let (idx, rest) = loop (input, 0) {
-    ([c, .. rest], n) if is_ascii_alphabetic_or_digit(c) =>
-      continue (rest, n + 1)
-    (rest, n) => break (n, rest)
-  }
+  let (idx, rest) = read_while(input, 0, is_ascii_alphabetic_or_digit)
   let word = input.view(start_offset=0, end_offset=idx).to_lower()
 
   // First try dialect-specific keywords
@@ -423,10 +427,7 @@ fn Lexer::read_dollar_placeholder(
   }
 
   // Read the number part
-  let (idx, rest) = loop (input, 0) {
-    ([c, .. rest], n) if c.is_ascii_digit() => continue (rest, n + 1)
-    (rest, n) => break (n, rest)
-  }
+  let (idx, rest) = read_while(input, 0, c => c.is_ascii_digit())
   let placeholder = "$" + input.view(start_offset=0, end_offset=idx).to_string()
   (Token::Placeholder(placeholder), rest)
 }
@@ -444,11 +445,7 @@ fn Lexer::read_colon_parameter(
   }
 
   // Read the parameter name part
-  let (idx, rest) = loop (input, 0) {
-    ([c, .. rest], n) if is_ascii_alphabetic_or_digit(c) =>
-      continue (rest, n + 1)
-    (rest, n) => break (n, rest)
-  }
+  let (idx, rest) = read_while(input, 0, is_ascii_alphabetic_or_digit)
   let placeholder = ":" + input.view(start_offset=0, end_offset=idx).to_string()
   (Token::Placeholder(placeholder), rest)
 }
@@ -467,11 +464,7 @@ fn Lexer::read_at_parameter(
   }
 
   // Read the parameter name part
-  let (idx, rest) = loop (input, 0) {
-    ([c, .. rest], n) if is_ascii_alphabetic_or_digit(c) =>
-      continue (rest, n + 1)
-    (rest, n) => break (n, rest)
-  }
+  let (idx, rest) = read_while(input, 0, is_ascii_alphabetic_or_digit)
   let placeholder = "@" + input.view(start_offset=0, end_offset=idx).to_string()
   (Token::Placeholder(placeholder), rest)
 }
@@ -482,7 +475,8 @@ fn Lexer::read_single_quoted_string(
   input : StringView,
 ) -> (Token, StringView) raise LexerError {
   let result = StringBuilder::new()
-  let rest = loop input {
+  let rest = for rest = input {
+    match rest {
     [.. "''", .. rest] => {
       result.write_char('\'')
       continue rest
@@ -517,6 +511,7 @@ fn Lexer::read_single_quoted_string(
       continue rest
     }
     [] => raise LexerError::UnterminatedString
+    }
   }
   (StringLiteral(result.to_string()), rest)
 }
@@ -527,7 +522,8 @@ fn Lexer::read_double_quoted_string(
   input : StringView,
 ) -> (Token, StringView) raise LexerError {
   let result = StringBuilder::new()
-  let rest = loop input {
+  let rest = for rest = input {
+    match rest {
     [.. "\\\"", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
       result.write_char('\"')
       continue rest
@@ -558,6 +554,7 @@ fn Lexer::read_double_quoted_string(
       continue rest
     }
     [] => raise LexerError::UnterminatedString
+    }
   }
   (StringLiteral(result.to_string()), rest)
 }
@@ -568,7 +565,8 @@ fn Lexer::read_backtick_quoted_identifier(
   input : StringView,
 ) -> (Token, StringView) raise LexerError {
   let result = StringBuilder::new()
-  let rest = loop input {
+  let rest = for rest = input {
+    match rest {
     [.. "``", .. rest] => {
       result.write_char('`')
       continue rest
@@ -587,6 +585,7 @@ fn Lexer::read_backtick_quoted_identifier(
       continue rest
     }
     [] => raise LexerError::UnterminatedString
+    }
   }
   (Identifier(result.to_string()), rest)
 }
@@ -605,10 +604,12 @@ test "Double quoted string" {
 
 ///|
 fn skip_line_comment(input : StringView) -> StringView {
-  loop input {
+  for input = input {
+    match input {
     ['\r' | '\n', .. rest] => break rest
     [_c, .. rest] => continue rest
     [] => break []
+    }
   }
 }
 
