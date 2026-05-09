@@ -162,7 +162,7 @@ fn read_frac(input : StringView) -> (Token, StringView) {
   if idx == 0 {
     (Period, rest)
   } else {
-    (Number("." + input.view(start_offset=0, end_offset=idx).to_string()), rest)
+    (Number("." + input.view(start_offset=0, end_offset=idx).to_owned()), rest)
   }
 }
 
@@ -173,7 +173,7 @@ fn read_number(input : StringView) -> (Token, StringView) {
     ['.', .. rest] => read_while(rest, idx + 1, c => c.is_ascii_digit())
     rest => (idx, rest)
   }
-  (Number(input.view(start_offset=0, end_offset=idx).to_string()), rest)
+  (Number(input.view(start_offset=0, end_offset=idx).to_owned()), rest)
 }
 
 ///|
@@ -185,7 +185,7 @@ fn Lexer::read_identifier_or_keyword(
   let word = input.view(start_offset=0, end_offset=idx).to_lower()
 
   // First try dialect-specific keywords
-  let token = match self.dialect.read_keyword(word.to_string()) {
+  let token = match self.dialect.read_keyword(word.to_owned()) {
     Some(keyword) => Keyword(keyword)
     None =>
       // Then try common keywords and boolean literals
@@ -403,7 +403,7 @@ fn Lexer::read_identifier_or_keyword(
         "force_null" => Keyword(ForceNull)
         "encoding" => Keyword(Encoding)
         // NOTE: Removed LOAD DATA keywords from common keywords - they are now MySQL-specific
-        word => Token::Identifier(word.to_string())
+        word => Token::Identifier(word.to_owned())
       }
   }
   (token, rest)
@@ -428,7 +428,7 @@ fn Lexer::read_dollar_placeholder(
 
   // Read the number part
   let (idx, rest) = read_while(input, 0, c => c.is_ascii_digit())
-  let placeholder = "$" + input.view(start_offset=0, end_offset=idx).to_string()
+  let placeholder = "$" + input.view(start_offset=0, end_offset=idx).to_owned()
   (Token::Placeholder(placeholder), rest)
 }
 
@@ -446,7 +446,7 @@ fn Lexer::read_colon_parameter(
 
   // Read the parameter name part
   let (idx, rest) = read_while(input, 0, is_ascii_alphabetic_or_digit)
-  let placeholder = ":" + input.view(start_offset=0, end_offset=idx).to_string()
+  let placeholder = ":" + input.view(start_offset=0, end_offset=idx).to_owned()
   (Token::Placeholder(placeholder), rest)
 }
 
@@ -465,7 +465,7 @@ fn Lexer::read_at_parameter(
 
   // Read the parameter name part
   let (idx, rest) = read_while(input, 0, is_ascii_alphabetic_or_digit)
-  let placeholder = "@" + input.view(start_offset=0, end_offset=idx).to_string()
+  let placeholder = "@" + input.view(start_offset=0, end_offset=idx).to_owned()
   (Token::Placeholder(placeholder), rest)
 }
 
