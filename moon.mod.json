@@ -6,7 +6,7 @@
     "Yoorkin/prettyprinter": "0.4.10"
   },
   "readme": "README.md",
-  "repository": "https://github.com/Milky2018/sqlparser-mbt.git",
+  "repository": "https://github.com/moonbit-community/sqlparser",
   "license": "Apache-2.0",
   "keywords": [
     "sql",
