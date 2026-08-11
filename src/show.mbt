@@ -32,7 +32,7 @@ fn[T : Debug] show_compact_debug(obj : T, logger : &Logger) -> Unit {
       }
     }
   }
-  buffer.output(logger)
+  Show::output(buffer, logger)
 }
 
 ///|
