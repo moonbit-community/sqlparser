@@ -1152,7 +1152,8 @@ pub impl Show for Statement
 pub(all) struct Statements {
   stmts : Array[Statement]
 } derive(Eq, @debug.Debug)
-pub fn Statements::op_get(Self, Int) -> Statement
+#alias("_[_]")
+pub fn Statements::get(Self, Int) -> Statement
 pub impl @prettyprinter.Pretty for Statements
 pub impl Show for Statements
 

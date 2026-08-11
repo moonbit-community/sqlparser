@@ -594,7 +594,7 @@ fn Lexer::read_backtick_quoted_identifier(
 test "Double quoted string" {
   let input = "\"Hello,\\\" World!\""
   let tokens = tokenize(input)
-  inspect(
+  debug_inspect(
     tokens,
     content=(
       #|[StringLiteral("Hello,\" World!")]
@@ -617,24 +617,34 @@ fn skip_line_comment(input : StringView) -> StringView {
 test "Lexing one keyword" {
   let input = "SELECT"
   let tokens = tokenize(input)
-  inspect(tokens, content="[Keyword(Select)]")
+  debug_inspect(tokens, content="[Keyword(Select)]")
 }
 
 ///|
 test "Lexing two keywords" {
   let input = "SELECT FROM"
   let tokens = tokenize(input)
-  inspect(tokens, content="[Keyword(Select), Keyword(From)]")
+  debug_inspect(tokens, content="[Keyword(Select), Keyword(From)]")
 }
 
 ///|
 test "Lexing simple query" {
   let input = "SELECT * FROM table WHERE id = 1;"
   let tokens = tokenize(input)
-  inspect(
+  debug_inspect(
     tokens,
     content=(
-      #|[Keyword(Select), Mul, Keyword(From), Keyword(Table), Keyword(Where), Identifier("id"), Eq, Number("1"), Semicolon]
+      #|[
+      #|  Keyword(Select),
+      #|  Mul,
+      #|  Keyword(From),
+      #|  Keyword(Table),
+      #|  Keyword(Where),
+      #|  Identifier("id"),
+      #|  Eq,
+      #|  Number("1"),
+      #|  Semicolon,
+      #|]
     ),
   )
 }
@@ -643,10 +653,16 @@ test "Lexing simple query" {
 test "Lexing single quoted string" {
   let input = "SELECT 'Hello, World!' FROM t;"
   let tokens = tokenize(input)
-  inspect(
+  debug_inspect(
     tokens,
     content=(
-      #|[Keyword(Select), StringLiteral("Hello, World!"), Keyword(From), Identifier("t"), Semicolon]
+      #|[
+      #|  Keyword(Select),
+      #|  StringLiteral("Hello, World!"),
+      #|  Keyword(From),
+      #|  Identifier("t"),
+      #|  Semicolon,
+      #|]
     ),
   )
 }
@@ -655,10 +671,16 @@ test "Lexing single quoted string" {
 test "Lexing single quoted string with escaped quotes" {
   let input = "SELECT 'Hello, ''World!''!' FROM t;"
   let tokens = tokenize(input)
-  inspect(
+  debug_inspect(
     tokens,
     content=(
-      #|[Keyword(Select), StringLiteral("Hello, 'World!'!"), Keyword(From), Identifier("t"), Semicolon]
+      #|[
+      #|  Keyword(Select),
+      #|  StringLiteral("Hello, 'World!'!"),
+      #|  Keyword(From),
+      #|  Identifier("t"),
+      #|  Semicolon,
+      #|]
     ),
   )
 }
@@ -667,17 +689,31 @@ test "Lexing single quoted string with escaped quotes" {
 test "Lexing binary operators" {
   let input = "< = > == <> <= >= <=>"
   let tokens = tokenize(input)
-  inspect(tokens, content="[Lt, Eq, Gt, DoubleEq, Neq, LtEq, GtEq, Spaceship]")
+  debug_inspect(
+    tokens,
+    content="[Lt, Eq, Gt, DoubleEq, Neq, LtEq, GtEq, Spaceship]",
+  )
 }
 
 ///|
 test "Skip line comment" {
   let input = "SELECT * FROM t -- This is a comment\n WHERE id = 1;\n --x \r -- Another comment \n"
   let tokens = tokenize(input)
-  inspect(
+  debug_inspect(
     tokens,
     content=(
-      #|[Keyword(Select), Mul, Keyword(From), Identifier("t"), Keyword(Where), Identifier("id"), Eq, Number("1"), Semicolon, Eof]
+      #|[
+      #|  Keyword(Select),
+      #|  Mul,
+      #|  Keyword(From),
+      #|  Identifier("t"),
+      #|  Keyword(Where),
+      #|  Identifier("id"),
+      #|  Eq,
+      #|  Number("1"),
+      #|  Semicolon,
+      #|  Eof,
+      #|]
     ),
   )
 }
@@ -686,10 +722,21 @@ test "Skip line comment" {
 test "Skip line comment 2" {
   let input = "-- License: Apache-2.0\nSELECT * FROM t -- This is a comment\n WHERE id = 1;\n --x \r -- Another comment \n 123"
   let tokens = tokenize(input)
-  inspect(
+  debug_inspect(
     tokens,
     content=(
-      #|[Keyword(Select), Mul, Keyword(From), Identifier("t"), Keyword(Where), Identifier("id"), Eq, Number("1"), Semicolon, Number("123")]
+      #|[
+      #|  Keyword(Select),
+      #|  Mul,
+      #|  Keyword(From),
+      #|  Identifier("t"),
+      #|  Keyword(Where),
+      #|  Identifier("id"),
+      #|  Eq,
+      #|  Number("1"),
+      #|  Semicolon,
+      #|  Number("123"),
+      #|]
     ),
   )
 }
@@ -698,10 +745,20 @@ test "Skip line comment 2" {
 test "Decimal point only" {
   let input = "123 . 123 .123 123.123 .1 1.1 22.22;"
   let tokens = tokenize(input)
-  inspect(
+  debug_inspect(
     tokens,
     content=(
-      #|[Number("123"), Period, Number("123"), Number(".123"), Number("123.123"), Number(".1"), Number("1.1"), Number("22.22"), Semicolon]
+      #|[
+      #|  Number("123"),
+      #|  Period,
+      #|  Number("123"),
+      #|  Number(".123"),
+      #|  Number("123.123"),
+      #|  Number(".1"),
+      #|  Number("1.1"),
+      #|  Number("22.22"),
+      #|  Semicolon,
+      #|]
     ),
   )
 }
@@ -710,10 +767,18 @@ test "Decimal point only" {
 test "Decimal point" {
   let input = "SELECT 3.14, .11 FROM t;"
   let tokens = tokenize(input)
-  inspect(
+  debug_inspect(
     tokens,
     content=(
-      #|[Keyword(Select), Number("3.14"), Comma, Number(".11"), Keyword(From), Identifier("t"), Semicolon]
+      #|[
+      #|  Keyword(Select),
+      #|  Number("3.14"),
+      #|  Comma,
+      #|  Number(".11"),
+      #|  Keyword(From),
+      #|  Identifier("t"),
+      #|  Semicolon,
+      #|]
     ),
   )
 }
@@ -722,7 +787,7 @@ test "Decimal point" {
 test "Complicated" {
   let input = "l_linestatus;\n"
   let tokens = tokenize(input)
-  inspect(
+  debug_inspect(
     tokens,
     content=(
       #|[Identifier("l_linestatus"), Semicolon, Eof]
@@ -734,10 +799,16 @@ test "Complicated" {
 test "Single quoted string with escaped backslash" {
   let input = "SELECT 'Hello, \\'World!\\'' FROM t;"
   let tokens = tokenize(dialect=MySQL::{  }, input)
-  inspect(
+  debug_inspect(
     tokens,
     content=(
-      #|[Keyword(Select), StringLiteral("Hello, 'World!'"), Keyword(From), Identifier("t"), Semicolon]
+      #|[
+      #|  Keyword(Select),
+      #|  StringLiteral("Hello, 'World!'"),
+      #|  Keyword(From),
+      #|  Identifier("t"),
+      #|  Semicolon,
+      #|]
     ),
   )
 }
@@ -746,10 +817,16 @@ test "Single quoted string with escaped backslash" {
 test "MySQL backtick quoted identifiers" {
   let input = "SELECT `column name` FROM `table name`;"
   let tokens = tokenize(dialect=MySQL::{  }, input)
-  inspect(
+  debug_inspect(
     tokens,
     content=(
-      #|[Keyword(Select), Identifier("column name"), Keyword(From), Identifier("table name"), Semicolon]
+      #|[
+      #|  Keyword(Select),
+      #|  Identifier("column name"),
+      #|  Keyword(From),
+      #|  Identifier("table name"),
+      #|  Semicolon,
+      #|]
     ),
   )
 }
@@ -758,10 +835,16 @@ test "MySQL backtick quoted identifiers" {
 test "MySQL backtick with escaped backticks" {
   let input = "SELECT `column``with``backticks` FROM t;"
   let tokens = tokenize(dialect=MySQL::{  }, input)
-  inspect(
+  debug_inspect(
     tokens,
     content=(
-      #|[Keyword(Select), Identifier("column`with`backticks"), Keyword(From), Identifier("t"), Semicolon]
+      #|[
+      #|  Keyword(Select),
+      #|  Identifier("column`with`backticks"),
+      #|  Keyword(From),
+      #|  Identifier("t"),
+      #|  Semicolon,
+      #|]
     ),
   )
 }

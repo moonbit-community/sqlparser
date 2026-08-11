@@ -20,7 +20,8 @@ pub impl @pp.Pretty for Statements with fn pretty(self) {
 }
 
 ///|
-pub fn Statements::op_get(self : Self, index : Int) -> Statement {
+#alias("_[_]")
+pub fn Statements::get(self : Self, index : Int) -> Statement {
   self.stmts[index]
 }
 
@@ -145,7 +146,7 @@ pub impl @pp.Pretty for QueryStmt with fn pretty(self) {
       @pp.hardline
     None => @pp.empty
   }) +
-  self.body.pretty() +
+  @pp.Pretty::pretty(self.body) +
   (if self.order_by.length() > 0 {
     @pp.hardline +
     @pp.text("ORDER BY") +
@@ -185,7 +186,11 @@ impl @pp.Pretty for SetExpr with fn pretty(self) {
     Query(stmt) =>
       @pp.parens(@pp.nest(@pp.hardline + stmt.pretty()) + @pp.hardline)
     SetOperation(op, left, right) =>
-      left.pretty() + @pp.hardline + op.pretty() + @pp.hardline + right.pretty()
+      @pp.Pretty::pretty(left) +
+      @pp.hardline +
+      op.pretty() +
+      @pp.hardline +
+      @pp.Pretty::pretty(right)
   }
 }
 
