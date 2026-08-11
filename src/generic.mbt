@@ -5,44 +5,48 @@
 pub(all) struct Generic {}
 
 ///|
-pub impl Dialect for Generic with supports_string_literal_backslash_escape(
+pub impl Dialect for Generic with fn supports_string_literal_backslash_escape(
   _self,
 ) {
   true
 }
 
 ///|
-pub impl Dialect for Generic with supports_boolean_literals(_self) {
+pub impl Dialect for Generic with fn supports_boolean_literals(_self) {
   true
 }
 
 ///|
-pub impl Dialect for Generic with supports_filter_during_aggregation(_self) {
+pub impl Dialect for Generic with fn supports_filter_during_aggregation(_self) {
   true
 }
 
 ///|
-pub impl Dialect for Generic with supports_within_after_array_aggregation(_self) {
+pub impl Dialect for Generic with fn supports_within_after_array_aggregation(
+  _self,
+) {
   true
 }
 
 ///|
-pub impl Dialect for Generic with requires_column_types_in_create_table(_self) {
+pub impl Dialect for Generic with fn requires_column_types_in_create_table(
+  _self,
+) {
   false
 }
 
 ///|
-pub impl Dialect for Generic with supports_if_not_exists(_self) {
+pub impl Dialect for Generic with fn supports_if_not_exists(_self) {
   true
 }
 
 ///|
-pub impl Dialect for Generic with supports_double_quoted_identifiers(_self) {
+pub impl Dialect for Generic with fn supports_double_quoted_identifiers(_self) {
   true
 }
 
 ///|
-pub impl Dialect for Generic with parse_statement(
+pub impl Dialect for Generic with fn parse_statement(
   _self : Generic,
   _parser : Parser,
   _tokens : ArrayView[Token],
@@ -51,7 +55,7 @@ pub impl Dialect for Generic with parse_statement(
 }
 
 ///|
-pub impl Dialect for Generic with parse_expr(
+pub impl Dialect for Generic with fn parse_expr(
   _self : Generic,
   _tokens : ArrayView[Token],
 ) -> ParserResult[Expr]? raise ParserError {
