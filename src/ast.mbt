@@ -15,7 +15,7 @@ pub(all) struct Statements {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for Statements with pretty(self) {
+pub impl @pp.Pretty for Statements with fn pretty(self) {
   @pp.separate(@pp.hardline + @pp.hardline, self.stmts.map(@pp.pretty))
 }
 
@@ -70,7 +70,7 @@ pub(all) enum Statement {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for Statement with pretty(self) {
+pub impl @pp.Pretty for Statement with fn pretty(self) {
   (match self {
     Statement::Query(stmt) => stmt.pretty()
     CreateTable(stmt) => stmt.pretty()
@@ -137,7 +137,7 @@ pub(all) struct QueryStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for QueryStmt with pretty(self) {
+pub impl @pp.Pretty for QueryStmt with fn pretty(self) {
   (match self.with_clause {
     Some(ctes) =>
       @pp.text("WITH ") +
@@ -179,7 +179,7 @@ enum SetExpr {
 } derive(Eq, Debug)
 
 ///|
-impl @pp.Pretty for SetExpr with pretty(self) {
+impl @pp.Pretty for SetExpr with fn pretty(self) {
   match self {
     Select(stmt) => stmt.pretty()
     Query(stmt) =>
@@ -208,7 +208,7 @@ struct SelectStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for SelectStmt with pretty(self) {
+pub impl @pp.Pretty for SelectStmt with fn pretty(self) {
   @pp.text("SELECT") +
   (if self.top is Some(top) { top.pretty() } else { @pp.empty }) +
   (if self.distinct { @pp.text(" DISTINCT") } else { @pp.empty }) +
@@ -261,7 +261,7 @@ enum SetOperator {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for SetOperator with pretty(self) {
+pub impl @pp.Pretty for SetOperator with fn pretty(self) {
   match self {
     SetOperator::Union => @pp.text("UNION")
     SetOperator::Intersect => @pp.text("INTERSECT")
@@ -277,7 +277,7 @@ pub(all) enum Projection {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for Projection with pretty(self) {
+pub impl @pp.Pretty for Projection with fn pretty(self) {
   match self {
     Projection::Wildcard => @pp.char('*')
     Projection::UnamedExpr(expr) => expr.pretty()
@@ -356,7 +356,7 @@ fn wrap_parens(expr : Expr, current_op : BinaryOperator) -> @pp.Document {
 }
 
 ///|
-pub impl @pp.Pretty for Expr with pretty(self) {
+pub impl @pp.Pretty for Expr with fn pretty(self) {
   match self {
     Expr::Identifier(name) => @pp.text(name)
     Expr::CompoundIdentifier(parts) =>
@@ -464,7 +464,7 @@ pub(all) enum Literal {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for Literal with pretty(self) {
+pub impl @pp.Pretty for Literal with fn pretty(self) {
   match self {
     Literal::Integer(value) => @pp.text("\{value}")
     Literal::Double(value) => @pp.text("\{value}")
@@ -482,7 +482,7 @@ pub(all) struct ArrayExpr {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for ArrayExpr with pretty(self) {
+pub impl @pp.Pretty for ArrayExpr with fn pretty(self) {
   (if self.named { @pp.text("ARRAY") } else { @pp.empty }) +
   @pp.text("[") +
   @pp.separate(@pp.text(", "), self.elem.map(@pp.pretty)) +
@@ -497,7 +497,7 @@ pub(all) enum AccessExpr {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for AccessExpr with pretty(self) {
+pub impl @pp.Pretty for AccessExpr with fn pretty(self) {
   match self {
     AccessExpr::Dot(expr) => @pp.text(".") + expr.pretty()
     AccessExpr::Subscript(subscript) => subscript.pretty()
@@ -512,7 +512,7 @@ pub(all) enum Subscript {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for Subscript with pretty(self) {
+pub impl @pp.Pretty for Subscript with fn pretty(self) {
   match self {
     Subscript::Index(index) => @pp.text("[") + index.pretty() + @pp.text("]")
     Subscript::Slice(lower, upper, stride) =>
@@ -543,7 +543,7 @@ pub(all) struct Cte {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for Cte with pretty(self) {
+pub impl @pp.Pretty for Cte with fn pretty(self) {
   @pp.text(self.name) +
   (match self.columns {
     Some(cols) =>
@@ -585,7 +585,7 @@ pub(all) enum BinaryOperator {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for BinaryOperator with pretty(self) {
+pub impl @pp.Pretty for BinaryOperator with fn pretty(self) {
   match self {
     BinaryOperator::Eq => @pp.text("=")
     BinaryOperator::Neq => @pp.text("<>")
@@ -620,7 +620,7 @@ pub(all) enum UnaryOperator {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for UnaryOperator with pretty(self) {
+pub impl @pp.Pretty for UnaryOperator with fn pretty(self) {
   match self {
     UnaryOperator::Plus => @pp.text("+")
     UnaryOperator::Minus => @pp.text("-")
@@ -639,7 +639,7 @@ pub(all) struct OrderByExpr {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for OrderByExpr with pretty(self) {
+pub impl @pp.Pretty for OrderByExpr with fn pretty(self) {
   self.expr.pretty() +
   (match self.asc {
     Some(true) => @pp.text(" ASC")
@@ -660,7 +660,7 @@ pub(all) struct TableRef {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for TableRef with pretty(self) {
+pub impl @pp.Pretty for TableRef with fn pretty(self) {
   self.factor.pretty() +
   @pp.separate_map(@pp.hardline, self.joins, fn(join) { join.pretty() })
 }
@@ -674,7 +674,7 @@ pub(all) enum TableFactor {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for TableFactor with pretty(self) {
+pub impl @pp.Pretty for TableFactor with fn pretty(self) {
   match self {
     TableFactor::Column(name, alias_name) =>
       name.pretty() +
@@ -700,7 +700,7 @@ pub(all) struct TableAlias {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for TableAlias with pretty(self) {
+pub impl @pp.Pretty for TableAlias with fn pretty(self) {
   @pp.text(" AS ") +
   @pp.text(self.name) +
   (if self.columns.length() > 0 {
@@ -720,7 +720,7 @@ pub(all) struct Join {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for Join with pretty(self) {
+pub impl @pp.Pretty for Join with fn pretty(self) {
   @pp.space +
   self.join_operator.pretty() +
   @pp.space +
@@ -752,7 +752,7 @@ pub(all) enum JoinOperator {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for JoinOperator with pretty(self) {
+pub impl @pp.Pretty for JoinOperator with fn pretty(self) {
   match self {
     JoinOperator::Join(_) => @pp.text("JOIN")
     JoinOperator::Left(_) => @pp.text("LEFT JOIN")
@@ -776,7 +776,7 @@ pub(all) enum JoinConstraint {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for JoinConstraint with pretty(self) {
+pub impl @pp.Pretty for JoinConstraint with fn pretty(self) {
   match self {
     JoinConstraint::On(expr) =>
       @pp.nest(@pp.hardline + @pp.text("ON ") + expr.pretty())
@@ -800,7 +800,7 @@ pub(all) enum IntervalQualifier {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for IntervalQualifier with pretty(self) {
+pub impl @pp.Pretty for IntervalQualifier with fn pretty(self) {
   match self {
     IntervalQualifier::Single(field) => field.pretty()
     IntervalQualifier::Range(from, to) =>
@@ -817,7 +817,7 @@ struct PrimaryDatetimeField {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for PrimaryDatetimeField with pretty(self) {
+pub impl @pp.Pretty for PrimaryDatetimeField with fn pretty(self) {
   self.field.pretty() +
   @pp.group(
     if self.precision is Some(p) {
@@ -839,7 +839,7 @@ pub(all) enum DatetimeUnit {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for DatetimeUnit with pretty(self) {
+pub impl @pp.Pretty for DatetimeUnit with fn pretty(self) {
   match self {
     DatetimeUnit::Year => @pp.text("YEAR")
     DatetimeUnit::Month => @pp.text("MONTH")
@@ -862,7 +862,7 @@ pub(all) struct CaseExpr {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for CaseExpr with pretty(self) {
+pub impl @pp.Pretty for CaseExpr with fn pretty(self) {
   @pp.text("CASE") +
   (match self.operand {
     Some(op) => @pp.space + op.pretty()
@@ -929,7 +929,7 @@ pub(all) enum WindowFrameBound {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for WindowSpec with pretty(self) {
+pub impl @pp.Pretty for WindowSpec with fn pretty(self) {
   let partition_clause = if self.partition_by.is_empty() {
     @pp.empty
   } else {
@@ -957,7 +957,7 @@ pub impl @pp.Pretty for WindowSpec with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for WindowFrameClause with pretty(self) {
+pub impl @pp.Pretty for WindowFrameClause with fn pretty(self) {
   let units_text = match self.frame_units {
     WindowFrameUnits::Rows => "ROWS"
     WindowFrameUnits::Range => "RANGE"
@@ -974,7 +974,7 @@ pub impl @pp.Pretty for WindowFrameClause with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for WindowFrameBound with pretty(self) {
+pub impl @pp.Pretty for WindowFrameBound with fn pretty(self) {
   match self {
     WindowFrameBound::UnboundedPreceding => @pp.text("UNBOUNDED PRECEDING")
     WindowFrameBound::UnboundedFollowing => @pp.text("UNBOUNDED FOLLOWING")
@@ -1003,7 +1003,7 @@ pub(all) enum CreateTableDefinition {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for CreateTableStmt with pretty(self) {
+pub impl @pp.Pretty for CreateTableStmt with fn pretty(self) {
   @pp.text("CREATE TABLE ") +
   (if self.if_not_exists { @pp.text("IF NOT EXISTS ") } else { @pp.empty }) +
   @pp.text(self.name) +
@@ -1012,7 +1012,7 @@ pub impl @pp.Pretty for CreateTableStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for CreateTableDefinition with pretty(self) {
+pub impl @pp.Pretty for CreateTableDefinition with fn pretty(self) {
   match self {
     CreateTableDefinition::Columns(columns, constraints) =>
       @pp.text("(") +
@@ -1044,7 +1044,7 @@ pub(all) struct ColumnDef {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for ColumnDef with pretty(self) {
+pub impl @pp.Pretty for ColumnDef with fn pretty(self) {
   @pp.text(self.name) +
   @pp.space +
   self.data_type.pretty() +
@@ -1069,7 +1069,7 @@ pub(all) enum DataType {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for DataType with pretty(self) {
+pub impl @pp.Pretty for DataType with fn pretty(self) {
   match self {
     Integer => @pp.text("INTEGER")
     Smallint => @pp.text("SMALLINT")
@@ -1096,7 +1096,7 @@ pub(all) enum ColumnDefOption {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for ColumnDefOption with pretty(self) {
+pub impl @pp.Pretty for ColumnDefOption with fn pretty(self) {
   match self {
     NotNull => @pp.text(" NOT NULL")
     Unique => @pp.text(" UNIQUE")
@@ -1116,7 +1116,7 @@ struct CreateViewStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for CreateViewStmt with pretty(self) {
+pub impl @pp.Pretty for CreateViewStmt with fn pretty(self) {
   @pp.text("CREATE VIEW ") +
   @pp.text(self.name) +
   (if self.columns.length() > 0 {
@@ -1175,7 +1175,7 @@ pub(all) struct IndexColumn {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for CreateIndexStmt with pretty(self) {
+pub impl @pp.Pretty for CreateIndexStmt with fn pretty(self) {
   @pp.text("CREATE") +
   (if self.unique { @pp.text(" UNIQUE") } else { @pp.empty }) +
   @pp.text(" INDEX") +
@@ -1199,7 +1199,7 @@ pub impl @pp.Pretty for CreateIndexStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for IndexMethod with pretty(self) {
+pub impl @pp.Pretty for IndexMethod with fn pretty(self) {
   match self {
     IndexMethod::Btree => @pp.text("BTREE")
     IndexMethod::Hash => @pp.text("HASH")
@@ -1211,7 +1211,7 @@ pub impl @pp.Pretty for IndexMethod with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for IndexColumn with pretty(self) {
+pub impl @pp.Pretty for IndexColumn with fn pretty(self) {
   self.name.pretty() +
   (match self.asc {
     Some(true) => @pp.text(" ASC")
@@ -1226,7 +1226,7 @@ pub impl @pp.Pretty for IndexColumn with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for ViewColumnDef with pretty(self) {
+pub impl @pp.Pretty for ViewColumnDef with fn pretty(self) {
   @pp.text(self.name)
 }
 
@@ -1244,7 +1244,7 @@ pub(all) struct CreateDatabaseStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for CreateDatabaseStmt with pretty(self) {
+pub impl @pp.Pretty for CreateDatabaseStmt with fn pretty(self) {
   @pp.text("CREATE DATABASE ") +
   (if self.if_not_exists { @pp.text("IF NOT EXISTS ") } else { @pp.empty }) +
   @pp.text(self.name) +
@@ -1270,7 +1270,7 @@ pub(all) struct CreateSchemaStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for CreateSchemaStmt with pretty(self) {
+pub impl @pp.Pretty for CreateSchemaStmt with fn pretty(self) {
   @pp.text("CREATE SCHEMA ") +
   (if self.if_not_exists { @pp.text("IF NOT EXISTS ") } else { @pp.empty }) +
   @pp.text(self.name) +
@@ -1334,7 +1334,7 @@ pub(all) struct CreateProcedureStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for CreateFunctionStmt with pretty(self) {
+pub impl @pp.Pretty for CreateFunctionStmt with fn pretty(self) {
   @pp.text("CREATE FUNCTION ") +
   (if self.if_not_exists { @pp.text("IF NOT EXISTS ") } else { @pp.empty }) +
   @pp.text(self.name) +
@@ -1356,7 +1356,7 @@ pub impl @pp.Pretty for CreateFunctionStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for CreateProcedureStmt with pretty(self) {
+pub impl @pp.Pretty for CreateProcedureStmt with fn pretty(self) {
   @pp.text("CREATE PROCEDURE ") +
   (if self.if_not_exists { @pp.text("IF NOT EXISTS ") } else { @pp.empty }) +
   @pp.text(self.name) +
@@ -1416,7 +1416,7 @@ pub(all) enum SequenceOwnedBy {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for CreateSequenceStmt with pretty(self) {
+pub impl @pp.Pretty for CreateSequenceStmt with fn pretty(self) {
   @pp.text("CREATE ") +
   (if self.temporary { @pp.text("TEMPORARY ") } else { @pp.empty }) +
   @pp.text("SEQUENCE ") +
@@ -1460,7 +1460,7 @@ pub impl @pp.Pretty for CreateSequenceStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for SequenceLimit with pretty(self) {
+pub impl @pp.Pretty for SequenceLimit with fn pretty(self) {
   match self {
     SequenceLimit::Value(val) => @pp.text(val.to_string())
     SequenceLimit::NoLimit => @pp.text("NO LIMIT")
@@ -1468,7 +1468,7 @@ pub impl @pp.Pretty for SequenceLimit with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for SequenceOwnedBy with pretty(self) {
+pub impl @pp.Pretty for SequenceOwnedBy with fn pretty(self) {
   match self {
     SequenceOwnedBy::Column(table, column) =>
       table.pretty() + @pp.text(".") + @pp.text(column)
@@ -1477,7 +1477,7 @@ pub impl @pp.Pretty for SequenceOwnedBy with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for FunctionParameter with pretty(self) {
+pub impl @pp.Pretty for FunctionParameter with fn pretty(self) {
   (match self.mode {
     Some(ParameterMode::In) => @pp.text("IN ")
     Some(ParameterMode::Out) => @pp.text("OUT ")
@@ -1490,7 +1490,7 @@ pub impl @pp.Pretty for FunctionParameter with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for ParameterMode with pretty(self) {
+pub impl @pp.Pretty for ParameterMode with fn pretty(self) {
   match self {
     ParameterMode::In => @pp.text("IN")
     ParameterMode::Out => @pp.text("OUT")
@@ -1505,7 +1505,7 @@ pub(all) struct DropViewStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for DropViewStmt with pretty(self) {
+pub impl @pp.Pretty for DropViewStmt with fn pretty(self) {
   @pp.text("DROP VIEW ") + @pp.text(self.name)
 }
 
@@ -1518,7 +1518,7 @@ pub(all) enum DuplicateTreatment {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for DuplicateTreatment with pretty(self) {
+pub impl @pp.Pretty for DuplicateTreatment with fn pretty(self) {
   match self {
     DuplicateTreatment::Distinct => @pp.text("DISTINCT")
     DuplicateTreatment::All => @pp.text("ALL")
@@ -1538,7 +1538,7 @@ pub(all) enum TableConstraint {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for TableConstraint with pretty(self) {
+pub impl @pp.Pretty for TableConstraint with fn pretty(self) {
   match self {
     Unique(cols) =>
       @pp.text("UNIQUE ") +
@@ -1568,7 +1568,7 @@ pub(all) struct ObjectName {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for ObjectName with pretty(self) {
+pub impl @pp.Pretty for ObjectName with fn pretty(self) {
   @pp.separate(
     @pp.text("."),
     self.parts.map(fn(part) {
@@ -1589,7 +1589,7 @@ pub(all) enum Top {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for Top with pretty(self) {
+pub impl @pp.Pretty for Top with fn pretty(self) {
   match self {
     Top::Constant(value) => @pp.text(" TOP \{value}")
     Top::Expr(expr) => @pp.text(" TOP (") + expr.pretty() + @pp.text(")")
@@ -1611,7 +1611,7 @@ pub(all) struct InsertStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for InsertStmt with pretty(self) {
+pub impl @pp.Pretty for InsertStmt with fn pretty(self) {
   // Handle REPLACE vs INSERT OR REPLACE
   (match self.or {
     Some(SqliteOnConflict::Replace) => @pp.text("REPLACE INTO ")
@@ -1643,7 +1643,7 @@ pub(all) enum InsertSource {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for InsertSource with pretty(self) {
+pub impl @pp.Pretty for InsertSource with fn pretty(self) {
   match self {
     InsertSource::Values(rows) =>
       @pp.text("VALUES ") +
@@ -1666,7 +1666,7 @@ pub(all) struct DeleteStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for DeleteStmt with pretty(self) {
+pub impl @pp.Pretty for DeleteStmt with fn pretty(self) {
   @pp.text("DELETE FROM ") +
   self.table_name.pretty() +
   (match self.where_clause {
@@ -1694,7 +1694,7 @@ pub(all) struct Assignment {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for UpdateStmt with pretty(self) {
+pub impl @pp.Pretty for UpdateStmt with fn pretty(self) {
   @pp.text("UPDATE ") +
   self.table_name.pretty() +
   @pp.hardline +
@@ -1707,7 +1707,7 @@ pub impl @pp.Pretty for UpdateStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for Assignment with pretty(self) {
+pub impl @pp.Pretty for Assignment with fn pretty(self) {
   @pp.text(self.column) + @pp.text(" = ") + self.value.pretty()
 }
 
@@ -1769,7 +1769,7 @@ pub(all) enum MergeAction {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for MergeStmt with pretty(self) {
+pub impl @pp.Pretty for MergeStmt with fn pretty(self) {
   @pp.text("MERGE INTO ") +
   self.target_table.pretty() +
   (match self.target_alias {
@@ -1798,7 +1798,7 @@ pub impl @pp.Pretty for MergeStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for MergeSource with pretty(self) {
+pub impl @pp.Pretty for MergeSource with fn pretty(self) {
   match self {
     MergeSource::Table(table) => table.pretty()
     MergeSource::Query(query) =>
@@ -1807,7 +1807,7 @@ pub impl @pp.Pretty for MergeSource with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for MergeWhenClause with pretty(self) {
+pub impl @pp.Pretty for MergeWhenClause with fn pretty(self) {
   @pp.text("WHEN ") +
   self.match_type.pretty() +
   (match self.condition {
@@ -1819,7 +1819,7 @@ pub impl @pp.Pretty for MergeWhenClause with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for MergeMatchType with pretty(self) {
+pub impl @pp.Pretty for MergeMatchType with fn pretty(self) {
   match self {
     MergeMatchType::Matched => @pp.text("MATCHED")
     MergeMatchType::NotMatched => @pp.text("NOT MATCHED")
@@ -1827,7 +1827,7 @@ pub impl @pp.Pretty for MergeMatchType with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for MergeAction with pretty(self) {
+pub impl @pp.Pretty for MergeAction with fn pretty(self) {
   match self {
     MergeAction::Insert(columns, values) =>
       @pp.text("INSERT ") +
@@ -1853,7 +1853,7 @@ pub(all) struct TruncateStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for TruncateStmt with pretty(self) {
+pub impl @pp.Pretty for TruncateStmt with fn pretty(self) {
   @pp.text("TRUNCATE ") + self.table_name.pretty()
 }
 
@@ -1866,7 +1866,7 @@ pub(all) struct DropTableStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for DropTableStmt with pretty(self) {
+pub impl @pp.Pretty for DropTableStmt with fn pretty(self) {
   @pp.text("DROP TABLE ") +
   (if self.if_exists { @pp.text("IF EXISTS ") } else { @pp.empty }) +
   self.table_name.pretty()
@@ -1885,7 +1885,7 @@ pub(all) struct DropIndexStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for DropIndexStmt with pretty(self) {
+pub impl @pp.Pretty for DropIndexStmt with fn pretty(self) {
   @pp.text("DROP INDEX ") +
   (if self.concurrently { @pp.text("CONCURRENTLY ") } else { @pp.empty }) +
   (if self.if_exists { @pp.text("IF EXISTS ") } else { @pp.empty }) +
@@ -1913,7 +1913,7 @@ pub(all) enum AlterTableOperation {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for AlterTableStmt with pretty(self) {
+pub impl @pp.Pretty for AlterTableStmt with fn pretty(self) {
   @pp.text("ALTER TABLE ") +
   (if self.if_exists { @pp.text("IF EXISTS ") } else { @pp.empty }) +
   self.table_name.pretty() +
@@ -1922,7 +1922,7 @@ pub impl @pp.Pretty for AlterTableStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for AlterTableOperation with pretty(self) {
+pub impl @pp.Pretty for AlterTableOperation with fn pretty(self) {
   match self {
     AlterTableOperation::DropColumn(column_name, if_exists) =>
       @pp.text("DROP COLUMN ") +
@@ -1963,7 +1963,7 @@ pub(all) struct IndexParameter {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for AlterIndexStmt with pretty(self) {
+pub impl @pp.Pretty for AlterIndexStmt with fn pretty(self) {
   @pp.text("ALTER INDEX ") +
   (if self.if_exists { @pp.text("IF EXISTS ") } else { @pp.empty }) +
   @pp.text(self.name) +
@@ -1972,7 +1972,7 @@ pub impl @pp.Pretty for AlterIndexStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for AlterIndexOperation with pretty(self) {
+pub impl @pp.Pretty for AlterIndexOperation with fn pretty(self) {
   match self {
     AlterIndexOperation::RenameTo(new_name) =>
       @pp.text("RENAME TO ") + @pp.text(new_name)
@@ -1990,7 +1990,7 @@ pub impl @pp.Pretty for AlterIndexOperation with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for IndexParameter with pretty(self) {
+pub impl @pp.Pretty for IndexParameter with fn pretty(self) {
   @pp.text(self.name) + @pp.text(" = ") + @pp.text(self.value)
 }
 
@@ -2035,7 +2035,7 @@ pub(all) enum ShowFilter {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for ShowStmt with pretty(self) {
+pub impl @pp.Pretty for ShowStmt with fn pretty(self) {
   @pp.text("SHOW ") +
   (if self.extended { @pp.text("EXTENDED ") } else { @pp.empty }) +
   (if self.full { @pp.text("FULL ") } else { @pp.empty }) +
@@ -2062,7 +2062,7 @@ pub impl @pp.Pretty for ShowStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for ShowType with pretty(self) {
+pub impl @pp.Pretty for ShowType with fn pretty(self) {
   match self {
     ShowType::Tables => @pp.text("TABLES")
     ShowType::Columns => @pp.text("COLUMNS")
@@ -2083,7 +2083,7 @@ pub impl @pp.Pretty for ShowType with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for ShowFilter with pretty(self) {
+pub impl @pp.Pretty for ShowFilter with fn pretty(self) {
   match self {
     ShowFilter::Like(pattern) =>
       @pp.text("LIKE '") + @pp.text(pattern) + @pp.text("'")
@@ -2116,7 +2116,7 @@ pub(all) struct SetAssignment {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for SetStmt with pretty(self) {
+pub impl @pp.Pretty for SetStmt with fn pretty(self) {
   @pp.text("SET ") +
   (match self.scope {
     SetScope::Global => @pp.text("GLOBAL ")
@@ -2128,7 +2128,7 @@ pub impl @pp.Pretty for SetStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for SetAssignment with pretty(self) {
+pub impl @pp.Pretty for SetAssignment with fn pretty(self) {
   (match self.variable {
     variable if variable.strip_prefix("@") != None => @pp.text(variable)
     variable => @pp.text(variable)
@@ -2145,7 +2145,7 @@ pub(all) struct UseStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for UseStmt with pretty(self) {
+pub impl @pp.Pretty for UseStmt with fn pretty(self) {
   @pp.text("USE ") + self.database_name.pretty()
 }
 
@@ -2236,7 +2236,7 @@ pub(all) enum CopyForceQuote {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for CopyStmt with pretty(self) {
+pub impl @pp.Pretty for CopyStmt with fn pretty(self) {
   @pp.text("COPY ") +
   self.source.pretty() +
   @pp.space +
@@ -2254,7 +2254,7 @@ pub impl @pp.Pretty for CopyStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for CopySource with pretty(self) {
+pub impl @pp.Pretty for CopySource with fn pretty(self) {
   match self {
     CopySource::Table(table_name, columns) =>
       table_name.pretty() +
@@ -2270,7 +2270,7 @@ pub impl @pp.Pretty for CopySource with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for CopyDirection with pretty(self) {
+pub impl @pp.Pretty for CopyDirection with fn pretty(self) {
   match self {
     CopyDirection::To => @pp.text("TO")
     CopyDirection::From => @pp.text("FROM")
@@ -2278,7 +2278,7 @@ pub impl @pp.Pretty for CopyDirection with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for CopyTarget with pretty(self) {
+pub impl @pp.Pretty for CopyTarget with fn pretty(self) {
   match self {
     CopyTarget::File(filename) =>
       @pp.text("'") + @pp.text(filename) + @pp.text("'")
@@ -2290,7 +2290,7 @@ pub impl @pp.Pretty for CopyTarget with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for CopyOption with pretty(self) {
+pub impl @pp.Pretty for CopyOption with fn pretty(self) {
   match self {
     CopyOption::Format(format) => @pp.text("FORMAT ") + format.pretty()
     CopyOption::Delimiter(delim) =>
@@ -2320,7 +2320,7 @@ pub impl @pp.Pretty for CopyOption with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for CopyFormat with pretty(self) {
+pub impl @pp.Pretty for CopyFormat with fn pretty(self) {
   match self {
     CopyFormat::Csv => @pp.text("CSV")
     CopyFormat::Text => @pp.text("TEXT")
@@ -2329,7 +2329,7 @@ pub impl @pp.Pretty for CopyFormat with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for CopyForceQuote with pretty(self) {
+pub impl @pp.Pretty for CopyForceQuote with fn pretty(self) {
   match self {
     CopyForceQuote::All => @pp.text("*")
     CopyForceQuote::Columns(columns) =>
@@ -2347,7 +2347,7 @@ pub(all) enum OnInsert {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for OnInsert with pretty(self) {
+pub impl @pp.Pretty for OnInsert with fn pretty(self) {
   match self {
     OnInsert::DuplicateKeyUpdate(assignments) =>
       @pp.text("ON DUPLICATE KEY UPDATE ") +
@@ -2388,7 +2388,7 @@ pub(all) enum ConflictAction {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for OnConflictClause with pretty(self) {
+pub impl @pp.Pretty for OnConflictClause with fn pretty(self) {
   (match self.conflict_target {
     Some(target) => target.pretty() + @pp.space
     None => @pp.empty
@@ -2397,7 +2397,7 @@ pub impl @pp.Pretty for OnConflictClause with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for ConflictTarget with pretty(self) {
+pub impl @pp.Pretty for ConflictTarget with fn pretty(self) {
   match self {
     ConflictTarget::Columns(columns) =>
       @pp.parens(@pp.separate(@pp.text(", "), columns.map(@pp.text)))
@@ -2413,7 +2413,7 @@ pub impl @pp.Pretty for ConflictTarget with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for ConflictAction with pretty(self) {
+pub impl @pp.Pretty for ConflictAction with fn pretty(self) {
   match self {
     ConflictAction::DoNothing => @pp.text("DO NOTHING")
     ConflictAction::DoUpdate(assignments, where_condition) =>
@@ -2438,7 +2438,7 @@ pub(all) enum SqliteOnConflict {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for SqliteOnConflict with pretty(self) {
+pub impl @pp.Pretty for SqliteOnConflict with fn pretty(self) {
   match self {
     SqliteOnConflict::Rollback => @pp.text("OR ROLLBACK")
     SqliteOnConflict::Abort => @pp.text("OR ABORT")
@@ -2458,7 +2458,7 @@ pub(all) struct BeginStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for BeginStmt with pretty(self) {
+pub impl @pp.Pretty for BeginStmt with fn pretty(self) {
   @pp.text("BEGIN") +
   (if self.work { @pp.text(" WORK") } else { @pp.empty }) +
   (if self.transaction { @pp.text(" TRANSACTION") } else { @pp.empty })
@@ -2472,7 +2472,7 @@ pub(all) struct CommitStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for CommitStmt with pretty(self) {
+pub impl @pp.Pretty for CommitStmt with fn pretty(self) {
   @pp.text("COMMIT") +
   (if self.work { @pp.text(" WORK") } else { @pp.empty }) +
   (if self.transaction { @pp.text(" TRANSACTION") } else { @pp.empty })
@@ -2487,7 +2487,7 @@ pub(all) struct RollbackStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for RollbackStmt with pretty(self) {
+pub impl @pp.Pretty for RollbackStmt with fn pretty(self) {
   @pp.text("ROLLBACK") +
   (if self.work { @pp.text(" WORK") } else { @pp.empty }) +
   (if self.transaction { @pp.text(" TRANSACTION") } else { @pp.empty }) +
@@ -2504,7 +2504,7 @@ pub(all) struct SavepointStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for SavepointStmt with pretty(self) {
+pub impl @pp.Pretty for SavepointStmt with fn pretty(self) {
   @pp.text("SAVEPOINT ") + @pp.text(self.name)
 }
 
@@ -2516,7 +2516,7 @@ pub(all) struct ReleaseSavepointStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for ReleaseSavepointStmt with pretty(self) {
+pub impl @pp.Pretty for ReleaseSavepointStmt with fn pretty(self) {
   @pp.text("RELEASE ") +
   (if self.savepoint_keyword { @pp.text("SAVEPOINT ") } else { @pp.empty }) +
   @pp.text(self.name)
@@ -2555,7 +2555,7 @@ pub(all) enum Privilege {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for GrantStmt with pretty(self) {
+pub impl @pp.Pretty for GrantStmt with fn pretty(self) {
   @pp.text("GRANT ") +
   @pp.separate(@pp.text(", "), self.privileges.map(@pp.pretty)) +
   @pp.text(" ON ") +
@@ -2570,7 +2570,7 @@ pub impl @pp.Pretty for GrantStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for Privilege with pretty(self) {
+pub impl @pp.Pretty for Privilege with fn pretty(self) {
   match self {
     Privilege::Select(cols) =>
       @pp.text("SELECT") +
@@ -2630,7 +2630,7 @@ pub(all) enum RevokeOption {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for RevokeStmt with pretty(self) {
+pub impl @pp.Pretty for RevokeStmt with fn pretty(self) {
   @pp.text("REVOKE ") +
   (if self.grant_option_for {
     @pp.text("GRANT OPTION FOR ")
@@ -2650,7 +2650,7 @@ pub impl @pp.Pretty for RevokeStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for RevokeOption with pretty(self) {
+pub impl @pp.Pretty for RevokeOption with fn pretty(self) {
   match self {
     RevokeOption::Restrict => @pp.text("RESTRICT")
     RevokeOption::Cascade => @pp.text("CASCADE")
@@ -2710,7 +2710,7 @@ pub(all) struct LoadDataLinesOptions {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for LoadDataStmt with pretty(self) {
+pub impl @pp.Pretty for LoadDataStmt with fn pretty(self) {
   @pp.text("LOAD DATA ") +
   (if self.is_local { @pp.text("LOCAL ") } else { @pp.empty }) +
   @pp.text("INFILE '") +
@@ -2762,7 +2762,7 @@ pub impl @pp.Pretty for LoadDataStmt with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for LoadDataDuplicateHandling with pretty(self) {
+pub impl @pp.Pretty for LoadDataDuplicateHandling with fn pretty(self) {
   match self {
     LoadDataDuplicateHandling::Replace => @pp.text("REPLACE")
     LoadDataDuplicateHandling::Ignore => @pp.text("IGNORE")
@@ -2770,7 +2770,7 @@ pub impl @pp.Pretty for LoadDataDuplicateHandling with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for LoadDataFieldsOptions with pretty(self) {
+pub impl @pp.Pretty for LoadDataFieldsOptions with fn pretty(self) {
   let parts = []
   match self.terminated_by {
     Some(term) =>
@@ -2801,7 +2801,7 @@ pub impl @pp.Pretty for LoadDataFieldsOptions with pretty(self) {
 }
 
 ///|
-pub impl @pp.Pretty for LoadDataLinesOptions with pretty(self) {
+pub impl @pp.Pretty for LoadDataLinesOptions with fn pretty(self) {
   let parts = []
   match self.starting_by {
     Some(start) =>
@@ -2833,7 +2833,7 @@ pub(all) struct PrepareStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for PrepareStmt with pretty(self) {
+pub impl @pp.Pretty for PrepareStmt with fn pretty(self) {
   @pp.text("PREPARE ") +
   @pp.text(self.name) +
   (if self.data_types.length() > 0 {
@@ -2914,7 +2914,7 @@ pub(all) struct ExecuteStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for ExecuteStmt with pretty(self) {
+pub impl @pp.Pretty for ExecuteStmt with fn pretty(self) {
   @pp.text("EXECUTE ") +
   (match self.name {
     Some(name) =>
@@ -2955,7 +2955,7 @@ pub(all) struct DeallocateStmt {
 } derive(Eq, Debug)
 
 ///|
-pub impl @pp.Pretty for DeallocateStmt with pretty(self) {
+pub impl @pp.Pretty for DeallocateStmt with fn pretty(self) {
   @pp.text("DEALLOCATE ") +
   (if self.prepare { @pp.text("PREPARE ") } else { @pp.empty }) +
   @pp.text(self.name)

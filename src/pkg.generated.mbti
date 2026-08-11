@@ -2,7 +2,7 @@
 package "moonbit-community/sqlparser"
 
 import {
-  "Yoorkin/prettyprinter",
+  "moonbit-community/prettyprinter",
   "moonbitlang/core/debug",
 }
 
@@ -1311,17 +1311,16 @@ pub impl Show for WindowSpec
 
 // Traits
 pub trait Dialect {
-  supports_string_literal_backslash_escape(Self) -> Bool
-  supports_boolean_literals(Self) -> Bool
-  supports_filter_during_aggregation(Self) -> Bool
-  supports_within_after_array_aggregation(Self) -> Bool
-  requires_column_types_in_create_table(Self) -> Bool
-  supports_if_not_exists(Self) -> Bool
-  supports_double_quoted_identifiers(Self) -> Bool
-  supports_array_syntax(Self) -> Bool
-  supports_named_parameters(Self) -> Bool
-  parse_expr(Self, ArrayView[Token]) -> (Expr, ArrayView[Token])? raise ParserError
-  parse_statement(Self, Parser, ArrayView[Token]) -> (Statement, ArrayView[Token])? raise ParserError
-  read_keyword(Self, String) -> Keyword?
+  fn supports_string_literal_backslash_escape(Self) -> Bool
+  fn supports_boolean_literals(Self) -> Bool
+  fn supports_filter_during_aggregation(Self) -> Bool
+  fn supports_within_after_array_aggregation(Self) -> Bool
+  fn requires_column_types_in_create_table(Self) -> Bool
+  fn supports_if_not_exists(Self) -> Bool
+  fn supports_double_quoted_identifiers(Self) -> Bool
+  fn supports_array_syntax(Self) -> Bool
+  fn supports_named_parameters(Self) -> Bool
+  fn parse_expr(Self, ArrayView[Token]) -> (Expr, ArrayView[Token])? raise ParserError
+  fn parse_statement(Self, Parser, ArrayView[Token]) -> (Statement, ArrayView[Token])? raise ParserError
+  fn read_keyword(Self, String) -> Keyword?
 }
-

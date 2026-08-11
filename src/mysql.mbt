@@ -2,42 +2,46 @@
 pub(all) struct MySQL {}
 
 ///|
-pub impl Dialect for MySQL with supports_string_literal_backslash_escape(_self) {
+pub impl Dialect for MySQL with fn supports_string_literal_backslash_escape(
+  _self,
+) {
   true
 }
 
 ///|
-pub impl Dialect for MySQL with supports_boolean_literals(_self) {
+pub impl Dialect for MySQL with fn supports_boolean_literals(_self) {
   true
 }
 
 ///|
-pub impl Dialect for MySQL with supports_filter_during_aggregation(_self) {
+pub impl Dialect for MySQL with fn supports_filter_during_aggregation(_self) {
   false
 }
 
 ///|
-pub impl Dialect for MySQL with supports_within_after_array_aggregation(_self) {
+pub impl Dialect for MySQL with fn supports_within_after_array_aggregation(
+  _self,
+) {
   false
 }
 
 ///|
-pub impl Dialect for MySQL with requires_column_types_in_create_table(_self) {
+pub impl Dialect for MySQL with fn requires_column_types_in_create_table(_self) {
   false
 }
 
 ///|
-pub impl Dialect for MySQL with supports_double_quoted_identifiers(_self) {
+pub impl Dialect for MySQL with fn supports_double_quoted_identifiers(_self) {
   false
 }
 
 ///|
-pub impl Dialect for MySQL with supports_if_not_exists(_self) {
+pub impl Dialect for MySQL with fn supports_if_not_exists(_self) {
   true
 }
 
 ///|
-pub impl Dialect for MySQL with read_keyword(_self : MySQL, word : String) -> Keyword? {
+pub impl Dialect for MySQL with fn read_keyword(_self : MySQL, word : String) -> Keyword? {
   match word {
     // MySQL-specific LOAD DATA keywords
     "load" => Some(Load)
@@ -56,7 +60,7 @@ pub impl Dialect for MySQL with read_keyword(_self : MySQL, word : String) -> Ke
 }
 
 ///|
-pub impl Dialect for MySQL with parse_statement(
+pub impl Dialect for MySQL with fn parse_statement(
   _self : MySQL,
   parser : Parser,
   tokens : ArrayView[Token],
@@ -85,7 +89,7 @@ pub impl Dialect for MySQL with parse_statement(
 }
 
 ///|
-pub impl Dialect for MySQL with parse_expr(
+pub impl Dialect for MySQL with fn parse_expr(
   _self : MySQL,
   _tokens : ArrayView[Token],
 ) -> ParserResult[Expr]? raise ParserError {

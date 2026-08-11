@@ -1,98 +1,98 @@
 ///|
 pub trait Dialect {
   /// Whether this dialect supports using backslash as escape character in string literals
-  supports_string_literal_backslash_escape(Self) -> Bool = _
+  fn supports_string_literal_backslash_escape(Self) -> Bool = _
 
   /// Whether this dialect supports boolean literals (TRUE/FALSE)
-  supports_boolean_literals(Self) -> Bool = _
+  fn supports_boolean_literals(Self) -> Bool = _
 
   /// Whether this dialect supports FILTER during aggregation (PostgreSQL style)
-  supports_filter_during_aggregation(Self) -> Bool = _
+  fn supports_filter_during_aggregation(Self) -> Bool = _
 
   /// Whether this dialect supports WITHIN after array aggregation functions
-  supports_within_after_array_aggregation(Self) -> Bool = _
+  fn supports_within_after_array_aggregation(Self) -> Bool = _
 
   /// Whether this dialect requires specifying column types in CREATE TABLE
-  requires_column_types_in_create_table(Self) -> Bool = _
+  fn requires_column_types_in_create_table(Self) -> Bool = _
 
   /// Whether this dialect supports IF NOT EXISTS in CREATE TABLE
-  supports_if_not_exists(Self) -> Bool = _
+  fn supports_if_not_exists(Self) -> Bool = _
 
   /// Whether this dialect supports double quotes for identifiers  
-  supports_double_quoted_identifiers(Self) -> Bool = _
+  fn supports_double_quoted_identifiers(Self) -> Bool = _
 
   /// Whether this dialect supports array syntax (ARRAY[...] and [...])
-  supports_array_syntax(Self) -> Bool = _
+  fn supports_array_syntax(Self) -> Bool = _
 
   /// Whether this dialect supports named parameters (@param_name)
-  supports_named_parameters(Self) -> Bool = _
+  fn supports_named_parameters(Self) -> Bool = _
 
   /// Custom expression parsing for dialect-specific syntax
-  parse_expr(Self, tokens : ArrayView[Token]) -> ParserResult[Expr]? raise ParserError = _
+  fn parse_expr(Self, tokens : ArrayView[Token]) -> ParserResult[Expr]? raise ParserError = _
 
   /// Custom statement parsing for dialect-specific syntax
-  parse_statement(Self, parser : Parser, tokens : ArrayView[Token]) -> ParserResult[
+  fn parse_statement(Self, parser : Parser, tokens : ArrayView[Token]) -> ParserResult[
     Statement,
   ]? raise ParserError = _
 
   /// Dialect-specific keyword recognition from string
-  read_keyword(Self, word : String) -> Keyword? = _
+  fn read_keyword(Self, word : String) -> Keyword? = _
 }
 
 ///|
-impl Dialect with supports_string_literal_backslash_escape(_self) {
+impl Dialect with fn supports_string_literal_backslash_escape(_self) {
   false
 }
 
 ///|
-impl Dialect with supports_boolean_literals(_self) {
+impl Dialect with fn supports_boolean_literals(_self) {
   true
 }
 
 ///|
-impl Dialect with supports_filter_during_aggregation(_self) {
+impl Dialect with fn supports_filter_during_aggregation(_self) {
   false
 }
 
 ///|
-impl Dialect with supports_within_after_array_aggregation(_self) {
+impl Dialect with fn supports_within_after_array_aggregation(_self) {
   false
 }
 
 ///|
-impl Dialect with requires_column_types_in_create_table(_self) {
+impl Dialect with fn requires_column_types_in_create_table(_self) {
   true
 }
 
 ///|
-impl Dialect with supports_if_not_exists(_self) {
+impl Dialect with fn supports_if_not_exists(_self) {
   true
 }
 
 ///|
-impl Dialect with supports_double_quoted_identifiers(_self) {
+impl Dialect with fn supports_double_quoted_identifiers(_self) {
   false
 }
 
 ///|
-impl Dialect with supports_array_syntax(_self) {
+impl Dialect with fn supports_array_syntax(_self) {
   false
 }
 
 ///|
-impl Dialect with supports_named_parameters(_self) {
+impl Dialect with fn supports_named_parameters(_self) {
   false
 }
 
 ///|
-impl Dialect with parse_expr(_self : Self, _tokens : ArrayView[Token]) -> ParserResult[
+impl Dialect with fn parse_expr(_self : Self, _tokens : ArrayView[Token]) -> ParserResult[
   Expr,
 ]? raise ParserError {
   None
 }
 
 ///|
-impl Dialect with parse_statement(
+impl Dialect with fn parse_statement(
   _self : Self,
   _parser : Parser,
   _tokens : ArrayView[Token],
@@ -103,7 +103,7 @@ impl Dialect with parse_statement(
 }
 
 ///|
-impl Dialect with read_keyword(_self : Self, _word : String) -> Keyword? {
+impl Dialect with fn read_keyword(_self : Self, _word : String) -> Keyword? {
   // By default, no dialect-specific keywords
   None
 }
