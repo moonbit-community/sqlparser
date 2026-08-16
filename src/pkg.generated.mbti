@@ -19,26 +19,53 @@ pub fn tokenize(dialect? : &Dialect, String) -> Array[Token] raise LexerError
 
 // Errors
 type LexerError derive(@debug.Debug)
+pub fn LexerError::output(Self, &Logger) -> Unit
+pub fn LexerError::to_repr(Self) -> @debug.Repr
+pub fn LexerError::to_string(Self) -> String
 pub impl Show for LexerError
 
 type ParserError derive(@debug.Debug)
+pub fn ParserError::output(Self, &Logger) -> Unit
+pub fn ParserError::to_repr(Self) -> @debug.Repr
+pub fn ParserError::to_string(Self) -> String
 pub impl Show for ParserError
 
 pub suberror SqlParserError {
   LexerError(LexerError)
   ParserError(ParserError)
 } derive(@debug.Debug)
+pub fn SqlParserError::output(Self, &Logger) -> Unit
+pub fn SqlParserError::to_repr(Self) -> @debug.Repr
+pub fn SqlParserError::to_string(Self) -> String
 pub impl Show for SqlParserError
 
 // Types and methods
 pub(all) struct ANSI {
 }
+pub fn ANSI::parse_expr(Self, ArrayView[Token]) -> (Expr, ArrayView[Token])? raise ParserError
+pub fn ANSI::parse_statement(Self, Parser, ArrayView[Token]) -> (Statement, ArrayView[Token])? raise ParserError
+pub fn ANSI::read_keyword(Self, String) -> Keyword?
+pub fn ANSI::requires_column_types_in_create_table(Self) -> Bool
+pub fn ANSI::supports_array_syntax(Self) -> Bool
+pub fn ANSI::supports_boolean_literals(Self) -> Bool
+pub fn ANSI::supports_double_quoted_identifiers(Self) -> Bool
+pub fn ANSI::supports_filter_during_aggregation(Self) -> Bool
+pub fn ANSI::supports_if_not_exists(Self) -> Bool
+pub fn ANSI::supports_named_parameters(Self) -> Bool
+pub fn ANSI::supports_string_literal_backslash_escape(Self) -> Bool
+pub fn ANSI::supports_within_after_array_aggregation(Self) -> Bool
 pub impl Dialect for ANSI
 
 pub(all) enum AccessExpr {
   Dot(Expr)
   Subscript(Subscript)
 } derive(Eq, @debug.Debug)
+pub fn AccessExpr::equal(Self, Self) -> Bool
+pub fn AccessExpr::not_equal(Self, Self) -> Bool
+pub fn AccessExpr::output(Self, &Logger) -> Unit
+pub fn AccessExpr::pretty(Self) -> @prettyprinter.Document
+pub fn AccessExpr::to_repr(Self) -> @debug.Repr
+pub fn AccessExpr::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for AccessExpr
 pub impl Show for AccessExpr
 
@@ -48,6 +75,12 @@ pub(all) enum AlterIndexOperation {
   Reset(Array[String])
   Set(Array[IndexParameter])
 } derive(Eq, @debug.Debug)
+pub fn AlterIndexOperation::equal(Self, Self) -> Bool
+pub fn AlterIndexOperation::not_equal(Self, Self) -> Bool
+pub fn AlterIndexOperation::output(Self, &Logger) -> Unit
+pub fn AlterIndexOperation::pretty(Self) -> @prettyprinter.Document
+pub fn AlterIndexOperation::to_repr(Self) -> @debug.Repr
+pub fn AlterIndexOperation::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for AlterIndexOperation
 pub impl Show for AlterIndexOperation
 
@@ -56,12 +89,24 @@ pub(all) struct AlterIndexStmt {
   if_exists : Bool
   operation : AlterIndexOperation
 } derive(Eq, @debug.Debug)
+pub fn AlterIndexStmt::equal(Self, Self) -> Bool
+pub fn AlterIndexStmt::not_equal(Self, Self) -> Bool
+pub fn AlterIndexStmt::output(Self, &Logger) -> Unit
+pub fn AlterIndexStmt::pretty(Self) -> @prettyprinter.Document
+pub fn AlterIndexStmt::to_repr(Self) -> @debug.Repr
+pub fn AlterIndexStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for AlterIndexStmt
 pub impl Show for AlterIndexStmt
 
 pub(all) enum AlterTableOperation {
   DropColumn(String, Bool)
 } derive(Eq, @debug.Debug)
+pub fn AlterTableOperation::equal(Self, Self) -> Bool
+pub fn AlterTableOperation::not_equal(Self, Self) -> Bool
+pub fn AlterTableOperation::output(Self, &Logger) -> Unit
+pub fn AlterTableOperation::pretty(Self) -> @prettyprinter.Document
+pub fn AlterTableOperation::to_repr(Self) -> @debug.Repr
+pub fn AlterTableOperation::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for AlterTableOperation
 pub impl Show for AlterTableOperation
 
@@ -70,6 +115,12 @@ pub(all) struct AlterTableStmt {
   if_exists : Bool
   operation : AlterTableOperation
 } derive(Eq, @debug.Debug)
+pub fn AlterTableStmt::equal(Self, Self) -> Bool
+pub fn AlterTableStmt::not_equal(Self, Self) -> Bool
+pub fn AlterTableStmt::output(Self, &Logger) -> Unit
+pub fn AlterTableStmt::pretty(Self) -> @prettyprinter.Document
+pub fn AlterTableStmt::to_repr(Self) -> @debug.Repr
+pub fn AlterTableStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for AlterTableStmt
 pub impl Show for AlterTableStmt
 
@@ -77,6 +128,12 @@ pub(all) struct ArrayExpr {
   elem : Array[Expr]
   named : Bool
 } derive(Eq, @debug.Debug)
+pub fn ArrayExpr::equal(Self, Self) -> Bool
+pub fn ArrayExpr::not_equal(Self, Self) -> Bool
+pub fn ArrayExpr::output(Self, &Logger) -> Unit
+pub fn ArrayExpr::pretty(Self) -> @prettyprinter.Document
+pub fn ArrayExpr::to_repr(Self) -> @debug.Repr
+pub fn ArrayExpr::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ArrayExpr
 pub impl Show for ArrayExpr
 
@@ -84,6 +141,12 @@ pub(all) struct Assignment {
   column : String
   value : Expr
 } derive(Eq, @debug.Debug)
+pub fn Assignment::equal(Self, Self) -> Bool
+pub fn Assignment::not_equal(Self, Self) -> Bool
+pub fn Assignment::output(Self, &Logger) -> Unit
+pub fn Assignment::pretty(Self) -> @prettyprinter.Document
+pub fn Assignment::to_repr(Self) -> @debug.Repr
+pub fn Assignment::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for Assignment
 pub impl Show for Assignment
 
@@ -91,11 +154,29 @@ pub(all) struct BeginStmt {
   work : Bool
   transaction : Bool
 } derive(Eq, @debug.Debug)
+pub fn BeginStmt::equal(Self, Self) -> Bool
+pub fn BeginStmt::not_equal(Self, Self) -> Bool
+pub fn BeginStmt::output(Self, &Logger) -> Unit
+pub fn BeginStmt::pretty(Self) -> @prettyprinter.Document
+pub fn BeginStmt::to_repr(Self) -> @debug.Repr
+pub fn BeginStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for BeginStmt
 pub impl Show for BeginStmt
 
 pub(all) struct BigQuery {
 }
+pub fn BigQuery::parse_expr(Self, ArrayView[Token]) -> (Expr, ArrayView[Token])? raise ParserError
+pub fn BigQuery::parse_statement(Self, Parser, ArrayView[Token]) -> (Statement, ArrayView[Token])? raise ParserError
+pub fn BigQuery::read_keyword(Self, String) -> Keyword?
+pub fn BigQuery::requires_column_types_in_create_table(Self) -> Bool
+pub fn BigQuery::supports_array_syntax(Self) -> Bool
+pub fn BigQuery::supports_boolean_literals(Self) -> Bool
+pub fn BigQuery::supports_double_quoted_identifiers(Self) -> Bool
+pub fn BigQuery::supports_filter_during_aggregation(Self) -> Bool
+pub fn BigQuery::supports_if_not_exists(Self) -> Bool
+pub fn BigQuery::supports_named_parameters(Self) -> Bool
+pub fn BigQuery::supports_string_literal_backslash_escape(Self) -> Bool
+pub fn BigQuery::supports_within_after_array_aggregation(Self) -> Bool
 pub impl Dialect for BigQuery
 
 pub(all) enum BinaryOperator {
@@ -121,7 +202,13 @@ pub(all) enum BinaryOperator {
   JsonContains
   JsonContainedIn
 } derive(Eq, @debug.Debug)
+pub fn BinaryOperator::equal(Self, Self) -> Bool
 pub fn BinaryOperator::get_precedence(Self) -> Precedence
+pub fn BinaryOperator::not_equal(Self, Self) -> Bool
+pub fn BinaryOperator::output(Self, &Logger) -> Unit
+pub fn BinaryOperator::pretty(Self) -> @prettyprinter.Document
+pub fn BinaryOperator::to_repr(Self) -> @debug.Repr
+pub fn BinaryOperator::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for BinaryOperator
 pub impl Show for BinaryOperator
 
@@ -130,11 +217,29 @@ pub(all) struct CaseExpr {
   when_then_clauses : Array[(Expr, Expr)]
   else_expr : Expr?
 } derive(Eq, @debug.Debug)
+pub fn CaseExpr::equal(Self, Self) -> Bool
+pub fn CaseExpr::not_equal(Self, Self) -> Bool
+pub fn CaseExpr::output(Self, &Logger) -> Unit
+pub fn CaseExpr::pretty(Self) -> @prettyprinter.Document
+pub fn CaseExpr::to_repr(Self) -> @debug.Repr
+pub fn CaseExpr::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CaseExpr
 pub impl Show for CaseExpr
 
 pub(all) struct ClickHouse {
 }
+pub fn ClickHouse::parse_expr(Self, ArrayView[Token]) -> (Expr, ArrayView[Token])? raise ParserError
+pub fn ClickHouse::parse_statement(Self, Parser, ArrayView[Token]) -> (Statement, ArrayView[Token])? raise ParserError
+pub fn ClickHouse::read_keyword(Self, String) -> Keyword?
+pub fn ClickHouse::requires_column_types_in_create_table(Self) -> Bool
+pub fn ClickHouse::supports_array_syntax(Self) -> Bool
+pub fn ClickHouse::supports_boolean_literals(Self) -> Bool
+pub fn ClickHouse::supports_double_quoted_identifiers(Self) -> Bool
+pub fn ClickHouse::supports_filter_during_aggregation(Self) -> Bool
+pub fn ClickHouse::supports_if_not_exists(Self) -> Bool
+pub fn ClickHouse::supports_named_parameters(Self) -> Bool
+pub fn ClickHouse::supports_string_literal_backslash_escape(Self) -> Bool
+pub fn ClickHouse::supports_within_after_array_aggregation(Self) -> Bool
 pub impl Dialect for ClickHouse
 
 pub(all) struct ColumnDef {
@@ -142,6 +247,12 @@ pub(all) struct ColumnDef {
   data_type : DataType
   options : Array[ColumnDefOption]
 } derive(Eq, @debug.Debug)
+pub fn ColumnDef::equal(Self, Self) -> Bool
+pub fn ColumnDef::not_equal(Self, Self) -> Bool
+pub fn ColumnDef::output(Self, &Logger) -> Unit
+pub fn ColumnDef::pretty(Self) -> @prettyprinter.Document
+pub fn ColumnDef::to_repr(Self) -> @debug.Repr
+pub fn ColumnDef::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ColumnDef
 pub impl Show for ColumnDef
 
@@ -151,6 +262,12 @@ pub(all) enum ColumnDefOption {
   Default(Expr)
   PrimaryKey
 } derive(Eq, @debug.Debug)
+pub fn ColumnDefOption::equal(Self, Self) -> Bool
+pub fn ColumnDefOption::not_equal(Self, Self) -> Bool
+pub fn ColumnDefOption::output(Self, &Logger) -> Unit
+pub fn ColumnDefOption::pretty(Self) -> @prettyprinter.Document
+pub fn ColumnDefOption::to_repr(Self) -> @debug.Repr
+pub fn ColumnDefOption::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ColumnDefOption
 pub impl Show for ColumnDefOption
 
@@ -158,6 +275,12 @@ pub(all) struct CommitStmt {
   work : Bool
   transaction : Bool
 } derive(Eq, @debug.Debug)
+pub fn CommitStmt::equal(Self, Self) -> Bool
+pub fn CommitStmt::not_equal(Self, Self) -> Bool
+pub fn CommitStmt::output(Self, &Logger) -> Unit
+pub fn CommitStmt::pretty(Self) -> @prettyprinter.Document
+pub fn CommitStmt::to_repr(Self) -> @debug.Repr
+pub fn CommitStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CommitStmt
 pub impl Show for CommitStmt
 
@@ -165,6 +288,12 @@ pub(all) enum ConflictAction {
   DoNothing
   DoUpdate(Array[Assignment], Expr?)
 } derive(Eq, @debug.Debug)
+pub fn ConflictAction::equal(Self, Self) -> Bool
+pub fn ConflictAction::not_equal(Self, Self) -> Bool
+pub fn ConflictAction::output(Self, &Logger) -> Unit
+pub fn ConflictAction::pretty(Self) -> @prettyprinter.Document
+pub fn ConflictAction::to_repr(Self) -> @debug.Repr
+pub fn ConflictAction::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ConflictAction
 pub impl Show for ConflictAction
 
@@ -173,6 +302,12 @@ pub(all) enum ConflictTarget {
   OnConstraint(String)
   OnExpression(Expr, Expr?)
 } derive(Eq, @debug.Debug)
+pub fn ConflictTarget::equal(Self, Self) -> Bool
+pub fn ConflictTarget::not_equal(Self, Self) -> Bool
+pub fn ConflictTarget::output(Self, &Logger) -> Unit
+pub fn ConflictTarget::pretty(Self) -> @prettyprinter.Document
+pub fn ConflictTarget::to_repr(Self) -> @debug.Repr
+pub fn ConflictTarget::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ConflictTarget
 pub impl Show for ConflictTarget
 
@@ -180,6 +315,12 @@ pub(all) enum CopyDirection {
   To
   From
 } derive(Eq, @debug.Debug)
+pub fn CopyDirection::equal(Self, Self) -> Bool
+pub fn CopyDirection::not_equal(Self, Self) -> Bool
+pub fn CopyDirection::output(Self, &Logger) -> Unit
+pub fn CopyDirection::pretty(Self) -> @prettyprinter.Document
+pub fn CopyDirection::to_repr(Self) -> @debug.Repr
+pub fn CopyDirection::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CopyDirection
 pub impl Show for CopyDirection
 
@@ -187,6 +328,12 @@ pub(all) enum CopyForceQuote {
   All
   Columns(Array[String])
 } derive(Eq, @debug.Debug)
+pub fn CopyForceQuote::equal(Self, Self) -> Bool
+pub fn CopyForceQuote::not_equal(Self, Self) -> Bool
+pub fn CopyForceQuote::output(Self, &Logger) -> Unit
+pub fn CopyForceQuote::pretty(Self) -> @prettyprinter.Document
+pub fn CopyForceQuote::to_repr(Self) -> @debug.Repr
+pub fn CopyForceQuote::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CopyForceQuote
 pub impl Show for CopyForceQuote
 
@@ -195,6 +342,12 @@ pub(all) enum CopyFormat {
   Text
   Binary
 } derive(Eq, @debug.Debug)
+pub fn CopyFormat::equal(Self, Self) -> Bool
+pub fn CopyFormat::not_equal(Self, Self) -> Bool
+pub fn CopyFormat::output(Self, &Logger) -> Unit
+pub fn CopyFormat::pretty(Self) -> @prettyprinter.Document
+pub fn CopyFormat::to_repr(Self) -> @debug.Repr
+pub fn CopyFormat::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CopyFormat
 pub impl Show for CopyFormat
 
@@ -210,6 +363,12 @@ pub(all) enum CopyOption {
   ForceNull(Array[String])
   Encoding(String)
 } derive(Eq, @debug.Debug)
+pub fn CopyOption::equal(Self, Self) -> Bool
+pub fn CopyOption::not_equal(Self, Self) -> Bool
+pub fn CopyOption::output(Self, &Logger) -> Unit
+pub fn CopyOption::pretty(Self) -> @prettyprinter.Document
+pub fn CopyOption::to_repr(Self) -> @debug.Repr
+pub fn CopyOption::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CopyOption
 pub impl Show for CopyOption
 
@@ -217,6 +376,12 @@ pub(all) enum CopySource {
   Table(ObjectName, Array[String]?)
   Query(QueryStmt)
 } derive(Eq, @debug.Debug)
+pub fn CopySource::equal(Self, Self) -> Bool
+pub fn CopySource::not_equal(Self, Self) -> Bool
+pub fn CopySource::output(Self, &Logger) -> Unit
+pub fn CopySource::pretty(Self) -> @prettyprinter.Document
+pub fn CopySource::to_repr(Self) -> @debug.Repr
+pub fn CopySource::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CopySource
 pub impl Show for CopySource
 
@@ -226,6 +391,12 @@ pub(all) struct CopyStmt {
   target : CopyTarget
   format_options : Array[CopyOption]
 } derive(Eq, @debug.Debug)
+pub fn CopyStmt::equal(Self, Self) -> Bool
+pub fn CopyStmt::not_equal(Self, Self) -> Bool
+pub fn CopyStmt::output(Self, &Logger) -> Unit
+pub fn CopyStmt::pretty(Self) -> @prettyprinter.Document
+pub fn CopyStmt::to_repr(Self) -> @debug.Repr
+pub fn CopyStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CopyStmt
 pub impl Show for CopyStmt
 
@@ -235,6 +406,12 @@ pub(all) enum CopyTarget {
   Stdout
   Program(String)
 } derive(Eq, @debug.Debug)
+pub fn CopyTarget::equal(Self, Self) -> Bool
+pub fn CopyTarget::not_equal(Self, Self) -> Bool
+pub fn CopyTarget::output(Self, &Logger) -> Unit
+pub fn CopyTarget::pretty(Self) -> @prettyprinter.Document
+pub fn CopyTarget::to_repr(Self) -> @debug.Repr
+pub fn CopyTarget::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CopyTarget
 pub impl Show for CopyTarget
 
@@ -244,6 +421,12 @@ pub(all) struct CreateDatabaseStmt {
   character_set : String?
   collate : String?
 } derive(Eq, @debug.Debug)
+pub fn CreateDatabaseStmt::equal(Self, Self) -> Bool
+pub fn CreateDatabaseStmt::not_equal(Self, Self) -> Bool
+pub fn CreateDatabaseStmt::output(Self, &Logger) -> Unit
+pub fn CreateDatabaseStmt::pretty(Self) -> @prettyprinter.Document
+pub fn CreateDatabaseStmt::to_repr(Self) -> @debug.Repr
+pub fn CreateDatabaseStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CreateDatabaseStmt
 pub impl Show for CreateDatabaseStmt
 
@@ -256,6 +439,12 @@ pub(all) struct CreateFunctionStmt {
   deterministic : Bool
   if_not_exists : Bool
 } derive(Eq, @debug.Debug)
+pub fn CreateFunctionStmt::equal(Self, Self) -> Bool
+pub fn CreateFunctionStmt::not_equal(Self, Self) -> Bool
+pub fn CreateFunctionStmt::output(Self, &Logger) -> Unit
+pub fn CreateFunctionStmt::pretty(Self) -> @prettyprinter.Document
+pub fn CreateFunctionStmt::to_repr(Self) -> @debug.Repr
+pub fn CreateFunctionStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CreateFunctionStmt
 pub impl Show for CreateFunctionStmt
 
@@ -269,6 +458,12 @@ pub(all) struct CreateIndexStmt {
   columns : Array[IndexColumn]
   where_clause : Expr?
 } derive(Eq, @debug.Debug)
+pub fn CreateIndexStmt::equal(Self, Self) -> Bool
+pub fn CreateIndexStmt::not_equal(Self, Self) -> Bool
+pub fn CreateIndexStmt::output(Self, &Logger) -> Unit
+pub fn CreateIndexStmt::pretty(Self) -> @prettyprinter.Document
+pub fn CreateIndexStmt::to_repr(Self) -> @debug.Repr
+pub fn CreateIndexStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CreateIndexStmt
 pub impl Show for CreateIndexStmt
 
@@ -279,6 +474,12 @@ pub(all) struct CreateProcedureStmt {
   body : String?
   if_not_exists : Bool
 } derive(Eq, @debug.Debug)
+pub fn CreateProcedureStmt::equal(Self, Self) -> Bool
+pub fn CreateProcedureStmt::not_equal(Self, Self) -> Bool
+pub fn CreateProcedureStmt::output(Self, &Logger) -> Unit
+pub fn CreateProcedureStmt::pretty(Self) -> @prettyprinter.Document
+pub fn CreateProcedureStmt::to_repr(Self) -> @debug.Repr
+pub fn CreateProcedureStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CreateProcedureStmt
 pub impl Show for CreateProcedureStmt
 
@@ -287,6 +488,12 @@ pub(all) struct CreateSchemaStmt {
   if_not_exists : Bool
   authorization : String?
 } derive(Eq, @debug.Debug)
+pub fn CreateSchemaStmt::equal(Self, Self) -> Bool
+pub fn CreateSchemaStmt::not_equal(Self, Self) -> Bool
+pub fn CreateSchemaStmt::output(Self, &Logger) -> Unit
+pub fn CreateSchemaStmt::pretty(Self) -> @prettyprinter.Document
+pub fn CreateSchemaStmt::to_repr(Self) -> @debug.Repr
+pub fn CreateSchemaStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CreateSchemaStmt
 pub impl Show for CreateSchemaStmt
 
@@ -302,6 +509,12 @@ pub(all) struct CreateSequenceStmt {
   cycle : Bool?
   owned_by : SequenceOwnedBy?
 } derive(Eq, @debug.Debug)
+pub fn CreateSequenceStmt::equal(Self, Self) -> Bool
+pub fn CreateSequenceStmt::not_equal(Self, Self) -> Bool
+pub fn CreateSequenceStmt::output(Self, &Logger) -> Unit
+pub fn CreateSequenceStmt::pretty(Self) -> @prettyprinter.Document
+pub fn CreateSequenceStmt::to_repr(Self) -> @debug.Repr
+pub fn CreateSequenceStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CreateSequenceStmt
 pub impl Show for CreateSequenceStmt
 
@@ -309,6 +522,12 @@ pub(all) enum CreateTableDefinition {
   Columns(Array[ColumnDef], Array[TableConstraint])
   AsQuery(QueryStmt)
 } derive(Eq, @debug.Debug)
+pub fn CreateTableDefinition::equal(Self, Self) -> Bool
+pub fn CreateTableDefinition::not_equal(Self, Self) -> Bool
+pub fn CreateTableDefinition::output(Self, &Logger) -> Unit
+pub fn CreateTableDefinition::pretty(Self) -> @prettyprinter.Document
+pub fn CreateTableDefinition::to_repr(Self) -> @debug.Repr
+pub fn CreateTableDefinition::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CreateTableDefinition
 pub impl Show for CreateTableDefinition
 
@@ -317,10 +536,22 @@ pub(all) struct CreateTableStmt {
   if_not_exists : Bool
   definition : CreateTableDefinition
 } derive(Eq, @debug.Debug)
+pub fn CreateTableStmt::equal(Self, Self) -> Bool
+pub fn CreateTableStmt::not_equal(Self, Self) -> Bool
+pub fn CreateTableStmt::output(Self, &Logger) -> Unit
+pub fn CreateTableStmt::pretty(Self) -> @prettyprinter.Document
+pub fn CreateTableStmt::to_repr(Self) -> @debug.Repr
+pub fn CreateTableStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CreateTableStmt
 pub impl Show for CreateTableStmt
 
 type CreateViewStmt derive(Eq, @debug.Debug)
+pub fn CreateViewStmt::equal(Self, Self) -> Bool
+pub fn CreateViewStmt::not_equal(Self, Self) -> Bool
+pub fn CreateViewStmt::output(Self, &Logger) -> Unit
+pub fn CreateViewStmt::pretty(Self) -> @prettyprinter.Document
+pub fn CreateViewStmt::to_repr(Self) -> @debug.Repr
+pub fn CreateViewStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CreateViewStmt
 pub impl Show for CreateViewStmt
 
@@ -329,6 +560,12 @@ pub(all) struct Cte {
   query : QueryStmt
   columns : Array[String]?
 } derive(Eq, @debug.Debug)
+pub fn Cte::equal(Self, Self) -> Bool
+pub fn Cte::not_equal(Self, Self) -> Bool
+pub fn Cte::output(Self, &Logger) -> Unit
+pub fn Cte::pretty(Self) -> @prettyprinter.Document
+pub fn Cte::to_repr(Self) -> @debug.Repr
+pub fn Cte::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for Cte
 pub impl Show for Cte
 
@@ -346,6 +583,12 @@ pub(all) enum DataType {
   Timestamp
   Blob
 } derive(Eq, @debug.Debug)
+pub fn DataType::equal(Self, Self) -> Bool
+pub fn DataType::not_equal(Self, Self) -> Bool
+pub fn DataType::output(Self, &Logger) -> Unit
+pub fn DataType::pretty(Self) -> @prettyprinter.Document
+pub fn DataType::to_repr(Self) -> @debug.Repr
+pub fn DataType::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for DataType
 pub impl Show for DataType
 
@@ -357,6 +600,12 @@ pub(all) enum DatetimeUnit {
   Minute
   Second
 } derive(Eq, @debug.Debug)
+pub fn DatetimeUnit::equal(Self, Self) -> Bool
+pub fn DatetimeUnit::not_equal(Self, Self) -> Bool
+pub fn DatetimeUnit::output(Self, &Logger) -> Unit
+pub fn DatetimeUnit::pretty(Self) -> @prettyprinter.Document
+pub fn DatetimeUnit::to_repr(Self) -> @debug.Repr
+pub fn DatetimeUnit::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for DatetimeUnit
 pub impl Show for DatetimeUnit
 
@@ -364,6 +613,12 @@ pub(all) struct DeallocateStmt {
   name : String
   prepare : Bool
 } derive(Eq, @debug.Debug)
+pub fn DeallocateStmt::equal(Self, Self) -> Bool
+pub fn DeallocateStmt::not_equal(Self, Self) -> Bool
+pub fn DeallocateStmt::output(Self, &Logger) -> Unit
+pub fn DeallocateStmt::pretty(Self) -> @prettyprinter.Document
+pub fn DeallocateStmt::to_repr(Self) -> @debug.Repr
+pub fn DeallocateStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for DeallocateStmt
 pub impl Show for DeallocateStmt
 
@@ -371,6 +626,12 @@ pub(all) struct DeleteStmt {
   table_name : ObjectName
   where_clause : Expr?
 } derive(Eq, @debug.Debug)
+pub fn DeleteStmt::equal(Self, Self) -> Bool
+pub fn DeleteStmt::not_equal(Self, Self) -> Bool
+pub fn DeleteStmt::output(Self, &Logger) -> Unit
+pub fn DeleteStmt::pretty(Self) -> @prettyprinter.Document
+pub fn DeleteStmt::to_repr(Self) -> @debug.Repr
+pub fn DeleteStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for DeleteStmt
 pub impl Show for DeleteStmt
 
@@ -380,6 +641,12 @@ pub(all) struct DropIndexStmt {
   concurrently : Bool
   table_name : ObjectName?
 } derive(Eq, @debug.Debug)
+pub fn DropIndexStmt::equal(Self, Self) -> Bool
+pub fn DropIndexStmt::not_equal(Self, Self) -> Bool
+pub fn DropIndexStmt::output(Self, &Logger) -> Unit
+pub fn DropIndexStmt::pretty(Self) -> @prettyprinter.Document
+pub fn DropIndexStmt::to_repr(Self) -> @debug.Repr
+pub fn DropIndexStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for DropIndexStmt
 pub impl Show for DropIndexStmt
 
@@ -387,23 +654,53 @@ pub(all) struct DropTableStmt {
   table_name : ObjectName
   if_exists : Bool
 } derive(Eq, @debug.Debug)
+pub fn DropTableStmt::equal(Self, Self) -> Bool
+pub fn DropTableStmt::not_equal(Self, Self) -> Bool
+pub fn DropTableStmt::output(Self, &Logger) -> Unit
+pub fn DropTableStmt::pretty(Self) -> @prettyprinter.Document
+pub fn DropTableStmt::to_repr(Self) -> @debug.Repr
+pub fn DropTableStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for DropTableStmt
 pub impl Show for DropTableStmt
 
 pub(all) struct DropViewStmt {
   name : String
 } derive(Eq, @debug.Debug)
+pub fn DropViewStmt::equal(Self, Self) -> Bool
+pub fn DropViewStmt::not_equal(Self, Self) -> Bool
+pub fn DropViewStmt::output(Self, &Logger) -> Unit
+pub fn DropViewStmt::pretty(Self) -> @prettyprinter.Document
+pub fn DropViewStmt::to_repr(Self) -> @debug.Repr
+pub fn DropViewStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for DropViewStmt
 pub impl Show for DropViewStmt
 
 pub(all) struct DuckDB {
 }
+pub fn DuckDB::parse_expr(Self, ArrayView[Token]) -> (Expr, ArrayView[Token])? raise ParserError
+pub fn DuckDB::parse_statement(Self, Parser, ArrayView[Token]) -> (Statement, ArrayView[Token])? raise ParserError
+pub fn DuckDB::read_keyword(Self, String) -> Keyword?
+pub fn DuckDB::requires_column_types_in_create_table(Self) -> Bool
+pub fn DuckDB::supports_array_syntax(Self) -> Bool
+pub fn DuckDB::supports_boolean_literals(Self) -> Bool
+pub fn DuckDB::supports_double_quoted_identifiers(Self) -> Bool
+pub fn DuckDB::supports_filter_during_aggregation(Self) -> Bool
+pub fn DuckDB::supports_if_not_exists(Self) -> Bool
+pub fn DuckDB::supports_named_parameters(Self) -> Bool
+pub fn DuckDB::supports_string_literal_backslash_escape(Self) -> Bool
+pub fn DuckDB::supports_within_after_array_aggregation(Self) -> Bool
 pub impl Dialect for DuckDB
 
 pub(all) enum DuplicateTreatment {
   Distinct
   All
 } derive(Eq, @debug.Debug)
+pub fn DuplicateTreatment::equal(Self, Self) -> Bool
+pub fn DuplicateTreatment::not_equal(Self, Self) -> Bool
+pub fn DuplicateTreatment::output(Self, &Logger) -> Unit
+pub fn DuplicateTreatment::pretty(Self) -> @prettyprinter.Document
+pub fn DuplicateTreatment::to_repr(Self) -> @debug.Repr
+pub fn DuplicateTreatment::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for DuplicateTreatment
 pub impl Show for DuplicateTreatment
 
@@ -414,6 +711,12 @@ pub(all) struct ExecuteStmt {
   into : Array[String]
   using_exprs : Array[Expr]
 } derive(Eq, @debug.Debug)
+pub fn ExecuteStmt::equal(Self, Self) -> Bool
+pub fn ExecuteStmt::not_equal(Self, Self) -> Bool
+pub fn ExecuteStmt::output(Self, &Logger) -> Unit
+pub fn ExecuteStmt::pretty(Self) -> @prettyprinter.Document
+pub fn ExecuteStmt::to_repr(Self) -> @debug.Repr
+pub fn ExecuteStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ExecuteStmt
 pub impl Show for ExecuteStmt
 
@@ -442,6 +745,12 @@ pub(all) enum Expr {
   CompoundFieldAccess(Expr, Array[AccessExpr])
   WindowFunction(String, DuplicateTreatment?, Array[Expr], WindowSpec)
 } derive(Eq, @debug.Debug)
+pub fn Expr::equal(Self, Self) -> Bool
+pub fn Expr::not_equal(Self, Self) -> Bool
+pub fn Expr::output(Self, &Logger) -> Unit
+pub fn Expr::pretty(Self) -> @prettyprinter.Document
+pub fn Expr::to_repr(Self) -> @debug.Repr
+pub fn Expr::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for Expr
 pub impl Show for Expr
 
@@ -450,11 +759,29 @@ pub(all) struct FunctionParameter {
   param_type : DataType
   mode : ParameterMode?
 } derive(Eq, @debug.Debug)
+pub fn FunctionParameter::equal(Self, Self) -> Bool
+pub fn FunctionParameter::not_equal(Self, Self) -> Bool
+pub fn FunctionParameter::output(Self, &Logger) -> Unit
+pub fn FunctionParameter::pretty(Self) -> @prettyprinter.Document
+pub fn FunctionParameter::to_repr(Self) -> @debug.Repr
+pub fn FunctionParameter::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for FunctionParameter
 pub impl Show for FunctionParameter
 
 pub(all) struct Generic {
 }
+pub fn Generic::parse_expr(Self, ArrayView[Token]) -> (Expr, ArrayView[Token])? raise ParserError
+pub fn Generic::parse_statement(Self, Parser, ArrayView[Token]) -> (Statement, ArrayView[Token])? raise ParserError
+pub fn Generic::read_keyword(Self, String) -> Keyword?
+pub fn Generic::requires_column_types_in_create_table(Self) -> Bool
+pub fn Generic::supports_array_syntax(Self) -> Bool
+pub fn Generic::supports_boolean_literals(Self) -> Bool
+pub fn Generic::supports_double_quoted_identifiers(Self) -> Bool
+pub fn Generic::supports_filter_during_aggregation(Self) -> Bool
+pub fn Generic::supports_if_not_exists(Self) -> Bool
+pub fn Generic::supports_named_parameters(Self) -> Bool
+pub fn Generic::supports_string_literal_backslash_escape(Self) -> Bool
+pub fn Generic::supports_within_after_array_aggregation(Self) -> Bool
 pub impl Dialect for Generic
 
 pub(all) struct GrantStmt {
@@ -463,6 +790,12 @@ pub(all) struct GrantStmt {
   grantees : Array[String]
   with_grant_option : Bool
 } derive(Eq, @debug.Debug)
+pub fn GrantStmt::equal(Self, Self) -> Bool
+pub fn GrantStmt::not_equal(Self, Self) -> Bool
+pub fn GrantStmt::output(Self, &Logger) -> Unit
+pub fn GrantStmt::pretty(Self) -> @prettyprinter.Document
+pub fn GrantStmt::to_repr(Self) -> @debug.Repr
+pub fn GrantStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for GrantStmt
 pub impl Show for GrantStmt
 
@@ -471,6 +804,12 @@ pub(all) struct IndexColumn {
   asc : Bool?
   nulls_first : Bool?
 } derive(Eq, @debug.Debug)
+pub fn IndexColumn::equal(Self, Self) -> Bool
+pub fn IndexColumn::not_equal(Self, Self) -> Bool
+pub fn IndexColumn::output(Self, &Logger) -> Unit
+pub fn IndexColumn::pretty(Self) -> @prettyprinter.Document
+pub fn IndexColumn::to_repr(Self) -> @debug.Repr
+pub fn IndexColumn::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for IndexColumn
 pub impl Show for IndexColumn
 
@@ -482,6 +821,12 @@ pub(all) enum IndexMethod {
   Spgist
   Brin
 } derive(Eq, @debug.Debug)
+pub fn IndexMethod::equal(Self, Self) -> Bool
+pub fn IndexMethod::not_equal(Self, Self) -> Bool
+pub fn IndexMethod::output(Self, &Logger) -> Unit
+pub fn IndexMethod::pretty(Self) -> @prettyprinter.Document
+pub fn IndexMethod::to_repr(Self) -> @debug.Repr
+pub fn IndexMethod::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for IndexMethod
 pub impl Show for IndexMethod
 
@@ -489,6 +834,12 @@ pub(all) struct IndexParameter {
   name : String
   value : String
 } derive(Eq, @debug.Debug)
+pub fn IndexParameter::equal(Self, Self) -> Bool
+pub fn IndexParameter::not_equal(Self, Self) -> Bool
+pub fn IndexParameter::output(Self, &Logger) -> Unit
+pub fn IndexParameter::pretty(Self) -> @prettyprinter.Document
+pub fn IndexParameter::to_repr(Self) -> @debug.Repr
+pub fn IndexParameter::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for IndexParameter
 pub impl Show for IndexParameter
 
@@ -496,6 +847,12 @@ pub(all) enum InsertSource {
   Values(Array[Array[Expr]])
   Query(QueryStmt)
 } derive(Eq, @debug.Debug)
+pub fn InsertSource::equal(Self, Self) -> Bool
+pub fn InsertSource::not_equal(Self, Self) -> Bool
+pub fn InsertSource::output(Self, &Logger) -> Unit
+pub fn InsertSource::pretty(Self) -> @prettyprinter.Document
+pub fn InsertSource::to_repr(Self) -> @debug.Repr
+pub fn InsertSource::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for InsertSource
 pub impl Show for InsertSource
 
@@ -506,6 +863,12 @@ pub(all) struct InsertStmt {
   or : SqliteOnConflict?
   on : OnInsert?
 } derive(Eq, @debug.Debug)
+pub fn InsertStmt::equal(Self, Self) -> Bool
+pub fn InsertStmt::not_equal(Self, Self) -> Bool
+pub fn InsertStmt::output(Self, &Logger) -> Unit
+pub fn InsertStmt::pretty(Self) -> @prettyprinter.Document
+pub fn InsertStmt::to_repr(Self) -> @debug.Repr
+pub fn InsertStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for InsertStmt
 pub impl Show for InsertStmt
 
@@ -513,6 +876,12 @@ pub(all) enum IntervalQualifier {
   Single(PrimaryDatetimeField)
   Range(PrimaryDatetimeField, PrimaryDatetimeField)
 } derive(Eq, @debug.Debug)
+pub fn IntervalQualifier::equal(Self, Self) -> Bool
+pub fn IntervalQualifier::not_equal(Self, Self) -> Bool
+pub fn IntervalQualifier::output(Self, &Logger) -> Unit
+pub fn IntervalQualifier::pretty(Self) -> @prettyprinter.Document
+pub fn IntervalQualifier::to_repr(Self) -> @debug.Repr
+pub fn IntervalQualifier::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for IntervalQualifier
 pub impl Show for IntervalQualifier
 
@@ -520,6 +889,12 @@ pub(all) struct Join {
   table_ref : TableRef
   join_operator : JoinOperator
 } derive(Eq, @debug.Debug)
+pub fn Join::equal(Self, Self) -> Bool
+pub fn Join::not_equal(Self, Self) -> Bool
+pub fn Join::output(Self, &Logger) -> Unit
+pub fn Join::pretty(Self) -> @prettyprinter.Document
+pub fn Join::to_repr(Self) -> @debug.Repr
+pub fn Join::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for Join
 pub impl Show for Join
 
@@ -528,6 +903,12 @@ pub(all) enum JoinConstraint {
   Using(Array[String])
   Non
 } derive(Eq, @debug.Debug)
+pub fn JoinConstraint::equal(Self, Self) -> Bool
+pub fn JoinConstraint::not_equal(Self, Self) -> Bool
+pub fn JoinConstraint::output(Self, &Logger) -> Unit
+pub fn JoinConstraint::pretty(Self) -> @prettyprinter.Document
+pub fn JoinConstraint::to_repr(Self) -> @debug.Repr
+pub fn JoinConstraint::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for JoinConstraint
 pub impl Show for JoinConstraint
 
@@ -542,6 +923,12 @@ pub(all) enum JoinOperator {
   Inner(JoinConstraint)
   Cross
 } derive(Eq, @debug.Debug)
+pub fn JoinOperator::equal(Self, Self) -> Bool
+pub fn JoinOperator::not_equal(Self, Self) -> Bool
+pub fn JoinOperator::output(Self, &Logger) -> Unit
+pub fn JoinOperator::pretty(Self) -> @prettyprinter.Document
+pub fn JoinOperator::to_repr(Self) -> @debug.Repr
+pub fn JoinOperator::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for JoinOperator
 pub impl Show for JoinOperator
 
@@ -760,6 +1147,11 @@ pub(all) enum Keyword {
   Owned
   No
 } derive(Eq, @debug.Debug)
+pub fn Keyword::equal(Self, Self) -> Bool
+pub fn Keyword::not_equal(Self, Self) -> Bool
+pub fn Keyword::output(Self, &Logger) -> Unit
+pub fn Keyword::to_repr(Self) -> @debug.Repr
+pub fn Keyword::to_string(Self) -> String
 pub impl Show for Keyword
 
 pub(all) enum Literal {
@@ -769,6 +1161,12 @@ pub(all) enum Literal {
   Boolean(Bool)
   Null
 } derive(Eq, @debug.Debug)
+pub fn Literal::equal(Self, Self) -> Bool
+pub fn Literal::not_equal(Self, Self) -> Bool
+pub fn Literal::output(Self, &Logger) -> Unit
+pub fn Literal::pretty(Self) -> @prettyprinter.Document
+pub fn Literal::to_repr(Self) -> @debug.Repr
+pub fn Literal::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for Literal
 pub impl Show for Literal
 
@@ -776,6 +1174,12 @@ pub(all) enum LoadDataDuplicateHandling {
   Replace
   Ignore
 } derive(Eq, @debug.Debug)
+pub fn LoadDataDuplicateHandling::equal(Self, Self) -> Bool
+pub fn LoadDataDuplicateHandling::not_equal(Self, Self) -> Bool
+pub fn LoadDataDuplicateHandling::output(Self, &Logger) -> Unit
+pub fn LoadDataDuplicateHandling::pretty(Self) -> @prettyprinter.Document
+pub fn LoadDataDuplicateHandling::to_repr(Self) -> @debug.Repr
+pub fn LoadDataDuplicateHandling::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for LoadDataDuplicateHandling
 pub impl Show for LoadDataDuplicateHandling
 
@@ -785,6 +1189,12 @@ pub(all) struct LoadDataFieldsOptions {
   optionally_enclosed : Bool
   escaped_by : String?
 } derive(Eq, @debug.Debug)
+pub fn LoadDataFieldsOptions::equal(Self, Self) -> Bool
+pub fn LoadDataFieldsOptions::not_equal(Self, Self) -> Bool
+pub fn LoadDataFieldsOptions::output(Self, &Logger) -> Unit
+pub fn LoadDataFieldsOptions::pretty(Self) -> @prettyprinter.Document
+pub fn LoadDataFieldsOptions::to_repr(Self) -> @debug.Repr
+pub fn LoadDataFieldsOptions::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for LoadDataFieldsOptions
 pub impl Show for LoadDataFieldsOptions
 
@@ -792,6 +1202,12 @@ pub(all) struct LoadDataLinesOptions {
   starting_by : String?
   terminated_by : String?
 } derive(Eq, @debug.Debug)
+pub fn LoadDataLinesOptions::equal(Self, Self) -> Bool
+pub fn LoadDataLinesOptions::not_equal(Self, Self) -> Bool
+pub fn LoadDataLinesOptions::output(Self, &Logger) -> Unit
+pub fn LoadDataLinesOptions::pretty(Self) -> @prettyprinter.Document
+pub fn LoadDataLinesOptions::to_repr(Self) -> @debug.Repr
+pub fn LoadDataLinesOptions::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for LoadDataLinesOptions
 pub impl Show for LoadDataLinesOptions
 
@@ -807,6 +1223,12 @@ pub(all) struct LoadDataStmt {
   columns : Array[String]?
   set_assignments : Array[Assignment]?
 } derive(Eq, @debug.Debug)
+pub fn LoadDataStmt::equal(Self, Self) -> Bool
+pub fn LoadDataStmt::not_equal(Self, Self) -> Bool
+pub fn LoadDataStmt::output(Self, &Logger) -> Unit
+pub fn LoadDataStmt::pretty(Self) -> @prettyprinter.Document
+pub fn LoadDataStmt::to_repr(Self) -> @debug.Repr
+pub fn LoadDataStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for LoadDataStmt
 pub impl Show for LoadDataStmt
 
@@ -815,6 +1237,12 @@ pub(all) enum MergeAction {
   Update(Array[Assignment])
   Delete
 } derive(Eq, @debug.Debug)
+pub fn MergeAction::equal(Self, Self) -> Bool
+pub fn MergeAction::not_equal(Self, Self) -> Bool
+pub fn MergeAction::output(Self, &Logger) -> Unit
+pub fn MergeAction::pretty(Self) -> @prettyprinter.Document
+pub fn MergeAction::to_repr(Self) -> @debug.Repr
+pub fn MergeAction::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for MergeAction
 pub impl Show for MergeAction
 
@@ -822,6 +1250,12 @@ pub(all) enum MergeMatchType {
   Matched
   NotMatched
 } derive(Eq, @debug.Debug)
+pub fn MergeMatchType::equal(Self, Self) -> Bool
+pub fn MergeMatchType::not_equal(Self, Self) -> Bool
+pub fn MergeMatchType::output(Self, &Logger) -> Unit
+pub fn MergeMatchType::pretty(Self) -> @prettyprinter.Document
+pub fn MergeMatchType::to_repr(Self) -> @debug.Repr
+pub fn MergeMatchType::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for MergeMatchType
 pub impl Show for MergeMatchType
 
@@ -829,6 +1263,12 @@ pub(all) enum MergeSource {
   Table(ObjectName)
   Query(QueryStmt)
 } derive(Eq, @debug.Debug)
+pub fn MergeSource::equal(Self, Self) -> Bool
+pub fn MergeSource::not_equal(Self, Self) -> Bool
+pub fn MergeSource::output(Self, &Logger) -> Unit
+pub fn MergeSource::pretty(Self) -> @prettyprinter.Document
+pub fn MergeSource::to_repr(Self) -> @debug.Repr
+pub fn MergeSource::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for MergeSource
 pub impl Show for MergeSource
 
@@ -840,6 +1280,12 @@ pub(all) struct MergeStmt {
   join_condition : Expr
   when_clauses : Array[MergeWhenClause]
 } derive(Eq, @debug.Debug)
+pub fn MergeStmt::equal(Self, Self) -> Bool
+pub fn MergeStmt::not_equal(Self, Self) -> Bool
+pub fn MergeStmt::output(Self, &Logger) -> Unit
+pub fn MergeStmt::pretty(Self) -> @prettyprinter.Document
+pub fn MergeStmt::to_repr(Self) -> @debug.Repr
+pub fn MergeStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for MergeStmt
 pub impl Show for MergeStmt
 
@@ -848,16 +1294,40 @@ pub(all) struct MergeWhenClause {
   condition : Expr?
   action : MergeAction
 } derive(Eq, @debug.Debug)
+pub fn MergeWhenClause::equal(Self, Self) -> Bool
+pub fn MergeWhenClause::not_equal(Self, Self) -> Bool
+pub fn MergeWhenClause::output(Self, &Logger) -> Unit
+pub fn MergeWhenClause::pretty(Self) -> @prettyprinter.Document
+pub fn MergeWhenClause::to_repr(Self) -> @debug.Repr
+pub fn MergeWhenClause::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for MergeWhenClause
 pub impl Show for MergeWhenClause
 
 pub(all) struct MySQL {
 }
+pub fn MySQL::parse_expr(Self, ArrayView[Token]) -> (Expr, ArrayView[Token])? raise ParserError
+pub fn MySQL::parse_statement(Self, Parser, ArrayView[Token]) -> (Statement, ArrayView[Token])? raise ParserError
+pub fn MySQL::read_keyword(Self, String) -> Keyword?
+pub fn MySQL::requires_column_types_in_create_table(Self) -> Bool
+pub fn MySQL::supports_array_syntax(Self) -> Bool
+pub fn MySQL::supports_boolean_literals(Self) -> Bool
+pub fn MySQL::supports_double_quoted_identifiers(Self) -> Bool
+pub fn MySQL::supports_filter_during_aggregation(Self) -> Bool
+pub fn MySQL::supports_if_not_exists(Self) -> Bool
+pub fn MySQL::supports_named_parameters(Self) -> Bool
+pub fn MySQL::supports_string_literal_backslash_escape(Self) -> Bool
+pub fn MySQL::supports_within_after_array_aggregation(Self) -> Bool
 pub impl Dialect for MySQL
 
 pub(all) struct ObjectName {
   parts : Array[String]
 } derive(Eq, @debug.Debug)
+pub fn ObjectName::equal(Self, Self) -> Bool
+pub fn ObjectName::not_equal(Self, Self) -> Bool
+pub fn ObjectName::output(Self, &Logger) -> Unit
+pub fn ObjectName::pretty(Self) -> @prettyprinter.Document
+pub fn ObjectName::to_repr(Self) -> @debug.Repr
+pub fn ObjectName::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ObjectName
 pub impl Show for ObjectName
 
@@ -865,6 +1335,12 @@ pub(all) struct OnConflictClause {
   conflict_target : ConflictTarget?
   conflict_action : ConflictAction
 } derive(Eq, @debug.Debug)
+pub fn OnConflictClause::equal(Self, Self) -> Bool
+pub fn OnConflictClause::not_equal(Self, Self) -> Bool
+pub fn OnConflictClause::output(Self, &Logger) -> Unit
+pub fn OnConflictClause::pretty(Self) -> @prettyprinter.Document
+pub fn OnConflictClause::to_repr(Self) -> @debug.Repr
+pub fn OnConflictClause::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for OnConflictClause
 pub impl Show for OnConflictClause
 
@@ -872,6 +1348,12 @@ pub(all) enum OnInsert {
   DuplicateKeyUpdate(Array[Assignment])
   OnConflict(OnConflictClause)
 } derive(Eq, @debug.Debug)
+pub fn OnInsert::equal(Self, Self) -> Bool
+pub fn OnInsert::not_equal(Self, Self) -> Bool
+pub fn OnInsert::output(Self, &Logger) -> Unit
+pub fn OnInsert::pretty(Self) -> @prettyprinter.Document
+pub fn OnInsert::to_repr(Self) -> @debug.Repr
+pub fn OnInsert::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for OnInsert
 pub impl Show for OnInsert
 
@@ -880,6 +1362,12 @@ pub(all) struct OrderByExpr {
   asc : Bool?
   nulls_first : Bool?
 } derive(Eq, @debug.Debug)
+pub fn OrderByExpr::equal(Self, Self) -> Bool
+pub fn OrderByExpr::not_equal(Self, Self) -> Bool
+pub fn OrderByExpr::output(Self, &Logger) -> Unit
+pub fn OrderByExpr::pretty(Self) -> @prettyprinter.Document
+pub fn OrderByExpr::to_repr(Self) -> @debug.Repr
+pub fn OrderByExpr::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for OrderByExpr
 pub impl Show for OrderByExpr
 
@@ -888,6 +1376,12 @@ pub(all) enum ParameterMode {
   Out
   InOut
 } derive(Eq, @debug.Debug)
+pub fn ParameterMode::equal(Self, Self) -> Bool
+pub fn ParameterMode::not_equal(Self, Self) -> Bool
+pub fn ParameterMode::output(Self, &Logger) -> Unit
+pub fn ParameterMode::pretty(Self) -> @prettyprinter.Document
+pub fn ParameterMode::to_repr(Self) -> @debug.Repr
+pub fn ParameterMode::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ParameterMode
 pub impl Show for ParameterMode
 
@@ -897,6 +1391,18 @@ pub struct Parser {
 
 pub(all) struct Postgres {
 }
+pub fn Postgres::parse_expr(Self, ArrayView[Token]) -> (Expr, ArrayView[Token])? raise ParserError
+pub fn Postgres::parse_statement(Self, Parser, ArrayView[Token]) -> (Statement, ArrayView[Token])? raise ParserError
+pub fn Postgres::read_keyword(Self, String) -> Keyword?
+pub fn Postgres::requires_column_types_in_create_table(Self) -> Bool
+pub fn Postgres::supports_array_syntax(Self) -> Bool
+pub fn Postgres::supports_boolean_literals(Self) -> Bool
+pub fn Postgres::supports_double_quoted_identifiers(Self) -> Bool
+pub fn Postgres::supports_filter_during_aggregation(Self) -> Bool
+pub fn Postgres::supports_if_not_exists(Self) -> Bool
+pub fn Postgres::supports_named_parameters(Self) -> Bool
+pub fn Postgres::supports_string_literal_backslash_escape(Self) -> Bool
+pub fn Postgres::supports_within_after_array_aggregation(Self) -> Bool
 pub impl Dialect for Postgres
 
 pub(all) enum Precedence {
@@ -917,10 +1423,22 @@ pub(all) struct PrepareStmt {
   data_types : Array[DataType]
   statement : Statement
 } derive(Eq, @debug.Debug)
+pub fn PrepareStmt::equal(Self, Self) -> Bool
+pub fn PrepareStmt::not_equal(Self, Self) -> Bool
+pub fn PrepareStmt::output(Self, &Logger) -> Unit
+pub fn PrepareStmt::pretty(Self) -> @prettyprinter.Document
+pub fn PrepareStmt::to_repr(Self) -> @debug.Repr
+pub fn PrepareStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for PrepareStmt
 pub impl Show for PrepareStmt
 
 type PrimaryDatetimeField derive(Eq, @debug.Debug)
+pub fn PrimaryDatetimeField::equal(Self, Self) -> Bool
+pub fn PrimaryDatetimeField::not_equal(Self, Self) -> Bool
+pub fn PrimaryDatetimeField::output(Self, &Logger) -> Unit
+pub fn PrimaryDatetimeField::pretty(Self) -> @prettyprinter.Document
+pub fn PrimaryDatetimeField::to_repr(Self) -> @debug.Repr
+pub fn PrimaryDatetimeField::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for PrimaryDatetimeField
 pub impl Show for PrimaryDatetimeField
 
@@ -940,6 +1458,12 @@ pub(all) enum Privilege {
   Connect
   Temporary
 } derive(Eq, @debug.Debug)
+pub fn Privilege::equal(Self, Self) -> Bool
+pub fn Privilege::not_equal(Self, Self) -> Bool
+pub fn Privilege::output(Self, &Logger) -> Unit
+pub fn Privilege::pretty(Self) -> @prettyprinter.Document
+pub fn Privilege::to_repr(Self) -> @debug.Repr
+pub fn Privilege::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for Privilege
 pub impl Show for Privilege
 
@@ -948,6 +1472,12 @@ pub(all) enum Projection {
   UnamedExpr(Expr)
   AliasedExpr(Expr, String)
 } derive(Eq, @debug.Debug)
+pub fn Projection::equal(Self, Self) -> Bool
+pub fn Projection::not_equal(Self, Self) -> Bool
+pub fn Projection::output(Self, &Logger) -> Unit
+pub fn Projection::pretty(Self) -> @prettyprinter.Document
+pub fn Projection::to_repr(Self) -> @debug.Repr
+pub fn Projection::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for Projection
 pub impl Show for Projection
 
@@ -958,17 +1488,41 @@ pub(all) struct QueryStmt {
   limit : Expr?
   offset : Expr?
 } derive(Eq, @debug.Debug)
+pub fn QueryStmt::equal(Self, Self) -> Bool
+pub fn QueryStmt::not_equal(Self, Self) -> Bool
+pub fn QueryStmt::output(Self, &Logger) -> Unit
+pub fn QueryStmt::pretty(Self) -> @prettyprinter.Document
+pub fn QueryStmt::to_repr(Self) -> @debug.Repr
+pub fn QueryStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for QueryStmt
 pub impl Show for QueryStmt
 
 pub(all) struct Redshift {
 }
+pub fn Redshift::parse_expr(Self, ArrayView[Token]) -> (Expr, ArrayView[Token])? raise ParserError
+pub fn Redshift::parse_statement(Self, Parser, ArrayView[Token]) -> (Statement, ArrayView[Token])? raise ParserError
+pub fn Redshift::read_keyword(Self, String) -> Keyword?
+pub fn Redshift::requires_column_types_in_create_table(Self) -> Bool
+pub fn Redshift::supports_array_syntax(Self) -> Bool
+pub fn Redshift::supports_boolean_literals(Self) -> Bool
+pub fn Redshift::supports_double_quoted_identifiers(Self) -> Bool
+pub fn Redshift::supports_filter_during_aggregation(Self) -> Bool
+pub fn Redshift::supports_if_not_exists(Self) -> Bool
+pub fn Redshift::supports_named_parameters(Self) -> Bool
+pub fn Redshift::supports_string_literal_backslash_escape(Self) -> Bool
+pub fn Redshift::supports_within_after_array_aggregation(Self) -> Bool
 pub impl Dialect for Redshift
 
 pub(all) struct ReleaseSavepointStmt {
   savepoint_keyword : Bool
   name : String
 } derive(Eq, @debug.Debug)
+pub fn ReleaseSavepointStmt::equal(Self, Self) -> Bool
+pub fn ReleaseSavepointStmt::not_equal(Self, Self) -> Bool
+pub fn ReleaseSavepointStmt::output(Self, &Logger) -> Unit
+pub fn ReleaseSavepointStmt::pretty(Self) -> @prettyprinter.Document
+pub fn ReleaseSavepointStmt::to_repr(Self) -> @debug.Repr
+pub fn ReleaseSavepointStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ReleaseSavepointStmt
 pub impl Show for ReleaseSavepointStmt
 
@@ -976,6 +1530,12 @@ pub(all) enum RevokeOption {
   Restrict
   Cascade
 } derive(Eq, @debug.Debug)
+pub fn RevokeOption::equal(Self, Self) -> Bool
+pub fn RevokeOption::not_equal(Self, Self) -> Bool
+pub fn RevokeOption::output(Self, &Logger) -> Unit
+pub fn RevokeOption::pretty(Self) -> @prettyprinter.Document
+pub fn RevokeOption::to_repr(Self) -> @debug.Repr
+pub fn RevokeOption::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for RevokeOption
 pub impl Show for RevokeOption
 
@@ -986,6 +1546,12 @@ pub(all) struct RevokeStmt {
   grantees : Array[String]
   cascade : RevokeOption?
 } derive(Eq, @debug.Debug)
+pub fn RevokeStmt::equal(Self, Self) -> Bool
+pub fn RevokeStmt::not_equal(Self, Self) -> Bool
+pub fn RevokeStmt::output(Self, &Logger) -> Unit
+pub fn RevokeStmt::pretty(Self) -> @prettyprinter.Document
+pub fn RevokeStmt::to_repr(Self) -> @debug.Repr
+pub fn RevokeStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for RevokeStmt
 pub impl Show for RevokeStmt
 
@@ -994,20 +1560,50 @@ pub(all) struct RollbackStmt {
   transaction : Bool
   savepoint : String?
 } derive(Eq, @debug.Debug)
+pub fn RollbackStmt::equal(Self, Self) -> Bool
+pub fn RollbackStmt::not_equal(Self, Self) -> Bool
+pub fn RollbackStmt::output(Self, &Logger) -> Unit
+pub fn RollbackStmt::pretty(Self) -> @prettyprinter.Document
+pub fn RollbackStmt::to_repr(Self) -> @debug.Repr
+pub fn RollbackStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for RollbackStmt
 pub impl Show for RollbackStmt
 
 pub(all) struct SQLite {
 }
+pub fn SQLite::parse_expr(Self, ArrayView[Token]) -> (Expr, ArrayView[Token])? raise ParserError
+pub fn SQLite::parse_statement(Self, Parser, ArrayView[Token]) -> (Statement, ArrayView[Token])? raise ParserError
+pub fn SQLite::read_keyword(Self, String) -> Keyword?
+pub fn SQLite::requires_column_types_in_create_table(Self) -> Bool
+pub fn SQLite::supports_array_syntax(Self) -> Bool
+pub fn SQLite::supports_boolean_literals(Self) -> Bool
+pub fn SQLite::supports_double_quoted_identifiers(Self) -> Bool
+pub fn SQLite::supports_filter_during_aggregation(Self) -> Bool
+pub fn SQLite::supports_if_not_exists(Self) -> Bool
+pub fn SQLite::supports_named_parameters(Self) -> Bool
+pub fn SQLite::supports_string_literal_backslash_escape(Self) -> Bool
+pub fn SQLite::supports_within_after_array_aggregation(Self) -> Bool
 pub impl Dialect for SQLite
 
 pub(all) struct SavepointStmt {
   name : String
 } derive(Eq, @debug.Debug)
+pub fn SavepointStmt::equal(Self, Self) -> Bool
+pub fn SavepointStmt::not_equal(Self, Self) -> Bool
+pub fn SavepointStmt::output(Self, &Logger) -> Unit
+pub fn SavepointStmt::pretty(Self) -> @prettyprinter.Document
+pub fn SavepointStmt::to_repr(Self) -> @debug.Repr
+pub fn SavepointStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for SavepointStmt
 pub impl Show for SavepointStmt
 
 type SelectStmt derive(Eq, @debug.Debug)
+pub fn SelectStmt::equal(Self, Self) -> Bool
+pub fn SelectStmt::not_equal(Self, Self) -> Bool
+pub fn SelectStmt::output(Self, &Logger) -> Unit
+pub fn SelectStmt::pretty(Self) -> @prettyprinter.Document
+pub fn SelectStmt::to_repr(Self) -> @debug.Repr
+pub fn SelectStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for SelectStmt
 pub impl Show for SelectStmt
 
@@ -1015,6 +1611,12 @@ pub(all) enum SequenceLimit {
   Value(Int)
   NoLimit
 } derive(Eq, @debug.Debug)
+pub fn SequenceLimit::equal(Self, Self) -> Bool
+pub fn SequenceLimit::not_equal(Self, Self) -> Bool
+pub fn SequenceLimit::output(Self, &Logger) -> Unit
+pub fn SequenceLimit::pretty(Self) -> @prettyprinter.Document
+pub fn SequenceLimit::to_repr(Self) -> @debug.Repr
+pub fn SequenceLimit::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for SequenceLimit
 pub impl Show for SequenceLimit
 
@@ -1022,6 +1624,12 @@ pub(all) enum SequenceOwnedBy {
   Column(ObjectName, String)
   ByNone
 } derive(Eq, @debug.Debug)
+pub fn SequenceOwnedBy::equal(Self, Self) -> Bool
+pub fn SequenceOwnedBy::not_equal(Self, Self) -> Bool
+pub fn SequenceOwnedBy::output(Self, &Logger) -> Unit
+pub fn SequenceOwnedBy::pretty(Self) -> @prettyprinter.Document
+pub fn SequenceOwnedBy::to_repr(Self) -> @debug.Repr
+pub fn SequenceOwnedBy::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for SequenceOwnedBy
 pub impl Show for SequenceOwnedBy
 
@@ -1029,13 +1637,30 @@ pub(all) struct SetAssignment {
   variable : String
   value : Expr
 } derive(Eq, @debug.Debug)
+pub fn SetAssignment::equal(Self, Self) -> Bool
+pub fn SetAssignment::not_equal(Self, Self) -> Bool
+pub fn SetAssignment::output(Self, &Logger) -> Unit
+pub fn SetAssignment::pretty(Self) -> @prettyprinter.Document
+pub fn SetAssignment::to_repr(Self) -> @debug.Repr
+pub fn SetAssignment::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for SetAssignment
 pub impl Show for SetAssignment
 
 type SetExpr derive(Eq, @debug.Debug)
+pub fn SetExpr::equal(Self, Self) -> Bool
+pub fn SetExpr::not_equal(Self, Self) -> Bool
+pub fn SetExpr::output(Self, &Logger) -> Unit
+pub fn SetExpr::to_repr(Self) -> @debug.Repr
+pub fn SetExpr::to_string(Self) -> String
 pub impl Show for SetExpr
 
 type SetOperator derive(Eq, @debug.Debug)
+pub fn SetOperator::equal(Self, Self) -> Bool
+pub fn SetOperator::not_equal(Self, Self) -> Bool
+pub fn SetOperator::output(Self, &Logger) -> Unit
+pub fn SetOperator::pretty(Self) -> @prettyprinter.Document
+pub fn SetOperator::to_repr(Self) -> @debug.Repr
+pub fn SetOperator::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for SetOperator
 pub impl Show for SetOperator
 
@@ -1045,12 +1670,23 @@ pub(all) enum SetScope {
   UserVar
   Local
 } derive(Eq, @debug.Debug)
+pub fn SetScope::equal(Self, Self) -> Bool
+pub fn SetScope::not_equal(Self, Self) -> Bool
+pub fn SetScope::output(Self, &Logger) -> Unit
+pub fn SetScope::to_repr(Self) -> @debug.Repr
+pub fn SetScope::to_string(Self) -> String
 pub impl Show for SetScope
 
 pub(all) struct SetStmt {
   scope : SetScope
   assignments : Array[SetAssignment]
 } derive(Eq, @debug.Debug)
+pub fn SetStmt::equal(Self, Self) -> Bool
+pub fn SetStmt::not_equal(Self, Self) -> Bool
+pub fn SetStmt::output(Self, &Logger) -> Unit
+pub fn SetStmt::pretty(Self) -> @prettyprinter.Document
+pub fn SetStmt::to_repr(Self) -> @debug.Repr
+pub fn SetStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for SetStmt
 pub impl Show for SetStmt
 
@@ -1058,6 +1694,12 @@ pub(all) enum ShowFilter {
   Like(String)
   Where(Expr)
 } derive(Eq, @debug.Debug)
+pub fn ShowFilter::equal(Self, Self) -> Bool
+pub fn ShowFilter::not_equal(Self, Self) -> Bool
+pub fn ShowFilter::output(Self, &Logger) -> Unit
+pub fn ShowFilter::pretty(Self) -> @prettyprinter.Document
+pub fn ShowFilter::to_repr(Self) -> @debug.Repr
+pub fn ShowFilter::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ShowFilter
 pub impl Show for ShowFilter
 
@@ -1069,6 +1711,12 @@ pub(all) struct ShowStmt {
   full : Bool
   global_scope : Bool
 } derive(Eq, @debug.Debug)
+pub fn ShowStmt::equal(Self, Self) -> Bool
+pub fn ShowStmt::not_equal(Self, Self) -> Bool
+pub fn ShowStmt::output(Self, &Logger) -> Unit
+pub fn ShowStmt::pretty(Self) -> @prettyprinter.Document
+pub fn ShowStmt::to_repr(Self) -> @debug.Repr
+pub fn ShowStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ShowStmt
 pub impl Show for ShowStmt
 
@@ -1089,11 +1737,29 @@ pub(all) enum ShowType {
   CreateEvent
   CreateTrigger
 } derive(Eq, @debug.Debug)
+pub fn ShowType::equal(Self, Self) -> Bool
+pub fn ShowType::not_equal(Self, Self) -> Bool
+pub fn ShowType::output(Self, &Logger) -> Unit
+pub fn ShowType::pretty(Self) -> @prettyprinter.Document
+pub fn ShowType::to_repr(Self) -> @debug.Repr
+pub fn ShowType::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ShowType
 pub impl Show for ShowType
 
 pub(all) struct Snowflake {
 }
+pub fn Snowflake::parse_expr(Self, ArrayView[Token]) -> (Expr, ArrayView[Token])? raise ParserError
+pub fn Snowflake::parse_statement(Self, Parser, ArrayView[Token]) -> (Statement, ArrayView[Token])? raise ParserError
+pub fn Snowflake::read_keyword(Self, String) -> Keyword?
+pub fn Snowflake::requires_column_types_in_create_table(Self) -> Bool
+pub fn Snowflake::supports_array_syntax(Self) -> Bool
+pub fn Snowflake::supports_boolean_literals(Self) -> Bool
+pub fn Snowflake::supports_double_quoted_identifiers(Self) -> Bool
+pub fn Snowflake::supports_filter_during_aggregation(Self) -> Bool
+pub fn Snowflake::supports_if_not_exists(Self) -> Bool
+pub fn Snowflake::supports_named_parameters(Self) -> Bool
+pub fn Snowflake::supports_string_literal_backslash_escape(Self) -> Bool
+pub fn Snowflake::supports_within_after_array_aggregation(Self) -> Bool
 pub impl Dialect for Snowflake
 
 pub(all) enum SqliteOnConflict {
@@ -1103,6 +1769,12 @@ pub(all) enum SqliteOnConflict {
   Ignore
   Replace
 } derive(Eq, @debug.Debug)
+pub fn SqliteOnConflict::equal(Self, Self) -> Bool
+pub fn SqliteOnConflict::not_equal(Self, Self) -> Bool
+pub fn SqliteOnConflict::output(Self, &Logger) -> Unit
+pub fn SqliteOnConflict::pretty(Self) -> @prettyprinter.Document
+pub fn SqliteOnConflict::to_repr(Self) -> @debug.Repr
+pub fn SqliteOnConflict::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for SqliteOnConflict
 pub impl Show for SqliteOnConflict
 
@@ -1146,14 +1818,26 @@ pub(all) enum Statement {
   Grant(GrantStmt)
   Revoke(RevokeStmt)
 } derive(Eq, @debug.Debug)
+pub fn Statement::equal(Self, Self) -> Bool
+pub fn Statement::not_equal(Self, Self) -> Bool
+pub fn Statement::output(Self, &Logger) -> Unit
+pub fn Statement::pretty(Self) -> @prettyprinter.Document
+pub fn Statement::to_repr(Self) -> @debug.Repr
+pub fn Statement::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for Statement
 pub impl Show for Statement
 
 pub(all) struct Statements {
   stmts : Array[Statement]
 } derive(Eq, @debug.Debug)
+pub fn Statements::equal(Self, Self) -> Bool
 #alias("_[_]")
 pub fn Statements::get(Self, Int) -> Statement
+pub fn Statements::not_equal(Self, Self) -> Bool
+pub fn Statements::output(Self, &Logger) -> Unit
+pub fn Statements::pretty(Self) -> @prettyprinter.Document
+pub fn Statements::to_repr(Self) -> @debug.Repr
+pub fn Statements::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for Statements
 pub impl Show for Statements
 
@@ -1161,6 +1845,12 @@ pub(all) enum Subscript {
   Index(Expr)
   Slice(Expr?, Expr?, Expr?)
 } derive(Eq, @debug.Debug)
+pub fn Subscript::equal(Self, Self) -> Bool
+pub fn Subscript::not_equal(Self, Self) -> Bool
+pub fn Subscript::output(Self, &Logger) -> Unit
+pub fn Subscript::pretty(Self) -> @prettyprinter.Document
+pub fn Subscript::to_repr(Self) -> @debug.Repr
+pub fn Subscript::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for Subscript
 pub impl Show for Subscript
 
@@ -1168,6 +1858,12 @@ pub(all) struct TableAlias {
   name : String
   columns : Array[String]
 } derive(Eq, @debug.Debug)
+pub fn TableAlias::equal(Self, Self) -> Bool
+pub fn TableAlias::not_equal(Self, Self) -> Bool
+pub fn TableAlias::output(Self, &Logger) -> Unit
+pub fn TableAlias::pretty(Self) -> @prettyprinter.Document
+pub fn TableAlias::to_repr(Self) -> @debug.Repr
+pub fn TableAlias::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for TableAlias
 pub impl Show for TableAlias
 
@@ -1177,6 +1873,12 @@ pub(all) enum TableConstraint {
   ForeignKey(columns~ : Array[OrderByExpr], foreign_table~ : ObjectName, foreign_columns~ : Array[String])
   Check(Expr)
 } derive(Eq, @debug.Debug)
+pub fn TableConstraint::equal(Self, Self) -> Bool
+pub fn TableConstraint::not_equal(Self, Self) -> Bool
+pub fn TableConstraint::output(Self, &Logger) -> Unit
+pub fn TableConstraint::pretty(Self) -> @prettyprinter.Document
+pub fn TableConstraint::to_repr(Self) -> @debug.Repr
+pub fn TableConstraint::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for TableConstraint
 pub impl Show for TableConstraint
 
@@ -1184,6 +1886,12 @@ pub(all) enum TableFactor {
   Column(ObjectName, TableAlias?)
   SubQuery(QueryStmt, TableAlias?)
 } derive(Eq, @debug.Debug)
+pub fn TableFactor::equal(Self, Self) -> Bool
+pub fn TableFactor::not_equal(Self, Self) -> Bool
+pub fn TableFactor::output(Self, &Logger) -> Unit
+pub fn TableFactor::pretty(Self) -> @prettyprinter.Document
+pub fn TableFactor::to_repr(Self) -> @debug.Repr
+pub fn TableFactor::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for TableFactor
 pub impl Show for TableFactor
 
@@ -1191,6 +1899,12 @@ pub(all) struct TableRef {
   factor : TableFactor
   joins : Array[Join]
 } derive(Eq, @debug.Debug)
+pub fn TableRef::equal(Self, Self) -> Bool
+pub fn TableRef::not_equal(Self, Self) -> Bool
+pub fn TableRef::output(Self, &Logger) -> Unit
+pub fn TableRef::pretty(Self) -> @prettyprinter.Document
+pub fn TableRef::to_repr(Self) -> @debug.Repr
+pub fn TableRef::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for TableRef
 pub impl Show for TableRef
 
@@ -1233,18 +1947,35 @@ pub(all) enum Token {
   Unknown(Char)
   Eof
 } derive(Eq, @debug.Debug)
+pub fn Token::equal(Self, Self) -> Bool
+pub fn Token::not_equal(Self, Self) -> Bool
+pub fn Token::output(Self, &Logger) -> Unit
+pub fn Token::to_repr(Self) -> @debug.Repr
+pub fn Token::to_string(Self) -> String
 pub impl Show for Token
 
 pub(all) enum Top {
   Constant(Int)
   Expr(Expr)
 } derive(Eq, @debug.Debug)
+pub fn Top::equal(Self, Self) -> Bool
+pub fn Top::not_equal(Self, Self) -> Bool
+pub fn Top::output(Self, &Logger) -> Unit
+pub fn Top::pretty(Self) -> @prettyprinter.Document
+pub fn Top::to_repr(Self) -> @debug.Repr
+pub fn Top::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for Top
 pub impl Show for Top
 
 pub(all) struct TruncateStmt {
   table_name : ObjectName
 } derive(Eq, @debug.Debug)
+pub fn TruncateStmt::equal(Self, Self) -> Bool
+pub fn TruncateStmt::not_equal(Self, Self) -> Bool
+pub fn TruncateStmt::output(Self, &Logger) -> Unit
+pub fn TruncateStmt::pretty(Self) -> @prettyprinter.Document
+pub fn TruncateStmt::to_repr(Self) -> @debug.Repr
+pub fn TruncateStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for TruncateStmt
 pub impl Show for TruncateStmt
 
@@ -1253,6 +1984,12 @@ pub(all) enum UnaryOperator {
   Minus
   Not
 } derive(Eq, @debug.Debug)
+pub fn UnaryOperator::equal(Self, Self) -> Bool
+pub fn UnaryOperator::not_equal(Self, Self) -> Bool
+pub fn UnaryOperator::output(Self, &Logger) -> Unit
+pub fn UnaryOperator::pretty(Self) -> @prettyprinter.Document
+pub fn UnaryOperator::to_repr(Self) -> @debug.Repr
+pub fn UnaryOperator::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for UnaryOperator
 pub impl Show for UnaryOperator
 
@@ -1261,18 +1998,36 @@ pub(all) struct UpdateStmt {
   assignments : Array[Assignment]
   where_clause : Expr?
 } derive(Eq, @debug.Debug)
+pub fn UpdateStmt::equal(Self, Self) -> Bool
+pub fn UpdateStmt::not_equal(Self, Self) -> Bool
+pub fn UpdateStmt::output(Self, &Logger) -> Unit
+pub fn UpdateStmt::pretty(Self) -> @prettyprinter.Document
+pub fn UpdateStmt::to_repr(Self) -> @debug.Repr
+pub fn UpdateStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for UpdateStmt
 pub impl Show for UpdateStmt
 
 pub(all) struct UseStmt {
   database_name : ObjectName
 } derive(Eq, @debug.Debug)
+pub fn UseStmt::equal(Self, Self) -> Bool
+pub fn UseStmt::not_equal(Self, Self) -> Bool
+pub fn UseStmt::output(Self, &Logger) -> Unit
+pub fn UseStmt::pretty(Self) -> @prettyprinter.Document
+pub fn UseStmt::to_repr(Self) -> @debug.Repr
+pub fn UseStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for UseStmt
 pub impl Show for UseStmt
 
 pub(all) struct ViewColumnDef {
   name : String
 } derive(Eq, @debug.Debug)
+pub fn ViewColumnDef::equal(Self, Self) -> Bool
+pub fn ViewColumnDef::not_equal(Self, Self) -> Bool
+pub fn ViewColumnDef::output(Self, &Logger) -> Unit
+pub fn ViewColumnDef::pretty(Self) -> @prettyprinter.Document
+pub fn ViewColumnDef::to_repr(Self) -> @debug.Repr
+pub fn ViewColumnDef::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ViewColumnDef
 pub impl Show for ViewColumnDef
 
@@ -1283,6 +2038,12 @@ pub(all) enum WindowFrameBound {
   Preceding(Expr)
   Following(Expr)
 } derive(Eq, @debug.Debug)
+pub fn WindowFrameBound::equal(Self, Self) -> Bool
+pub fn WindowFrameBound::not_equal(Self, Self) -> Bool
+pub fn WindowFrameBound::output(Self, &Logger) -> Unit
+pub fn WindowFrameBound::pretty(Self) -> @prettyprinter.Document
+pub fn WindowFrameBound::to_repr(Self) -> @debug.Repr
+pub fn WindowFrameBound::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for WindowFrameBound
 pub impl Show for WindowFrameBound
 
@@ -1291,6 +2052,12 @@ pub(all) struct WindowFrameClause {
   frame_start : WindowFrameBound
   frame_end : WindowFrameBound?
 } derive(Eq, @debug.Debug)
+pub fn WindowFrameClause::equal(Self, Self) -> Bool
+pub fn WindowFrameClause::not_equal(Self, Self) -> Bool
+pub fn WindowFrameClause::output(Self, &Logger) -> Unit
+pub fn WindowFrameClause::pretty(Self) -> @prettyprinter.Document
+pub fn WindowFrameClause::to_repr(Self) -> @debug.Repr
+pub fn WindowFrameClause::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for WindowFrameClause
 pub impl Show for WindowFrameClause
 
@@ -1298,6 +2065,11 @@ pub(all) enum WindowFrameUnits {
   Rows
   Range
 } derive(Eq, @debug.Debug)
+pub fn WindowFrameUnits::equal(Self, Self) -> Bool
+pub fn WindowFrameUnits::not_equal(Self, Self) -> Bool
+pub fn WindowFrameUnits::output(Self, &Logger) -> Unit
+pub fn WindowFrameUnits::to_repr(Self) -> @debug.Repr
+pub fn WindowFrameUnits::to_string(Self) -> String
 pub impl Show for WindowFrameUnits
 
 pub(all) struct WindowSpec {
@@ -1305,6 +2077,12 @@ pub(all) struct WindowSpec {
   order_by : Array[OrderByExpr]
   frame_clause : WindowFrameClause?
 } derive(Eq, @debug.Debug)
+pub fn WindowSpec::equal(Self, Self) -> Bool
+pub fn WindowSpec::not_equal(Self, Self) -> Bool
+pub fn WindowSpec::output(Self, &Logger) -> Unit
+pub fn WindowSpec::pretty(Self) -> @prettyprinter.Document
+pub fn WindowSpec::to_repr(Self) -> @debug.Repr
+pub fn WindowSpec::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for WindowSpec
 pub impl Show for WindowSpec
 
