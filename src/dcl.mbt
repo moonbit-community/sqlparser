@@ -29,7 +29,7 @@ fn Parser::parse_grant_statement(
       (true, tokens)
     _ => (false, tokens)
   }
-  ({ privileges, objects, grantees, with_grant_option }, tokens)
+  ({ privileges, objects, grantees, with_grant_option, }, tokens)
 }
 
 ///|
@@ -66,7 +66,7 @@ fn Parser::parse_revoke_statement(
     [Keyword(Cascade), .. tokens] => (Some(RevokeOption::Cascade), tokens)
     _ => (None, tokens)
   }
-  ({ grant_option_for, privileges, objects, grantees, cascade }, tokens)
+  ({ grant_option_for, privileges, objects, grantees, cascade, }, tokens)
 }
 
 ///|

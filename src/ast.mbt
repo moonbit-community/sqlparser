@@ -2965,3 +2965,1009 @@ pub impl @pp.Pretty for DeallocateStmt with fn pretty(self) {
   (if self.prepare { @pp.text("PREPARE ") } else { @pp.empty }) +
   @pp.text(self.name)
 }
+
+///|
+pub extend AccessExpr with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend AccessExpr with Debug::{to_repr}
+
+///|
+pub extend AccessExpr with Eq::{not_equal, equal}
+
+///|
+pub extend AlterIndexOperation with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend AlterIndexOperation with Debug::{to_repr}
+
+///|
+pub extend AlterIndexOperation with Eq::{not_equal, equal}
+
+///|
+pub extend AlterIndexStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend AlterIndexStmt with Debug::{to_repr}
+
+///|
+pub extend AlterIndexStmt with Eq::{not_equal, equal}
+
+///|
+pub extend AlterTableOperation with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend AlterTableOperation with Debug::{to_repr}
+
+///|
+pub extend AlterTableOperation with Eq::{not_equal, equal}
+
+///|
+pub extend AlterTableStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend AlterTableStmt with Debug::{to_repr}
+
+///|
+pub extend AlterTableStmt with Eq::{not_equal, equal}
+
+///|
+pub extend ArrayExpr with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend ArrayExpr with Debug::{to_repr}
+
+///|
+pub extend ArrayExpr with Eq::{not_equal, equal}
+
+///|
+pub extend Assignment with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend Assignment with Debug::{to_repr}
+
+///|
+pub extend Assignment with Eq::{not_equal, equal}
+
+///|
+pub extend BeginStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend BeginStmt with Debug::{to_repr}
+
+///|
+pub extend BeginStmt with Eq::{not_equal, equal}
+
+///|
+pub extend BinaryOperator with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend BinaryOperator with Debug::{to_repr}
+
+///|
+pub extend BinaryOperator with Eq::{not_equal, equal}
+
+///|
+pub extend CaseExpr with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend CaseExpr with Debug::{to_repr}
+
+///|
+pub extend CaseExpr with Eq::{not_equal, equal}
+
+///|
+pub extend ColumnDef with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend ColumnDef with Debug::{to_repr}
+
+///|
+pub extend ColumnDef with Eq::{not_equal, equal}
+
+///|
+pub extend ColumnDefOption with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend ColumnDefOption with Debug::{to_repr}
+
+///|
+pub extend ColumnDefOption with Eq::{not_equal, equal}
+
+///|
+pub extend CommitStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend CommitStmt with Debug::{to_repr}
+
+///|
+pub extend CommitStmt with Eq::{not_equal, equal}
+
+///|
+pub extend ConflictAction with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend ConflictAction with Debug::{to_repr}
+
+///|
+pub extend ConflictAction with Eq::{not_equal, equal}
+
+///|
+pub extend ConflictTarget with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend ConflictTarget with Debug::{to_repr}
+
+///|
+pub extend ConflictTarget with Eq::{not_equal, equal}
+
+///|
+pub extend CopyDirection with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend CopyDirection with Debug::{to_repr}
+
+///|
+pub extend CopyDirection with Eq::{not_equal, equal}
+
+///|
+pub extend CopyForceQuote with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend CopyForceQuote with Debug::{to_repr}
+
+///|
+pub extend CopyForceQuote with Eq::{not_equal, equal}
+
+///|
+pub extend CopyFormat with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend CopyFormat with Debug::{to_repr}
+
+///|
+pub extend CopyFormat with Eq::{not_equal, equal}
+
+///|
+pub extend CopyOption with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend CopyOption with Debug::{to_repr}
+
+///|
+pub extend CopyOption with Eq::{not_equal, equal}
+
+///|
+pub extend CopySource with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend CopySource with Debug::{to_repr}
+
+///|
+pub extend CopySource with Eq::{not_equal, equal}
+
+///|
+pub extend CopyStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend CopyStmt with Debug::{to_repr}
+
+///|
+pub extend CopyStmt with Eq::{not_equal, equal}
+
+///|
+pub extend CopyTarget with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend CopyTarget with Debug::{to_repr}
+
+///|
+pub extend CopyTarget with Eq::{not_equal, equal}
+
+///|
+pub extend CreateDatabaseStmt with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend CreateDatabaseStmt with Debug::{to_repr}
+
+///|
+pub extend CreateDatabaseStmt with Eq::{not_equal, equal}
+
+///|
+pub extend CreateFunctionStmt with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend CreateFunctionStmt with Debug::{to_repr}
+
+///|
+pub extend CreateFunctionStmt with Eq::{not_equal, equal}
+
+///|
+pub extend CreateIndexStmt with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend CreateIndexStmt with Debug::{to_repr}
+
+///|
+pub extend CreateIndexStmt with Eq::{not_equal, equal}
+
+///|
+pub extend CreateProcedureStmt with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend CreateProcedureStmt with Debug::{to_repr}
+
+///|
+pub extend CreateProcedureStmt with Eq::{not_equal, equal}
+
+///|
+pub extend CreateSchemaStmt with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend CreateSchemaStmt with Debug::{to_repr}
+
+///|
+pub extend CreateSchemaStmt with Eq::{not_equal, equal}
+
+///|
+pub extend CreateSequenceStmt with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend CreateSequenceStmt with Debug::{to_repr}
+
+///|
+pub extend CreateSequenceStmt with Eq::{not_equal, equal}
+
+///|
+pub extend CreateTableDefinition with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend CreateTableDefinition with Debug::{to_repr}
+
+///|
+pub extend CreateTableDefinition with Eq::{not_equal, equal}
+
+///|
+pub extend CreateTableStmt with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend CreateTableStmt with Debug::{to_repr}
+
+///|
+pub extend CreateTableStmt with Eq::{not_equal, equal}
+
+///|
+pub extend CreateViewStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend CreateViewStmt with Debug::{to_repr}
+
+///|
+pub extend CreateViewStmt with Eq::{not_equal, equal}
+
+///|
+pub extend Cte with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend Cte with Debug::{to_repr}
+
+///|
+pub extend Cte with Eq::{not_equal, equal}
+
+///|
+pub extend DataType with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend DataType with Debug::{to_repr}
+
+///|
+pub extend DataType with Eq::{not_equal, equal}
+
+///|
+pub extend DatetimeUnit with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend DatetimeUnit with Debug::{to_repr}
+
+///|
+pub extend DatetimeUnit with Eq::{not_equal, equal}
+
+///|
+pub extend DeallocateStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend DeallocateStmt with Debug::{to_repr}
+
+///|
+pub extend DeallocateStmt with Eq::{not_equal, equal}
+
+///|
+pub extend DeleteStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend DeleteStmt with Debug::{to_repr}
+
+///|
+pub extend DeleteStmt with Eq::{not_equal, equal}
+
+///|
+pub extend DropIndexStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend DropIndexStmt with Debug::{to_repr}
+
+///|
+pub extend DropIndexStmt with Eq::{not_equal, equal}
+
+///|
+pub extend DropTableStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend DropTableStmt with Debug::{to_repr}
+
+///|
+pub extend DropTableStmt with Eq::{not_equal, equal}
+
+///|
+pub extend DropViewStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend DropViewStmt with Debug::{to_repr}
+
+///|
+pub extend DropViewStmt with Eq::{not_equal, equal}
+
+///|
+pub extend DuplicateTreatment with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend DuplicateTreatment with Debug::{to_repr}
+
+///|
+pub extend DuplicateTreatment with Eq::{not_equal, equal}
+
+///|
+pub extend ExecuteStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend ExecuteStmt with Debug::{to_repr}
+
+///|
+pub extend ExecuteStmt with Eq::{not_equal, equal}
+
+///|
+pub extend Expr with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend Expr with Debug::{to_repr}
+
+///|
+pub extend Expr with Eq::{not_equal, equal}
+
+///|
+pub extend FunctionParameter with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend FunctionParameter with Debug::{to_repr}
+
+///|
+pub extend FunctionParameter with Eq::{not_equal, equal}
+
+///|
+pub extend GrantStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend GrantStmt with Debug::{to_repr}
+
+///|
+pub extend GrantStmt with Eq::{not_equal, equal}
+
+///|
+pub extend IndexColumn with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend IndexColumn with Debug::{to_repr}
+
+///|
+pub extend IndexColumn with Eq::{not_equal, equal}
+
+///|
+pub extend IndexMethod with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend IndexMethod with Debug::{to_repr}
+
+///|
+pub extend IndexMethod with Eq::{not_equal, equal}
+
+///|
+pub extend IndexParameter with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend IndexParameter with Debug::{to_repr}
+
+///|
+pub extend IndexParameter with Eq::{not_equal, equal}
+
+///|
+pub extend InsertSource with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend InsertSource with Debug::{to_repr}
+
+///|
+pub extend InsertSource with Eq::{not_equal, equal}
+
+///|
+pub extend InsertStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend InsertStmt with Debug::{to_repr}
+
+///|
+pub extend InsertStmt with Eq::{not_equal, equal}
+
+///|
+pub extend IntervalQualifier with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend IntervalQualifier with Debug::{to_repr}
+
+///|
+pub extend IntervalQualifier with Eq::{not_equal, equal}
+
+///|
+pub extend Join with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend Join with Debug::{to_repr}
+
+///|
+pub extend Join with Eq::{not_equal, equal}
+
+///|
+pub extend JoinConstraint with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend JoinConstraint with Debug::{to_repr}
+
+///|
+pub extend JoinConstraint with Eq::{not_equal, equal}
+
+///|
+pub extend JoinOperator with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend JoinOperator with Debug::{to_repr}
+
+///|
+pub extend JoinOperator with Eq::{not_equal, equal}
+
+///|
+pub extend Literal with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend Literal with Debug::{to_repr}
+
+///|
+pub extend Literal with Eq::{not_equal, equal}
+
+///|
+pub extend LoadDataDuplicateHandling with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend LoadDataDuplicateHandling with Debug::{to_repr}
+
+///|
+pub extend LoadDataDuplicateHandling with Eq::{not_equal, equal}
+
+///|
+pub extend LoadDataFieldsOptions with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend LoadDataFieldsOptions with Debug::{to_repr}
+
+///|
+pub extend LoadDataFieldsOptions with Eq::{not_equal, equal}
+
+///|
+pub extend LoadDataLinesOptions with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend LoadDataLinesOptions with Debug::{to_repr}
+
+///|
+pub extend LoadDataLinesOptions with Eq::{not_equal, equal}
+
+///|
+pub extend LoadDataStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend LoadDataStmt with Debug::{to_repr}
+
+///|
+pub extend LoadDataStmt with Eq::{not_equal, equal}
+
+///|
+pub extend MergeAction with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend MergeAction with Debug::{to_repr}
+
+///|
+pub extend MergeAction with Eq::{not_equal, equal}
+
+///|
+pub extend MergeMatchType with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend MergeMatchType with Debug::{to_repr}
+
+///|
+pub extend MergeMatchType with Eq::{not_equal, equal}
+
+///|
+pub extend MergeSource with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend MergeSource with Debug::{to_repr}
+
+///|
+pub extend MergeSource with Eq::{not_equal, equal}
+
+///|
+pub extend MergeStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend MergeStmt with Debug::{to_repr}
+
+///|
+pub extend MergeStmt with Eq::{not_equal, equal}
+
+///|
+pub extend MergeWhenClause with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend MergeWhenClause with Debug::{to_repr}
+
+///|
+pub extend MergeWhenClause with Eq::{not_equal, equal}
+
+///|
+pub extend ObjectName with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend ObjectName with Debug::{to_repr}
+
+///|
+pub extend ObjectName with Eq::{not_equal, equal}
+
+///|
+pub extend OnConflictClause with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend OnConflictClause with Debug::{to_repr}
+
+///|
+pub extend OnConflictClause with Eq::{not_equal, equal}
+
+///|
+pub extend OnInsert with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend OnInsert with Debug::{to_repr}
+
+///|
+pub extend OnInsert with Eq::{not_equal, equal}
+
+///|
+pub extend OrderByExpr with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend OrderByExpr with Debug::{to_repr}
+
+///|
+pub extend OrderByExpr with Eq::{not_equal, equal}
+
+///|
+pub extend ParameterMode with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend ParameterMode with Debug::{to_repr}
+
+///|
+pub extend ParameterMode with Eq::{not_equal, equal}
+
+///|
+pub extend PrepareStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend PrepareStmt with Debug::{to_repr}
+
+///|
+pub extend PrepareStmt with Eq::{not_equal, equal}
+
+///|
+pub extend PrimaryDatetimeField with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend PrimaryDatetimeField with Debug::{to_repr}
+
+///|
+pub extend PrimaryDatetimeField with Eq::{not_equal, equal}
+
+///|
+pub extend Privilege with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend Privilege with Debug::{to_repr}
+
+///|
+pub extend Privilege with Eq::{not_equal, equal}
+
+///|
+pub extend Projection with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend Projection with Debug::{to_repr}
+
+///|
+pub extend Projection with Eq::{not_equal, equal}
+
+///|
+pub extend QueryStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend QueryStmt with Debug::{to_repr}
+
+///|
+pub extend QueryStmt with Eq::{not_equal, equal}
+
+///|
+pub extend ReleaseSavepointStmt with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend ReleaseSavepointStmt with Debug::{to_repr}
+
+///|
+pub extend ReleaseSavepointStmt with Eq::{not_equal, equal}
+
+///|
+pub extend RevokeOption with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend RevokeOption with Debug::{to_repr}
+
+///|
+pub extend RevokeOption with Eq::{not_equal, equal}
+
+///|
+pub extend RevokeStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend RevokeStmt with Debug::{to_repr}
+
+///|
+pub extend RevokeStmt with Eq::{not_equal, equal}
+
+///|
+pub extend RollbackStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend RollbackStmt with Debug::{to_repr}
+
+///|
+pub extend RollbackStmt with Eq::{not_equal, equal}
+
+///|
+pub extend SavepointStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend SavepointStmt with Debug::{to_repr}
+
+///|
+pub extend SavepointStmt with Eq::{not_equal, equal}
+
+///|
+pub extend SelectStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend SelectStmt with Debug::{to_repr}
+
+///|
+pub extend SelectStmt with Eq::{not_equal, equal}
+
+///|
+pub extend SequenceLimit with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend SequenceLimit with Debug::{to_repr}
+
+///|
+pub extend SequenceLimit with Eq::{not_equal, equal}
+
+///|
+pub extend SequenceOwnedBy with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend SequenceOwnedBy with Debug::{to_repr}
+
+///|
+pub extend SequenceOwnedBy with Eq::{not_equal, equal}
+
+///|
+pub extend SetAssignment with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend SetAssignment with Debug::{to_repr}
+
+///|
+pub extend SetAssignment with Eq::{not_equal, equal}
+
+///|
+pub extend SetExpr with Debug::{to_repr}
+
+///|
+pub extend SetExpr with Eq::{not_equal, equal}
+
+///|
+pub extend SetOperator with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend SetOperator with Debug::{to_repr}
+
+///|
+pub extend SetOperator with Eq::{not_equal, equal}
+
+///|
+pub extend SetScope with Debug::{to_repr}
+
+///|
+pub extend SetScope with Eq::{not_equal, equal}
+
+///|
+pub extend SetStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend SetStmt with Debug::{to_repr}
+
+///|
+pub extend SetStmt with Eq::{not_equal, equal}
+
+///|
+pub extend ShowFilter with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend ShowFilter with Debug::{to_repr}
+
+///|
+pub extend ShowFilter with Eq::{not_equal, equal}
+
+///|
+pub extend ShowStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend ShowStmt with Debug::{to_repr}
+
+///|
+pub extend ShowStmt with Eq::{not_equal, equal}
+
+///|
+pub extend ShowType with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend ShowType with Debug::{to_repr}
+
+///|
+pub extend ShowType with Eq::{not_equal, equal}
+
+///|
+pub extend SqliteOnConflict with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend SqliteOnConflict with Debug::{to_repr}
+
+///|
+pub extend SqliteOnConflict with Eq::{not_equal, equal}
+
+///|
+pub extend Statement with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend Statement with Debug::{to_repr}
+
+///|
+pub extend Statement with Eq::{not_equal, equal}
+
+///|
+pub extend Statements with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend Statements with Debug::{to_repr}
+
+///|
+pub extend Statements with Eq::{not_equal, equal}
+
+///|
+pub extend Subscript with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend Subscript with Debug::{to_repr}
+
+///|
+pub extend Subscript with Eq::{not_equal, equal}
+
+///|
+pub extend TableAlias with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend TableAlias with Debug::{to_repr}
+
+///|
+pub extend TableAlias with Eq::{not_equal, equal}
+
+///|
+pub extend TableConstraint with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend TableConstraint with Debug::{to_repr}
+
+///|
+pub extend TableConstraint with Eq::{not_equal, equal}
+
+///|
+pub extend TableFactor with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend TableFactor with Debug::{to_repr}
+
+///|
+pub extend TableFactor with Eq::{not_equal, equal}
+
+///|
+pub extend TableRef with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend TableRef with Debug::{to_repr}
+
+///|
+pub extend TableRef with Eq::{not_equal, equal}
+
+///|
+pub extend Top with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend Top with Debug::{to_repr}
+
+///|
+pub extend Top with Eq::{not_equal, equal}
+
+///|
+pub extend TruncateStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend TruncateStmt with Debug::{to_repr}
+
+///|
+pub extend TruncateStmt with Eq::{not_equal, equal}
+
+///|
+pub extend UnaryOperator with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend UnaryOperator with Debug::{to_repr}
+
+///|
+pub extend UnaryOperator with Eq::{not_equal, equal}
+
+///|
+pub extend UpdateStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend UpdateStmt with Debug::{to_repr}
+
+///|
+pub extend UpdateStmt with Eq::{not_equal, equal}
+
+///|
+pub extend UseStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend UseStmt with Debug::{to_repr}
+
+///|
+pub extend UseStmt with Eq::{not_equal, equal}
+
+///|
+pub extend ViewColumnDef with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend ViewColumnDef with Debug::{to_repr}
+
+///|
+pub extend ViewColumnDef with Eq::{not_equal, equal}
+
+///|
+pub extend WindowFrameBound with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend WindowFrameBound with Debug::{to_repr}
+
+///|
+pub extend WindowFrameBound with Eq::{not_equal, equal}
+
+///|
+pub extend WindowFrameClause with @moonbit-community/prettyprinter.Pretty::{
+  pretty,
+}
+
+///|
+pub extend WindowFrameClause with Debug::{to_repr}
+
+///|
+pub extend WindowFrameClause with Eq::{not_equal, equal}
+
+///|
+pub extend WindowFrameUnits with Debug::{to_repr}
+
+///|
+pub extend WindowFrameUnits with Eq::{not_equal, equal}
+
+///|
+pub extend WindowSpec with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend WindowSpec with Debug::{to_repr}
+
+///|
+pub extend WindowSpec with Eq::{not_equal, equal}

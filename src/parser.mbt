@@ -42,7 +42,7 @@ fn Parser::expect_token(
 ///|
 pub fn parse(
   tokens : ArrayView[Token],
-  dialect? : &Dialect = MySQL::{  },
+  dialect? : &Dialect = MySQL::{ },
 ) -> Array[Statement] raise ParserError {
   let parser = Parser::{ dialect, }
   let statements = []
@@ -316,7 +316,7 @@ fn Parser::parse_show_statement(
     }
     _ => (None, tokens)
   }
-  ({ show_type, object, filter, extended, full, global_scope }, tokens)
+  ({ show_type, object, filter, extended, full, global_scope, }, tokens)
 }
 
 ///|
@@ -343,7 +343,7 @@ fn Parser::parse_set_statement(
   } else {
     scope
   }
-  ({ scope: final_scope, assignments }, tokens)
+  ({ scope: final_scope, assignments, }, tokens)
 }
 
 ///|
@@ -363,7 +363,7 @@ fn Parser::parse_set_assignments(
   }
   let tokens = self.expect_token(tokens, Eq)
   let (value, tokens) = self.parse_expr(tokens)
-  assignments.push({ variable, value })
+  assignments.push({ variable, value, })
 
   // Parse additional assignments
   for tokens = tokens {
@@ -381,7 +381,7 @@ fn Parser::parse_set_assignments(
         }
         let remaining_tokens = self.expect_token(remaining_tokens, Eq)
         let (value, remaining_tokens) = self.parse_expr(remaining_tokens)
-        assignments.push({ variable, value })
+        assignments.push({ variable, value, })
         continue remaining_tokens
       }
       tokens => break (assignments, tokens)
@@ -563,7 +563,7 @@ fn Parser::parse_copy_statement(
     [LParen, .. tokens] => self.parse_copy_options(tokens)
     _ => ([], tokens)
   }
-  ({ source, direction, target, format_options }, tokens)
+  ({ source, direction, target, format_options, }, tokens)
 }
 
 ///|
@@ -952,7 +952,7 @@ fn Parser::parse_duplicate_key_assignments(
     match tokens {
       [Identifier(column), Eq, .. tokens] => {
         let (value, tokens) = self.parse_expr(tokens)
-        assignments.push({ column, value })
+        assignments.push({ column, value, })
         match tokens {
           [Comma, .. tokens] => continue tokens
           _ => break tokens
@@ -1106,7 +1106,7 @@ fn Parser::parse_on_conflict_clause(
     [] =>
       raise InternalBug("parse_on_conflict_clause: expected conflict action")
   }
-  ({ conflict_target, conflict_action }, tokens)
+  ({ conflict_target, conflict_action, }, tokens)
 }
 
 ///|
@@ -1317,7 +1317,7 @@ fn Parser::parse_load_data_fields_options(
       tokens => break tokens
     }
   }
-  ({ terminated_by, enclosed_by, optionally_enclosed, escaped_by }, tokens)
+  ({ terminated_by, enclosed_by, optionally_enclosed, escaped_by, }, tokens)
 }
 
 ///|
@@ -1340,7 +1340,7 @@ fn Parser::parse_load_data_lines_options(
       tokens => break tokens
     }
   }
-  ({ starting_by, terminated_by }, tokens)
+  ({ starting_by, terminated_by, }, tokens)
 }
 
 ///|
@@ -1391,7 +1391,7 @@ fn Parser::parse_prepare_statement(
 
   // statement
   let (statement, tokens) = self.parse_statement(tokens)
-  ({ name, data_types, statement }, tokens)
+  ({ name, data_types, statement, }, tokens)
 }
 
 ///|
@@ -1411,7 +1411,7 @@ fn Parser::parse_execute_statement(
   let (name, tokens) = match tokens {
     [Keyword(Immediate), .. tokens] => (None, tokens)
     [Identifier(id), .. tokens] => {
-      let object_name : ObjectName = { parts: [id] }
+      let object_name : ObjectName = { parts: [id], }
       (Some(object_name), tokens)
     }
     _ =>
@@ -1493,7 +1493,7 @@ fn Parser::parse_execute_statement(
     }
     _ => ([], tokens)
   }
-  ({ name, parameters, has_parentheses, into, using_exprs }, tokens)
+  ({ name, parameters, has_parentheses, into, using_exprs, }, tokens)
 }
 
 ///|
@@ -1517,5 +1517,8 @@ fn Parser::parse_deallocate_statement(
     [Identifier(name), .. tokens] => (name, tokens)
     _ => raise UnexpectedTokenMessageError(tokens[0], "prepared statement name")
   }
-  ({ name, prepare }, tokens)
+  ({ name, prepare, }, tokens)
 }
+
+///|
+pub extend ParserError with Debug::{to_repr}

@@ -29,7 +29,7 @@ fn Parser::parse_begin_statement(
     }
     _ => tokens
   }
-  ({ work, transaction }, tokens)
+  ({ work, transaction, }, tokens)
 }
 
 ///|
@@ -41,7 +41,7 @@ fn Parser::parse_start_transaction_statement(
   let tokens = self.expect_token(tokens, Keyword(Transaction))
 
   // START TRANSACTION is equivalent to BEGIN TRANSACTION
-  ({ work: false, transaction: true }, tokens)
+  ({ work: false, transaction: true, }, tokens)
 }
 
 ///|
@@ -72,7 +72,7 @@ fn Parser::parse_commit_statement(
     }
     _ => tokens
   }
-  ({ work, transaction }, tokens)
+  ({ work, transaction, }, tokens)
 }
 
 ///|
@@ -117,7 +117,7 @@ fn Parser::parse_rollback_statement(
     }
     _ => tokens
   }
-  ({ work, transaction, savepoint }, tokens)
+  ({ work, transaction, savepoint, }, tokens)
 }
 
 ///|
@@ -161,7 +161,7 @@ fn Parser::parse_release_savepoint_statement(
         "parse_release_savepoint_statement: unexpected end of tokens",
       )
   }
-  ({ savepoint_keyword, name }, tokens)
+  ({ savepoint_keyword, name, }, tokens)
 }
 
 ///|

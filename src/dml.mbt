@@ -75,7 +75,10 @@ fn Parser::parse_select(
     }
     _ => (None, tokens)
   }
-  ({ projections, from, where_clause, group_by, having, distinct, top }, tokens)
+  (
+    { projections, from, where_clause, group_by, having, distinct, top, },
+    tokens,
+  )
 }
 
 ///|
@@ -109,7 +112,7 @@ fn Parser::parse_query(
     }
     _ => (None, tokens)
   }
-  ({ with_clause, body, order_by, limit, offset }, tokens)
+  ({ with_clause, body, order_by, limit, offset, }, tokens)
 }
 
 ///|
@@ -148,7 +151,7 @@ fn Parser::parse_aliasing(
           }
         tokens => tokens
       }
-      (Some({ name, columns }), tokens)
+      (Some({ name, columns, }), tokens)
     }
     tokens => (None, tokens)
   }
@@ -720,20 +723,20 @@ fn Parser::parse_table_ref(
             continue tokens
           }
           tokens => {
-            joins.push({ join_operator: join_operator_maker(Non), table_ref })
+            joins.push({ join_operator: join_operator_maker(Non), table_ref, })
             continue tokens
           }
         }
       }
       [Keyword(Cross), Keyword(Join), .. tokens] => {
         let (table_ref, tokens) = self.parse_table_ref(tokens)
-        joins.push({ join_operator: JoinOperator::Cross, table_ref })
+        joins.push({ join_operator: JoinOperator::Cross, table_ref, })
         continue tokens
       }
       tokens => break tokens
     }
   }
-  ({ factor, joins }, tokens)
+  ({ factor, joins, }, tokens)
 }
 
 ///|
@@ -749,7 +752,7 @@ fn Parser::parse_table_factor(
     }
     [Token::Placeholder(name), .. tokens] => {
       // Support parameterized table names (e.g., BigQuery @table)
-      let object_name : ObjectName = { parts: [name] }
+      let object_name : ObjectName = { parts: [name], }
       let (optional_alias, tokens) = self.parse_aliasing(tokens)
       (TableFactor::Column(object_name, optional_alias), tokens)
     }
@@ -826,7 +829,7 @@ fn Parser::parse_order_by_expr(
     [Keyword(Nulls), Keyword(Last), .. tokens] => (Some(false), tokens)
     _ => (None, tokens)
   }
-  ({ expr, asc, nulls_first }, tokens)
+  ({ expr, asc, nulls_first, }, tokens)
 }
 
 ///|
@@ -922,7 +925,7 @@ fn Parser::parse_case_expr(
         continue tokens
       }
       [Keyword(End), .. tokens] => {
-        let case_expr = Expr::Case({ when_then_clauses, else_expr, operand })
+        let case_expr = Expr::Case({ when_then_clauses, else_expr, operand, })
         break (case_expr, tokens)
       }
       [token, .. _tokens] =>
@@ -973,7 +976,7 @@ fn Parser::parse_primary_datetime_field(
         }
         tokens => (None, tokens)
       }
-      ({ field, precision }, tokens)
+      ({ field, precision, }, tokens)
     }
     [token, .. _tokens] =>
       raise UnexpectedTokenMessageError(
@@ -1135,7 +1138,7 @@ fn Parser::parse_array_expr(
       }
     }
   }
-  (Array(ArrayExpr::{ elem: elements, named }), tokens)
+  (Array(ArrayExpr::{ elem: elements, named, }), tokens)
 }
 
 ///|
@@ -1280,7 +1283,7 @@ test "From multiple table refs" {
 ///|
 test "SubQuery" {
   let tokens = "SELECT sub FROM (SELECT name FROM users WHERE active = true) AS sub;"
-  let stmt = parse_sql(tokens, dialect=Postgres::{  })[0] |> pretty_print
+  let stmt = parse_sql(tokens, dialect=Postgres::{ })[0] |> pretty_print
   inspect(
     stmt,
     content=(
@@ -1554,7 +1557,7 @@ test "Full outer join" {
 ///|
 test "Null, true and false" {
   let tokens = "SELECT NULL, true, false FROM t1;"
-  let stmt = parse_sql(dialect=Postgres::{  }, tokens)[0] |> pretty_print
+  let stmt = parse_sql(dialect=Postgres::{ }, tokens)[0] |> pretty_print
   inspect(
     stmt,
     content=(
@@ -1999,7 +2002,7 @@ fn Parser::parse_insert_statement(
     }
     _ => (None, tokens)
   }
-  ({ table_name, columns, source, or: or_conflict, on: on_insert }, tokens)
+  ({ table_name, columns, source, or: or_conflict, on: on_insert, }, tokens)
 }
 
 ///|
@@ -2146,7 +2149,7 @@ fn Parser::parse_delete_statement(
     }
     _ => (None, tokens)
   }
-  ({ table_name, where_clause }, tokens)
+  ({ table_name, where_clause, }, tokens)
 }
 
 ///|
@@ -2189,7 +2192,7 @@ fn Parser::parse_update_statement(
     match tokens {
       [Identifier(column), Eq, .. tokens] => {
         let (value, tokens) = self.parse_expr(tokens)
-        assignments.push({ column, value })
+        assignments.push({ column, value, })
         match tokens {
           [Comma, .. tokens] => continue tokens
           _ => break tokens
@@ -2210,7 +2213,7 @@ fn Parser::parse_update_statement(
     }
     _ => (None, tokens)
   }
-  ({ table_name, assignments, where_clause }, tokens)
+  ({ table_name, assignments, where_clause, }, tokens)
 }
 
 ///|
@@ -2338,7 +2341,7 @@ fn Parser::parse_cte(
   let tokens = self.expect_token(tokens, LParen)
   let (query, tokens) = self.parse_query(tokens)
   let tokens = self.expect_token(tokens, RParen)
-  ({ name: cte_name, query, columns }, tokens)
+  ({ name: cte_name, query, columns, }, tokens)
 }
 
 ///|
@@ -2391,7 +2394,7 @@ fn Parser::parse_window_spec(
 
   // Parse optional frame clause
   let (frame_clause, tokens) = self.parse_window_frame_clause(tokens)
-  ({ partition_by, order_by, frame_clause }, tokens)
+  ({ partition_by, order_by, frame_clause, }, tokens)
 }
 
 ///|
@@ -2419,11 +2422,11 @@ fn Parser::parse_frame_bounds(
   match tokens {
     [Keyword(Unbounded), Keyword(Preceding), .. tokens] => {
       let frame_start = WindowFrameBound::UnboundedPreceding
-      (Some({ frame_units, frame_start, frame_end: None }), tokens)
+      (Some({ frame_units, frame_start, frame_end: None, }), tokens)
     }
     [Keyword(Current), Keyword(Row), .. tokens] => {
       let frame_start = WindowFrameBound::CurrentRow
-      (Some({ frame_units, frame_start, frame_end: None }), tokens)
+      (Some({ frame_units, frame_start, frame_end: None, }), tokens)
     }
     [Keyword(Between), .. tokens] => {
       // Parse start bound
@@ -2431,7 +2434,7 @@ fn Parser::parse_frame_bounds(
       let tokens = self.expect_token(tokens, Keyword(And))
       // Parse end bound
       let (frame_end, tokens) = self.parse_frame_bound(tokens)
-      (Some({ frame_units, frame_start, frame_end: Some(frame_end) }), tokens)
+      (Some({ frame_units, frame_start, frame_end: Some(frame_end), }), tokens)
     }
     _ => {
       // Try to parse a single expression followed by PRECEDING/FOLLOWING
@@ -2859,7 +2862,7 @@ fn Parser::parse_merge_when_clause(
   // Parse THEN action
   let tokens = self.expect_token(tokens, Keyword(Then))
   let (action, tokens) = self.parse_merge_action(tokens)
-  ({ match_type, condition, action }, tokens)
+  ({ match_type, condition, action, }, tokens)
 }
 
 ///|
@@ -2910,7 +2913,7 @@ fn Parser::parse_merge_action(
         match tokens {
           [Identifier(column), Eq, .. tokens] => {
             let (value, tokens) = self.parse_expr(tokens)
-            assignments.push({ column, value })
+            assignments.push({ column, value, })
             match tokens {
               [Comma, .. tokens] => continue tokens
               _ => break tokens

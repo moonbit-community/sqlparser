@@ -1,9 +1,9 @@
 name = "moonbit-community/sqlparser"
 
-version = "0.5.0"
+version = "0.5.1"
 
 import {
-  "moonbitlang/x@0.4.41",
+  "moonbitlang/x@0.5.1",
   "moonbit-community/prettyprinter@0.4.10",
 }
 

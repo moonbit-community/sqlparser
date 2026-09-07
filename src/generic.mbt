@@ -61,3 +61,19 @@ pub impl Dialect for Generic with fn parse_expr(
 ) -> ParserResult[Expr]? raise ParserError {
   None
 }
+
+///|
+pub extend Generic with Dialect::{
+  supports_filter_during_aggregation,
+  parse_statement,
+  supports_within_after_array_aggregation,
+  requires_column_types_in_create_table,
+  supports_boolean_literals,
+  supports_string_literal_backslash_escape,
+  supports_array_syntax,
+  supports_double_quoted_identifiers,
+  parse_expr,
+  supports_named_parameters,
+  supports_if_not_exists,
+  read_keyword,
+}

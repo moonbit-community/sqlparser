@@ -221,3 +221,9 @@ pub(all) enum Keyword {
   Owned
   No
 } derive(Eq, Debug)
+
+///|
+pub extend Keyword with Debug::{to_repr}
+
+///|
+pub extend Keyword with Eq::{not_equal, equal}

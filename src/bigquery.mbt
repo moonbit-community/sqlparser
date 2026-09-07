@@ -70,7 +70,7 @@ pub impl Dialect for BigQuery with fn parse_expr(
 
 test "BigQuery named parameter" {
   let tokens = "SELECT * FROM users WHERE id = @user_id;"
-  let stmt = parse_sql(dialect=BigQuery::{  }, tokens).stmts[0] |> pretty_print
+  let stmt = parse_sql(dialect=BigQuery::{ }, tokens).stmts[0] |> pretty_print
   inspect(
     stmt,
     content=(
@@ -87,7 +87,7 @@ test "BigQuery named parameter" {
 ///|
 test "BigQuery positional parameter" {
   let tokens = "SELECT * FROM users WHERE id = ?;"
-  let stmt = parse_sql(dialect=BigQuery::{  }, tokens).stmts[0] |> pretty_print
+  let stmt = parse_sql(dialect=BigQuery::{ }, tokens).stmts[0] |> pretty_print
   inspect(
     stmt,
     content=(
@@ -104,7 +104,7 @@ test "BigQuery positional parameter" {
 ///|
 test "BigQuery mixed parameters" {
   let tokens = "SELECT * FROM users WHERE id = @user_id AND age > ?;"
-  let stmt = parse_sql(dialect=BigQuery::{  }, tokens).stmts[0] |> pretty_print
+  let stmt = parse_sql(dialect=BigQuery::{ }, tokens).stmts[0] |> pretty_print
   inspect(
     stmt,
     content=(
@@ -122,7 +122,7 @@ test "BigQuery mixed parameters" {
 ///|
 test "BigQuery multiple named parameters" {
   let tokens = "SELECT @field FROM @table WHERE @condition = @value;"
-  let stmt = parse_sql(dialect=BigQuery::{  }, tokens).stmts[0] |> pretty_print
+  let stmt = parse_sql(dialect=BigQuery::{ }, tokens).stmts[0] |> pretty_print
   inspect(
     stmt,
     content=(
@@ -141,7 +141,7 @@ test "BigQuery multiple named parameters" {
 
 test "Named parameters treated as identifiers in MySQL" {
   let tokens = "SELECT @user_id FROM users;"
-  let stmt = parse_sql(dialect=MySQL::{  }, tokens).stmts[0] |> pretty_print
+  let stmt = parse_sql(dialect=MySQL::{ }, tokens).stmts[0] |> pretty_print
   inspect(
     stmt,
     content=(
@@ -151,4 +151,20 @@ test "Named parameters treated as identifiers in MySQL" {
       #|  users;
     ),
   )
+}
+
+///|
+pub extend BigQuery with Dialect::{
+  supports_filter_during_aggregation,
+  parse_statement,
+  supports_within_after_array_aggregation,
+  requires_column_types_in_create_table,
+  supports_boolean_literals,
+  supports_string_literal_backslash_escape,
+  supports_array_syntax,
+  supports_double_quoted_identifiers,
+  parse_expr,
+  supports_named_parameters,
+  supports_if_not_exists,
+  read_keyword,
 }

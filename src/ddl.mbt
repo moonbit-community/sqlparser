@@ -32,7 +32,7 @@ fn Parser::parse_create_table_statement(
       (CreateTableDefinition::Columns(columns, constraints), tokens)
     }
   }
-  ({ name, if_not_exists, definition }, tokens)
+  ({ name, if_not_exists, definition, }, tokens)
 }
 
 ///|
@@ -122,7 +122,7 @@ fn Parser::parse_create_index_statement(
             (Some(false), rest_tokens)
           _ => (None, rest_tokens)
         }
-        columns.push({ name: column_expr, asc, nulls_first })
+        columns.push({ name: column_expr, asc, nulls_first, })
         match rest_tokens {
           [Comma, .. rest_tokens] => continue rest_tokens
           [RParen, .. rest_tokens] => break rest_tokens
@@ -354,7 +354,7 @@ fn Parser::parse_column_defs(
         [Identifier(name), .. tokens] => {
           let (data_type, tokens) = self.parse_data_type(tokens)
           let (options, tokens) = self.parse_column_def_option(tokens)
-          columns.push({ name, data_type, options })
+          columns.push({ name, data_type, options, })
           match tokens {
             [Comma, .. tokens] => continue tokens
             [RParen, .. tokens] => break tokens
@@ -563,7 +563,7 @@ fn Parser::parse_create_view_statement(
   }
   let tokens = self.expect_token(tokens, Keyword(As))
   let (query, tokens) = self.parse_query(tokens)
-  ({ name, columns, query }, tokens)
+  ({ name, columns, query, }, tokens)
 }
 
 ///|
@@ -797,7 +797,7 @@ fn Parser::parse_drop_table_statement(
     _ => (false, tokens)
   }
   let (table_name, tokens) = self.parse_object_name(tokens)
-  ({ table_name, if_exists }, tokens)
+  ({ table_name, if_exists, }, tokens)
 }
 
 ///|
@@ -867,7 +867,7 @@ fn Parser::parse_drop_index_statement(
     }
     _ => (None, tokens)
   }
-  ({ name, if_exists, concurrently, table_name }, tokens)
+  ({ name, if_exists, concurrently, table_name, }, tokens)
 }
 
 ///|
@@ -972,7 +972,7 @@ fn Parser::parse_alter_table_statement(
     [] =>
       raise InternalBug("parse_alter_table_statement: unexpected end of tokens")
   }
-  ({ table_name, if_exists, operation }, tokens)
+  ({ table_name, if_exists, operation, }, tokens)
 }
 
 ///|
@@ -1083,7 +1083,7 @@ fn Parser::parse_alter_index_statement(
                   "parse_alter_index_statement: expected parameter value",
                 )
             }
-            params.push({ name: param_name, value })
+            params.push({ name: param_name, value, })
             match tokens {
               [Comma, .. tokens] => continue tokens
               [RParen, .. tokens] => break tokens
@@ -1116,7 +1116,7 @@ fn Parser::parse_alter_index_statement(
         "parse_alter_index_statement: expected operation after index name",
       )
   }
-  ({ name, if_exists, operation }, tokens)
+  ({ name, if_exists, operation, }, tokens)
 }
 
 ///|
@@ -1282,7 +1282,7 @@ fn Parser::parse_create_database_statement(
       (Some(collation), tokens)
     _ => (None, tokens)
   }
-  ({ name, if_not_exists, character_set, collate }, tokens)
+  ({ name, if_not_exists, character_set, collate, }, tokens)
 }
 
 ///|
@@ -1322,7 +1322,7 @@ fn Parser::parse_create_schema_statement(
       (Some(user), tokens)
     _ => (None, tokens)
   }
-  ({ name, if_not_exists, authorization }, tokens)
+  ({ name, if_not_exists, authorization, }, tokens)
 }
 
 ///|
@@ -1570,7 +1570,7 @@ fn Parser::parse_create_procedure_statement(
       (Some(body_text), tokens)
     _ => (None, tokens)
   }
-  ({ name, parameters, language, body, if_not_exists }, tokens)
+  ({ name, parameters, language, body, if_not_exists, }, tokens)
 }
 
 ///|
@@ -1603,7 +1603,7 @@ fn Parser::parse_function_parameter(
 
   // Parse parameter type
   let (param_type, tokens) = self.parse_data_type(tokens)
-  ({ name, param_type, mode }, tokens)
+  ({ name, param_type, mode, }, tokens)
 }
 
 ///|
@@ -1831,7 +1831,7 @@ fn Parser::parse_create_sequence_statement(
         Identifier(column_name),
         .. rest_tokens,
       ] => {
-        let table_obj = ObjectName::{ parts: [table_name] }
+        let table_obj = ObjectName::{ parts: [table_name], }
         owned_by = Some(SequenceOwnedBy::Column(table_obj, column_name))
         continue rest_tokens
       }

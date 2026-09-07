@@ -2,7 +2,7 @@
 fn read_and_parse(path : String) -> @sqlparser.Statements {
   let input = @fs.read_file_to_string(path) catch {
     e => {
-      println("Read file error: \{e.to_string()}")
+      println("Read file error: \{Repr(e)}")
       panic()
     }
   }

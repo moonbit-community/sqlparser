@@ -53,7 +53,7 @@ priv struct Lexer {
 
 ///|
 pub fn tokenize(
-  dialect? : &Dialect = MySQL::{  },
+  dialect? : &Dialect = MySQL::{ },
   input : String,
 ) -> Array[Token] raise LexerError {
   let lexer = Lexer::{ dialect, }
@@ -474,7 +474,7 @@ fn Lexer::read_single_quoted_string(
   self : Lexer,
   input : StringView,
 ) -> (Token, StringView) raise LexerError {
-  let result = StringBuilder::new()
+  let result = StringBuilder()
   let rest = for rest = input {
     match rest {
       [.. "''", .. rest] => {
@@ -521,7 +521,7 @@ fn Lexer::read_double_quoted_string(
   self : Lexer,
   input : StringView,
 ) -> (Token, StringView) raise LexerError {
-  let result = StringBuilder::new()
+  let result = StringBuilder()
   let rest = for rest = input {
     match rest {
       [.. "\\\"", .. rest] if self.dialect.supports_string_literal_backslash_escape() => {
@@ -564,7 +564,7 @@ fn Lexer::read_backtick_quoted_identifier(
   self : Lexer,
   input : StringView,
 ) -> (Token, StringView) raise LexerError {
-  let result = StringBuilder::new()
+  let result = StringBuilder()
   let rest = for rest = input {
     match rest {
       [.. "``", .. rest] => {
@@ -798,7 +798,7 @@ test "Complicated" {
 ///|
 test "Single quoted string with escaped backslash" {
   let input = "SELECT 'Hello, \\'World!\\'' FROM t;"
-  let tokens = tokenize(dialect=MySQL::{  }, input)
+  let tokens = tokenize(dialect=MySQL::{ }, input)
   debug_inspect(
     tokens,
     content=(
@@ -816,7 +816,7 @@ test "Single quoted string with escaped backslash" {
 ///|
 test "MySQL backtick quoted identifiers" {
   let input = "SELECT `column name` FROM `table name`;"
-  let tokens = tokenize(dialect=MySQL::{  }, input)
+  let tokens = tokenize(dialect=MySQL::{ }, input)
   debug_inspect(
     tokens,
     content=(
@@ -834,7 +834,7 @@ test "MySQL backtick quoted identifiers" {
 ///|
 test "MySQL backtick with escaped backticks" {
   let input = "SELECT `column``with``backticks` FROM t;"
-  let tokens = tokenize(dialect=MySQL::{  }, input)
+  let tokens = tokenize(dialect=MySQL::{ }, input)
   debug_inspect(
     tokens,
     content=(
@@ -848,3 +848,12 @@ test "MySQL backtick with escaped backticks" {
     ),
   )
 }
+
+///|
+pub extend LexerError with Debug::{to_repr}
+
+///|
+pub extend Token with Debug::{to_repr}
+
+///|
+pub extend Token with Eq::{not_equal, equal}
