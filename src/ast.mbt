@@ -170,7 +170,7 @@ pub impl @pp.Pretty for QueryStmt with fn pretty(self) {
 }
 
 ///|
-enum SetExpr {
+pub(all) enum SetExpr {
   // Restricted
   Select(SelectStmt)
   // Parenthesized
@@ -195,7 +195,7 @@ impl @pp.Pretty for SetExpr with fn pretty(self) {
 }
 
 ///|
-struct SelectStmt {
+pub(all) struct SelectStmt {
   // SELECT <projections>
   projections : Array[Projection]
   // TOP <expr>
@@ -259,7 +259,7 @@ pub impl @pp.Pretty for SelectStmt with fn pretty(self) {
 }
 
 ///|
-enum SetOperator {
+pub(all) enum SetOperator {
   Union
   Intersect
   Except
@@ -814,7 +814,7 @@ pub impl @pp.Pretty for IntervalQualifier with fn pretty(self) {
 }
 
 ///|
-struct PrimaryDatetimeField {
+pub(all) struct PrimaryDatetimeField {
   // YEAR, MONTH, DAY, HOUR, MINUTE, SECOND
   field : DatetimeUnit
   // (3)
@@ -1111,7 +1111,7 @@ pub impl @pp.Pretty for ColumnDefOption with fn pretty(self) {
 }
 
 ///|
-struct CreateViewStmt {
+pub(all) struct CreateViewStmt {
   // CREATE VIEW <view_name>
   name : String
   // [(<column_name>, ...)]
