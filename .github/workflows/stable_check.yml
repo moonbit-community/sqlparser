@@ -29,7 +29,7 @@ jobs:
           moon update
 
       - name: moon check
-        run: moon check
+        run: moon check --deny-warn
 
       - name: format diff
         run: |
