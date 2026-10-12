@@ -53,7 +53,7 @@ priv struct Lexer {
 
 ///|
 pub fn tokenize(
-  dialect? : &Dialect = MySQL::{ },
+  dialect~ : &Dialect = MySQL::{ },
   input : String,
 ) -> Array[Token] raise LexerError {
   let lexer = Lexer::{ dialect, }
@@ -145,9 +145,9 @@ fn skip_whitespace(input : StringView) -> StringView {
 ///|
 fn read_while(
   input : StringView,
-  idx : Int,
+  idx : Int32,
   predicate : (Char) -> Bool,
-) -> (Int, StringView) {
+) -> (Int32, StringView) {
   for input = input, idx = idx {
     match input {
       [c, .. rest] if predicate(c) => continue rest, idx + 1

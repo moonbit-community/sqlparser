@@ -2,7 +2,7 @@
 fn Parser::parse_set_expr(
   self : Parser,
   tokens : ArrayView[Token],
-  min_bp : Int,
+  min_bp : Int32,
 ) -> ParserResult[SetExpr] raise ParserError {
   let mut left_tokens = match tokens {
     [LParen, .. tokens] => {
@@ -210,7 +210,7 @@ fn Parser::parse_expr(
 }
 
 ///|
-fn get_next_bp(tokens : ArrayView[Token]) -> Int {
+fn get_next_bp(tokens : ArrayView[Token]) -> Int32 {
   match tokens {
     [token, .. _tokens] if try_binary_operator(token) is Some(op) =>
       op.get_precedence().value()
@@ -230,7 +230,7 @@ fn get_next_bp(tokens : ArrayView[Token]) -> Int {
 fn Parser::parse_binary_expr(
   self : Parser,
   tokens : ArrayView[Token],
-  min_bp : Int,
+  min_bp : Int32,
 ) -> ParserResult[Expr] raise ParserError {
   let mut expr_tokens = self.parse_primary_expr(tokens)
   // Handle postfix operations like array subscripts and field access
@@ -251,7 +251,7 @@ fn Parser::parse_infix(
   self : Parser,
   tokens : ArrayView[Token],
   left : Expr,
-  min_bp : Int,
+  min_bp : Int32,
 ) -> ParserResult[Expr] raise ParserError {
   match tokens {
     [token, .. tokens] if try_binary_operator(token) is Some(op) => {

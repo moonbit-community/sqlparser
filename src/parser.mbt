@@ -42,7 +42,7 @@ fn Parser::expect_token(
 ///|
 pub fn parse(
   tokens : ArrayView[Token],
-  dialect? : &Dialect = MySQL::{ },
+  dialect~ : &Dialect = MySQL::{ },
 ) -> Array[Statement] raise ParserError {
   let parser = Parser::{ dialect, }
   let statements = []

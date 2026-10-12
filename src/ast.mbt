@@ -21,7 +21,7 @@ pub impl @pp.Pretty for Statements with fn pretty(self) {
 
 ///|
 #alias("_[_]")
-pub fn Statements::get(self : Self, index : Int) -> Statement {
+pub fn Statements::get(self : Self, index : Int32) -> Statement {
   self.stmts[index]
 }
 
@@ -461,7 +461,7 @@ pub impl @pp.Pretty for Expr with fn pretty(self) {
 
 ///|
 pub(all) enum Literal {
-  Integer(Int)
+  Integer(Int32)
   Double(Double) // TODO: float32
   String(String)
   Boolean(Bool)
@@ -818,7 +818,7 @@ struct PrimaryDatetimeField {
   // YEAR, MONTH, DAY, HOUR, MINUTE, SECOND
   field : DatetimeUnit
   // (3)
-  precision : Int?
+  precision : Int32?
 } derive(Eq, Debug)
 
 ///|
@@ -1061,11 +1061,11 @@ pub(all) enum DataType {
   Integer
   Smallint
   Bigint
-  Float(Int?)
+  Float(Int32?)
   Real
   Double
-  Char(Int)
-  Varchar(Int)
+  Char(Int32)
+  Varchar(Int32)
   Text
   Boolean
   Timestamp
@@ -1387,15 +1387,15 @@ pub(all) struct CreateSequenceStmt {
   /// TEMPORARY flag
   temporary : Bool
   /// INCREMENT BY value (default 1)
-  increment : Int?
+  increment : Int32?
   /// MINVALUE value or NO MINVALUE
   minvalue : SequenceLimit?
   /// MAXVALUE value or NO MAXVALUE  
   maxvalue : SequenceLimit?
   /// START WITH value (default 1)
-  start_with : Int?
+  start_with : Int32?
   /// CACHE value
-  cache : Int?
+  cache : Int32?
   /// CYCLE or NO CYCLE (default NO CYCLE)
   cycle : Bool?
   /// OWNED BY table.column or OWNED BY NONE
@@ -1406,7 +1406,7 @@ pub(all) struct CreateSequenceStmt {
 /// Sequence limit specification
 pub(all) enum SequenceLimit {
   /// MINVALUE/MAXVALUE value
-  Value(Int)
+  Value(Int32)
   /// NO MINVALUE/NO MAXVALUE
   NoLimit
 } derive(Eq, Debug)
@@ -1589,7 +1589,7 @@ pub impl @pp.Pretty for ObjectName with fn pretty(self) {
 
 ///|
 pub(all) enum Top {
-  Constant(Int)
+  Constant(Int32)
   Expr(Expr)
 } derive(Eq, Debug)
 
@@ -2679,7 +2679,7 @@ pub(all) struct LoadDataStmt {
   /// [LINES [STARTING BY 'string'] [TERMINATED BY 'string']]
   lines_options : LoadDataLinesOptions?
   /// [IGNORE number LINES]
-  ignore_lines : Int?
+  ignore_lines : Int32?
   /// [(column_name_or_user_var, ...)]
   columns : Array[String]?
   /// [SET column_name = expr, ...]

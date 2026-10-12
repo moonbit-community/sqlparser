@@ -39,7 +39,7 @@ pub(all) enum Precedence {
 }
 
 ///|
-pub fn Precedence::value(self : Precedence) -> Int {
+pub fn Precedence::value(self : Precedence) -> Int32 {
   match self {
     And => 10
     Like => 19
