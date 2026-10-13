@@ -545,7 +545,11 @@ pub fn CreateTableStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for CreateTableStmt
 pub impl Show for CreateTableStmt
 
-type CreateViewStmt derive(Eq, @debug.Debug)
+pub(all) struct CreateViewStmt {
+  name : String
+  columns : Array[ViewColumnDef]
+  query : QueryStmt
+} derive(Eq, @debug.Debug)
 pub fn CreateViewStmt::equal(Self, Self) -> Bool
 pub fn CreateViewStmt::not_equal(Self, Self) -> Bool
 pub fn CreateViewStmt::output(Self, &Logger) -> Unit
@@ -1432,7 +1436,10 @@ pub fn PrepareStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for PrepareStmt
 pub impl Show for PrepareStmt
 
-type PrimaryDatetimeField derive(Eq, @debug.Debug)
+pub(all) struct PrimaryDatetimeField {
+  field : DatetimeUnit
+  precision : Int?
+} derive(Eq, @debug.Debug)
 pub fn PrimaryDatetimeField::equal(Self, Self) -> Bool
 pub fn PrimaryDatetimeField::not_equal(Self, Self) -> Bool
 pub fn PrimaryDatetimeField::output(Self, &Logger) -> Unit
@@ -1597,7 +1604,15 @@ pub fn SavepointStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for SavepointStmt
 pub impl Show for SavepointStmt
 
-type SelectStmt derive(Eq, @debug.Debug)
+pub(all) struct SelectStmt {
+  projections : Array[Projection]
+  top : Top?
+  distinct : Bool
+  from : Array[TableRef]
+  where_clause : Expr?
+  group_by : Array[Expr]
+  having : Expr?
+} derive(Eq, @debug.Debug)
 pub fn SelectStmt::equal(Self, Self) -> Bool
 pub fn SelectStmt::not_equal(Self, Self) -> Bool
 pub fn SelectStmt::output(Self, &Logger) -> Unit
@@ -1646,7 +1661,11 @@ pub fn SetAssignment::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for SetAssignment
 pub impl Show for SetAssignment
 
-type SetExpr derive(Eq, @debug.Debug)
+pub(all) enum SetExpr {
+  Select(SelectStmt)
+  Query(QueryStmt)
+  SetOperation(SetOperator, SetExpr, SetExpr)
+} derive(Eq, @debug.Debug)
 pub fn SetExpr::equal(Self, Self) -> Bool
 pub fn SetExpr::not_equal(Self, Self) -> Bool
 pub fn SetExpr::output(Self, &Logger) -> Unit
@@ -1654,7 +1673,11 @@ pub fn SetExpr::to_repr(Self) -> @debug.Repr
 pub fn SetExpr::to_string(Self) -> String
 pub impl Show for SetExpr
 
-type SetOperator derive(Eq, @debug.Debug)
+pub(all) enum SetOperator {
+  Union
+  Intersect
+  Except
+} derive(Eq, @debug.Debug)
 pub fn SetOperator::equal(Self, Self) -> Bool
 pub fn SetOperator::not_equal(Self, Self) -> Bool
 pub fn SetOperator::output(Self, &Logger) -> Unit
