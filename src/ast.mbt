@@ -51,6 +51,7 @@ pub(all) enum Statement {
   Use(UseStmt)
   Copy(CopyStmt)
   LoadData(LoadDataStmt)
+  Explain(ExplainStmt)
   Prepare(PrepareStmt)
   Execute(ExecuteStmt)
   Deallocate(DeallocateStmt)
@@ -72,7 +73,14 @@ pub(all) enum Statement {
 
 ///|
 pub impl @pp.Pretty for Statement with fn pretty(self) {
-  (match self {
+  self.pretty_clause() + @pp.text(";")
+}
+
+///|
+/// Render the statement without the trailing semicolon, for statements that
+/// embed another statement (`PREPARE ... AS`, `EXPLAIN ...`).
+pub fn Statement::pretty_clause(self : Statement) -> @pp.Document {
+  match self {
     Query(stmt) => stmt.pretty()
     CreateTable(stmt) => stmt.pretty()
     CreateView(stmt) => stmt.pretty()
@@ -97,6 +105,7 @@ pub impl @pp.Pretty for Statement with fn pretty(self) {
     Use(stmt) => stmt.pretty()
     Copy(stmt) => stmt.pretty()
     LoadData(stmt) => stmt.pretty()
+    Explain(stmt) => stmt.pretty()
     Prepare(stmt) => stmt.pretty()
     Execute(stmt) => stmt.pretty()
     Deallocate(stmt) => stmt.pretty()
@@ -119,8 +128,41 @@ pub impl @pp.Pretty for Statement with fn pretty(self) {
     ReleaseSavepoint(stmt) => stmt.pretty()
     Grant(stmt) => stmt.pretty()
     Revoke(stmt) => stmt.pretty()
+  }
+}
+
+///|
+/// `EXPLAIN [QUERY PLAN] [ANALYZE] [VERBOSE] [FORMAT = format] <statement>`
+///
+/// - `QUERY PLAN` is SQLite's form.
+/// - `ANALYZE` / `VERBOSE` follow the PostgreSQL legacy bare form and
+///   MySQL 8's `EXPLAIN ANALYZE`.
+/// - `FORMAT = <name>` follows MySQL's `EXPLAIN FORMAT = JSON`.
+pub(all) struct ExplainStmt {
+  /// SQLite: `EXPLAIN QUERY PLAN <statement>`
+  query_plan : Bool
+  /// PostgreSQL / MySQL 8: `EXPLAIN ANALYZE <statement>`
+  analyze : Bool
+  /// PostgreSQL: `EXPLAIN VERBOSE <statement>`
+  verbose : Bool
+  /// MySQL / PostgreSQL: `EXPLAIN FORMAT = JSON`
+  format : String?
+  /// The statement being explained
+  statement : Statement
+} derive(Eq, Debug)
+
+///|
+pub impl @pp.Pretty for ExplainStmt with fn pretty(self) {
+  @pp.text("EXPLAIN") +
+  (if self.query_plan { @pp.text(" QUERY PLAN") } else { @pp.empty }) +
+  (if self.analyze { @pp.text(" ANALYZE") } else { @pp.empty }) +
+  (if self.verbose { @pp.text(" VERBOSE") } else { @pp.empty }) +
+  (match self.format {
+    Some(format) => @pp.text(" FORMAT = ") + @pp.text(format)
+    None => @pp.empty
   }) +
-  @pp.text(";")
+  @pp.space +
+  self.statement.pretty_clause()
 }
 
 ///|
@@ -2838,54 +2880,7 @@ pub impl @pp.Pretty for PrepareStmt with fn pretty(self) {
     @pp.empty
   }) +
   @pp.text(" AS ") +
-  (match self.statement {
-    Query(stmt) => stmt.pretty()
-    CreateTable(stmt) => stmt.pretty()
-    CreateView(stmt) => stmt.pretty()
-    CreateIndex(stmt) => stmt.pretty()
-    CreateDatabase(stmt) => stmt.pretty()
-    CreateSchema(stmt) => stmt.pretty()
-    CreateFunction(stmt) => stmt.pretty()
-    CreateProcedure(stmt) => stmt.pretty()
-    CreateSequence(stmt) => stmt.pretty()
-    DropView(stmt) => stmt.pretty()
-    DropTable(stmt) => stmt.pretty()
-    DropIndex(stmt) => stmt.pretty()
-    Insert(stmt) => stmt.pretty()
-    Delete(stmt) => stmt.pretty()
-    Update(stmt) => stmt.pretty()
-    Merge(stmt) => stmt.pretty()
-    Truncate(stmt) => stmt.pretty()
-    AlterTable(stmt) => stmt.pretty()
-    AlterIndex(stmt) => stmt.pretty()
-    Show(stmt) => stmt.pretty()
-    Set(stmt) => stmt.pretty()
-    Use(stmt) => stmt.pretty()
-    Copy(stmt) => stmt.pretty()
-    LoadData(stmt) => stmt.pretty()
-    Prepare(stmt) => stmt.pretty()
-    Execute(stmt) => stmt.pretty()
-    Deallocate(stmt) => stmt.pretty()
-    LockTables(tables) =>
-      @pp.text("LOCK TABLES ") +
-      @pp.separate(@pp.text(", "), tables.map(@pp.pretty))
-    UnlockTables => @pp.text("UNLOCK TABLES")
-    Listen(channel) => @pp.text("LISTEN ") + @pp.text(channel)
-    Notify(channel, payload) =>
-      @pp.text("NOTIFY ") +
-      @pp.text(channel) +
-      (match payload {
-        Some(msg) => @pp.text(", '") + @pp.text(msg) + @pp.text("'")
-        None => @pp.empty
-      })
-    Begin(stmt) => stmt.pretty()
-    Commit(stmt) => stmt.pretty()
-    Rollback(stmt) => stmt.pretty()
-    Savepoint(stmt) => stmt.pretty()
-    ReleaseSavepoint(stmt) => stmt.pretty()
-    Grant(stmt) => stmt.pretty()
-    Revoke(stmt) => stmt.pretty()
-  })
+  self.statement.pretty_clause()
 }
 
 ///|
@@ -3338,6 +3333,15 @@ pub extend DuplicateTreatment with Debug::{to_repr}
 
 ///|
 pub extend DuplicateTreatment with Eq::{not_equal, equal}
+
+///|
+pub extend ExplainStmt with @moonbit-community/prettyprinter.Pretty::{pretty}
+
+///|
+pub extend ExplainStmt with Debug::{to_repr}
+
+///|
+pub extend ExplainStmt with Eq::{not_equal, equal}
 
 ///|
 pub extend ExecuteStmt with @moonbit-community/prettyprinter.Pretty::{pretty}

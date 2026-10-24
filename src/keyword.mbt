@@ -220,6 +220,10 @@ pub(all) enum Keyword {
   Cycle
   Owned
   No
+  // EXPLAIN statement keywords
+  Explain
+  Analyze
+  Verbose
 } derive(Eq, Debug)
 
 ///|

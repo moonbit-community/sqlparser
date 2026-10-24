@@ -162,6 +162,8 @@ fn Parser::parse_statement(
       self.parse_use_statement(tokens).map(stmt => Use(stmt))
     [Keyword(Copy), .. _rest] =>
       self.parse_copy_statement(tokens).map(stmt => Copy(stmt))
+    [Keyword(Explain), .. _rest] =>
+      self.parse_explain_statement(tokens).map(stmt => Explain(stmt))
     [Keyword(Prepare), .. _rest] =>
       self.parse_prepare_statement(tokens).map(stmt => Prepare(stmt))
     [Keyword(Execute), .. _rest] =>
