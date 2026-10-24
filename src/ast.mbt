@@ -519,7 +519,13 @@ pub impl @pp.Pretty for Literal with fn pretty(self) {
       // integer, breaking parse/pretty/parse round-trips.
       @pp.text(if text.contains_char('.') { text } else { "\{text}.0" })
     }
-    String(value) => @pp.text("'\{value}'")
+    String(value) => {
+      // Escape embedded single quotes by doubling them, the one quoting
+      // rule every supported dialect accepts, so the printed literal
+      // re-parses to the same value.
+      let escaped = value.replace_all(old="'", new="''")
+      @pp.text("'\{escaped}'")
+    }
     Boolean(value) => @pp.text(if value { "TRUE" } else { "FALSE" })
     Null => @pp.text("NULL")
   }
