@@ -52,20 +52,21 @@ priv struct Lexer {
 }
 
 ///|
+/// Tokenize `input` into a token stream. The result always ends with exactly
+/// one `Eof` token, even when the input does not end with whitespace, so
+/// parsers may safely peek at the head of any non-empty view.
 pub fn tokenize(
   dialect~ : &Dialect = MySQL::{ },
   input : String,
 ) -> Array[Token] raise LexerError {
   let lexer = Lexer::{ dialect, }
   let tokens = []
-  for input = input[:] {
-    match input {
+  for rest = input[:] {
+    let (token, rest) = lexer.next_token(rest)
+    tokens.push(token)
+    match rest {
       [] => break
-      input => {
-        let (token, input) = lexer.next_token(input)
-        tokens.push(token)
-        continue input
-      }
+      rest => continue rest
     }
   }
   tokens
