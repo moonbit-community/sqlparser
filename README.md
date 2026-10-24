@@ -53,16 +53,18 @@ The parser follows a modular design:
   - `ddl.mbt`: Data Definition Language parsing  
   - `tcl.mbt`: Transaction Control Language parsing
   - `dcl.mbt`: Data Control Language parsing
+  - `explain.mbt`: EXPLAIN statement parsing (QUERY PLAN / ANALYZE / VERBOSE / FORMAT)
 
 ## Testing
 
-The library includes comprehensive test coverage with 284+ tests covering:
+The library includes comprehensive test coverage with 391 tests covering:
 
 - All SQL statement types across all language categories
 - Dialect-specific features and syntax variations
 - Complex expressions and nested queries
 - Edge cases and error handling
 - Pretty printing accuracy
+- Round-trip guarantees (every TPC-H query must parse, print and re-parse to an equal AST)
 
 Run tests with:
 ```bash
