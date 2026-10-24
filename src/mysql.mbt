@@ -324,7 +324,7 @@ test "MySQL REPLACE INTO with multiple values" {
   inspect(
     stmt,
     content=(
-      #|REPLACE INTO products (id, name, price) VALUES (1, 'Widget', 10.5), (2, 'Gadget', 15);
+      #|REPLACE INTO products (id, name, price) VALUES (1, 'Widget', 10.5), (2, 'Gadget', 15.0);
     ),
   )
 }

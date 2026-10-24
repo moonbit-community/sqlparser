@@ -2096,7 +2096,7 @@ test "Delete with WHERE" {
     stmt,
     content=(
       #|DELETE FROM students
-      #|WHERE grade > 3;
+      #|WHERE grade > 3.0;
     ),
   )
 }
@@ -2188,7 +2188,7 @@ test "Update without WHERE" {
     stmt,
     content=(
       #|UPDATE students
-      #|SET grade = 1;
+      #|SET grade = 1.0;
     ),
   )
 }

@@ -513,7 +513,12 @@ pub(all) enum Literal {
 pub impl @pp.Pretty for Literal with fn pretty(self) {
   match self {
     Integer(value) => @pp.text("\{value}")
-    Double(value) => @pp.text("\{value}")
+    Double(value) => {
+      let text = "\{value}"
+      // A double printed without a decimal point would lex back as an
+      // integer, breaking parse/pretty/parse round-trips.
+      @pp.text(if text.contains_char('.') { text } else { "\{text}.0" })
+    }
     String(value) => @pp.text("'\{value}'")
     Boolean(value) => @pp.text(if value { "TRUE" } else { "FALSE" })
     Null => @pp.text("NULL")
