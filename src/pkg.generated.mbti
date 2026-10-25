@@ -720,6 +720,19 @@ pub fn ExecuteStmt::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for ExecuteStmt
 pub impl Show for ExecuteStmt
 
+pub(all) struct ExplainStmt {
+  query_plan : Bool
+  analyze : Bool
+  verbose : Bool
+  format : String?
+  statement : Statement
+} derive(Eq, @debug.Debug)
+pub fn ExplainStmt::equal(Self, Self) -> Bool
+pub fn ExplainStmt::not_equal(Self, Self) -> Bool
+pub fn ExplainStmt::pretty(Self) -> @prettyprinter.Document
+pub fn ExplainStmt::to_repr(Self) -> @debug.Repr
+pub impl @prettyprinter.Pretty for ExplainStmt
+
 pub(all) enum Expr {
   Identifier(String)
   CompoundIdentifier(Array[String])
@@ -1803,6 +1816,7 @@ pub(all) enum Statement {
   Use(UseStmt)
   Copy(CopyStmt)
   LoadData(LoadDataStmt)
+  Explain(ExplainStmt)
   Prepare(PrepareStmt)
   Execute(ExecuteStmt)
   Deallocate(DeallocateStmt)
@@ -1822,6 +1836,7 @@ pub fn Statement::equal(Self, Self) -> Bool
 pub fn Statement::not_equal(Self, Self) -> Bool
 pub fn Statement::output(Self, &Logger) -> Unit
 pub fn Statement::pretty(Self) -> @prettyprinter.Document
+pub fn Statement::pretty_clause(Self) -> @prettyprinter.Document
 pub fn Statement::to_repr(Self) -> @debug.Repr
 pub fn Statement::to_string(Self) -> String
 pub impl @prettyprinter.Pretty for Statement
