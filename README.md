@@ -57,7 +57,7 @@ The parser follows a modular design:
 
 ## Testing
 
-The library includes comprehensive test coverage with 391 tests covering:
+The library includes comprehensive test coverage with 403 tests covering:
 
 - All SQL statement types across all language categories
 - Dialect-specific features and syntax variations
