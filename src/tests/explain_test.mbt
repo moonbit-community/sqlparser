@@ -116,3 +116,14 @@ test "EXPLAIN still parses after contextual matching" {
     inspect(stmts == again, content="true")
   }
 }
+
+///|
+test "EXPLAIN FORMAT accepts every MySQL format name" {
+  for name in ["TEXT", "JSON", "TREE", "XML", "YAML"] {
+    let sql = "EXPLAIN FORMAT = \{name} SELECT 1 FROM t"
+    let stmts = @sqlparser.parse_sql(sql)
+    let printed = @sqlparser.pretty_print(stmts)
+    let again = @sqlparser.parse_sql(printed)
+    inspect(stmts == again, content="true")
+  }
+}

@@ -46,6 +46,10 @@ fn Parser::parse_explain_statement(
         }
         let (name, tokens) = match tokens {
           [Identifier(name), .. tokens] => (name, tokens)
+          // Some format names collide with existing keywords (`TEXT` is the
+          // MySQL default). Accept the keyword form; its `Show` output is
+          // the constructor name, which lowercased matches the SQL word.
+          [Keyword(kw), .. tokens] => (kw.to_string().to_lower(), tokens)
           [token, .. _tokens] =>
             raise UnexpectedTokenMessageError(token, "expected FORMAT name")
           [] => raise InternalBug("parse_explain_statement: end of tokens")
