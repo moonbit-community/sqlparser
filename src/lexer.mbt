@@ -386,10 +386,6 @@ fn Lexer::read_identifier_or_keyword(
         "cycle" => Keyword(Cycle)
         "owned" => Keyword(Owned)
         "no" => Keyword(No)
-        // EXPLAIN statement keywords
-        "explain" => Keyword(Explain)
-        "analyze" => Keyword(Analyze)
-        "verbose" => Keyword(Verbose)
         // ALTER INDEX keywords
         "rename" => Keyword(Rename)
         "tablespace" => Keyword(Tablespace)

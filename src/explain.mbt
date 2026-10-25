@@ -8,24 +8,28 @@
 //   EXPLAIN [ANALYZE] [VERBOSE] <statement>   (PostgreSQL legacy bare form,
 //                                              MySQL 8 EXPLAIN ANALYZE)
 //   EXPLAIN [FORMAT [=] <name>] <statement>   (MySQL FORMAT = JSON)
+//
+// "explain", "analyze" and "verbose" are matched contextually (not global
+// keywords) so they stay usable as plain identifiers, e.g. as column or
+// table names.
 
 ///|
 fn Parser::parse_explain_statement(
   self : Parser,
   tokens : ArrayView[Token],
 ) -> ParserResult[ExplainStmt] raise ParserError {
-  let tokens = self.expect_token(tokens, Keyword(Explain))
+  let tokens = self.expect_token(tokens, Identifier("explain"))
   let mut query_plan = false
   let mut analyze = false
   let mut verbose = false
   let mut format : String? = None
   let tokens = for tokens = tokens {
     match tokens {
-      [Keyword(Analyze), .. tokens] => {
+      [Identifier(word), .. tokens] if word.to_lower() == "analyze" => {
         analyze = true
         continue tokens
       }
-      [Keyword(Verbose), .. tokens] => {
+      [Identifier(word), .. tokens] if word.to_lower() == "verbose" => {
         verbose = true
         continue tokens
       }
