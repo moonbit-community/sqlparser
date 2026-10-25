@@ -118,7 +118,7 @@ pub fn Statement::pretty_clause(self : Statement) -> @pp.Document {
       @pp.text("NOTIFY ") +
       @pp.text(channel) +
       (match payload {
-        Some(msg) => @pp.text(", '") + @pp.text(msg) + @pp.text("'")
+        Some(msg) => @pp.text(", ") + quote_string_literal(msg)
         None => @pp.empty
       })
     Begin(stmt) => stmt.pretty()
@@ -427,9 +427,12 @@ pub impl @pp.Pretty for Expr with fn pretty(self) {
         @pp.empty
       })
     Wildcard => @pp.char('*')
-    Datetime(s) => @pp.text("DATE '") + @pp.text(s) + @pp.char('\'')
+    Datetime(s) => @pp.text("DATE ") + quote_string_literal(s)
     Interval(s, qualifier) =>
-      @pp.text("INTERVAL '") + @pp.text(s) + @pp.text("' ") + qualifier.pretty()
+      @pp.text("INTERVAL ") +
+      quote_string_literal(s) +
+      @pp.text(" ") +
+      qualifier.pretty()
     Like(positive~, left, right) =>
       left.pretty() +
       @pp.text(if positive { "" } else { " NOT" }) +
@@ -510,25 +513,126 @@ pub(all) enum Literal {
 } derive(Eq, Debug)
 
 ///|
+/// Render a `Double` as plain decimal notation with digits on both sides of
+/// the point. `Double::to_string` switches to scientific notation for very
+/// small or very large magnitudes, but the lexer has no exponent syntax, so
+/// those forms would not re-parse; expand them back to plain digits. The
+/// significant digits are kept exactly, so the result parses to the same
+/// value.
+fn format_double_as_decimal(value : Double) -> String {
+  let text = value.to_string()
+  let mut exp_at = text.length()
+  for i, ch in text {
+    if ch == 'e' || ch == 'E' {
+      exp_at = i
+      break
+    }
+  }
+  if exp_at == text.length() {
+    // Already plain notation; keep a decimal point so the literal does not
+    // lex back as an integer.
+    return if text.contains_char('.') { text } else { "\{text}.0" }
+  }
+  // Split the mantissa into sign and digits, tracking where the decimal
+  // point sits relative to the start of the digits.
+  let mut negative = false
+  let mut seen_point = false
+  let digits : Array[Char] = []
+  let mut point = 0
+  for i, ch in text {
+    if i >= exp_at {
+      break
+    }
+    if ch == '-' {
+      negative = true
+    } else if ch == '.' {
+      seen_point = true
+      point = digits.length()
+    } else if ch >= '0' && ch <= '9' {
+      digits.push(ch)
+    }
+  }
+  if !seen_point {
+    point = digits.length()
+  }
+  // Parse the exponent: an optional sign followed by digits.
+  let mut exp_sign = 1
+  let mut exponent = 0
+  let mut idx = exp_at + 1
+  if idx < text.length() {
+    let ch = text.get_char(idx).unwrap_or('\u{0000}')
+    if ch == '+' {
+      idx += 1
+    } else if ch == '-' {
+      exp_sign = -1
+      idx += 1
+    }
+  }
+  while idx < text.length() {
+    let ch = text.get_char(idx).unwrap_or('\u{0000}')
+    if ch < '0' || ch > '9' {
+      break
+    }
+    exponent = exponent * 10 + ch.to_int() - '0'.to_int()
+    idx += 1
+  }
+  let point = point + exp_sign * exponent
+  let len = digits.length()
+  let buf = StringBuilder()
+  if negative {
+    buf.write_char('-')
+  }
+  if point <= 0 {
+    // 0.<zeros><digits>
+    buf.write_char('0')
+    buf.write_char('.')
+    for _i = 0; _i < -point; _i = _i + 1 {
+      buf.write_char('0')
+    }
+    for ch in digits {
+      buf.write_char(ch)
+    }
+  } else if point >= len {
+    // <digits><zeros>.0
+    for ch in digits {
+      buf.write_char(ch)
+    }
+    for _i = len; _i < point; _i = _i + 1 {
+      buf.write_char('0')
+    }
+    buf.write_char('.')
+    buf.write_char('0')
+  } else {
+    // <digits>.<digits>
+    for i = 0; i < point; i = i + 1 {
+      buf.write_char(digits[i])
+    }
+    buf.write_char('.')
+    for i = point; i < len; i = i + 1 {
+      buf.write_char(digits[i])
+    }
+  }
+  buf.to_string()
+}
+
+///|
 pub impl @pp.Pretty for Literal with fn pretty(self) {
   match self {
     Integer(value) => @pp.text("\{value}")
-    Double(value) => {
-      let text = "\{value}"
-      // A double printed without a decimal point would lex back as an
-      // integer, breaking parse/pretty/parse round-trips.
-      @pp.text(if text.contains_char('.') { text } else { "\{text}.0" })
-    }
-    String(value) => {
-      // Escape embedded single quotes by doubling them, the one quoting
-      // rule every supported dialect accepts, so the printed literal
-      // re-parses to the same value.
-      let escaped = value.replace_all(old="'", new="''")
-      @pp.text("'\{escaped}'")
-    }
+    Double(value) => @pp.text(format_double_as_decimal(value))
+    String(value) => quote_string_literal(value)
     Boolean(value) => @pp.text(if value { "TRUE" } else { "FALSE" })
     Null => @pp.text("NULL")
   }
+}
+
+///|
+/// Quote `value` as a SQL string literal. Embedded single quotes are doubled,
+/// the one escaping rule every supported dialect accepts, so the printed
+/// literal re-parses to the same value. Every printed string literal must go
+/// through this, not just `Literal::String`.
+fn quote_string_literal(value : String) -> @pp.Document {
+  @pp.text("'") + @pp.text(value.replace_all(old="'", new="''")) + @pp.text("'")
 }
 
 ///|
@@ -1404,8 +1508,7 @@ pub impl @pp.Pretty for CreateFunctionStmt with fn pretty(self) {
   }) +
   (if self.deterministic { @pp.text(" DETERMINISTIC") } else { @pp.empty }) +
   (match self.body {
-    Some(body_text) =>
-      @pp.text(" AS ") + @pp.text("'") + @pp.text(body_text) + @pp.text("'")
+    Some(body_text) => @pp.text(" AS ") + quote_string_literal(body_text)
     None => @pp.empty
   })
 }
@@ -1421,8 +1524,7 @@ pub impl @pp.Pretty for CreateProcedureStmt with fn pretty(self) {
     None => @pp.empty
   }) +
   (match self.body {
-    Some(body_text) =>
-      @pp.text(" AS ") + @pp.text("'") + @pp.text(body_text) + @pp.text("'")
+    Some(body_text) => @pp.text(" AS ") + quote_string_literal(body_text)
     None => @pp.empty
   })
 }
@@ -2136,7 +2238,7 @@ pub impl @pp.Pretty for ShowType with fn pretty(self) {
 ///|
 pub impl @pp.Pretty for ShowFilter with fn pretty(self) {
   match self {
-    Like(pattern) => @pp.text("LIKE '") + @pp.text(pattern) + @pp.text("'")
+    Like(pattern) => @pp.text("LIKE ") + quote_string_literal(pattern)
     Where(expr) => @pp.text("WHERE ") + expr.pretty()
   }
 }
@@ -2330,11 +2432,10 @@ pub impl @pp.Pretty for CopyDirection with fn pretty(self) {
 ///|
 pub impl @pp.Pretty for CopyTarget with fn pretty(self) {
   match self {
-    File(filename) => @pp.text("'") + @pp.text(filename) + @pp.text("'")
+    File(filename) => quote_string_literal(filename)
     Stdin => @pp.text("STDIN")
     Stdout => @pp.text("STDOUT")
-    Program(command) =>
-      @pp.text("PROGRAM '") + @pp.text(command) + @pp.text("'")
+    Program(command) => @pp.text("PROGRAM ") + quote_string_literal(command)
   }
 }
 
@@ -2342,16 +2443,14 @@ pub impl @pp.Pretty for CopyTarget with fn pretty(self) {
 pub impl @pp.Pretty for CopyOption with fn pretty(self) {
   match self {
     Format(format) => @pp.text("FORMAT ") + format.pretty()
-    Delimiter(delim) =>
-      @pp.text("DELIMITER '") + @pp.text(delim) + @pp.text("'")
-    Null(null_str) => @pp.text("NULL '") + @pp.text(null_str) + @pp.text("'")
+    Delimiter(delim) => @pp.text("DELIMITER ") + quote_string_literal(delim)
+    Null(null_str) => @pp.text("NULL ") + quote_string_literal(null_str)
     Header(Some(true)) => @pp.text("HEADER true")
     Header(Some(false)) => @pp.text("HEADER false")
     Header(None) => @pp.text("HEADER")
-    Quote(quote_char) =>
-      @pp.text("QUOTE '") + @pp.text(quote_char) + @pp.text("'")
+    Quote(quote_char) => @pp.text("QUOTE ") + quote_string_literal(quote_char)
     Escape(escape_char) =>
-      @pp.text("ESCAPE '") + @pp.text(escape_char) + @pp.text("'")
+      @pp.text("ESCAPE ") + quote_string_literal(escape_char)
     ForceQuote(force_quote) => @pp.text("FORCE_QUOTE ") + force_quote.pretty()
     ForceNotNull(columns) =>
       @pp.text("FORCE_NOT_NULL (") +
@@ -2361,8 +2460,7 @@ pub impl @pp.Pretty for CopyOption with fn pretty(self) {
       @pp.text("FORCE_NULL (") +
       @pp.separate(@pp.text(", "), columns.map(@pp.text)) +
       @pp.text(")")
-    Encoding(encoding) =>
-      @pp.text("ENCODING '") + @pp.text(encoding) + @pp.text("'")
+    Encoding(encoding) => @pp.text("ENCODING ") + quote_string_literal(encoding)
   }
 }
 
@@ -2760,9 +2858,8 @@ pub(all) struct LoadDataLinesOptions {
 pub impl @pp.Pretty for LoadDataStmt with fn pretty(self) {
   @pp.text("LOAD DATA ") +
   (if self.is_local { @pp.text("LOCAL ") } else { @pp.empty }) +
-  @pp.text("INFILE '") +
-  @pp.text(self.filename) +
-  @pp.text("'") +
+  @pp.text("INFILE ") +
+  quote_string_literal(self.filename) +
   @pp.nest(
     @pp.hardline +
     (match self.duplicate_handling {
@@ -2821,23 +2918,22 @@ pub impl @pp.Pretty for LoadDataFieldsOptions with fn pretty(self) {
   let parts = []
   match self.terminated_by {
     Some(term) =>
-      parts.push(@pp.text("TERMINATED BY '") + @pp.text(term) + @pp.text("'"))
+      parts.push(@pp.text("TERMINATED BY ") + quote_string_literal(term))
     None => ()
   }
   match self.enclosed_by {
     Some(enc) => {
       let prefix = if self.optionally_enclosed {
-        "OPTIONALLY ENCLOSED BY '"
+        "OPTIONALLY ENCLOSED BY "
       } else {
-        "ENCLOSED BY '"
+        "ENCLOSED BY "
       }
-      parts.push(@pp.text(prefix) + @pp.text(enc) + @pp.text("'"))
+      parts.push(@pp.text(prefix) + quote_string_literal(enc))
     }
     None => ()
   }
   match self.escaped_by {
-    Some(esc) =>
-      parts.push(@pp.text("ESCAPED BY '") + @pp.text(esc) + @pp.text("'"))
+    Some(esc) => parts.push(@pp.text("ESCAPED BY ") + quote_string_literal(esc))
     None => ()
   }
   if parts.length() > 0 {
@@ -2852,12 +2948,12 @@ pub impl @pp.Pretty for LoadDataLinesOptions with fn pretty(self) {
   let parts = []
   match self.starting_by {
     Some(start) =>
-      parts.push(@pp.text("STARTING BY '") + @pp.text(start) + @pp.text("'"))
+      parts.push(@pp.text("STARTING BY ") + quote_string_literal(start))
     None => ()
   }
   match self.terminated_by {
     Some(term) =>
-      parts.push(@pp.text("TERMINATED BY '") + @pp.text(term) + @pp.text("'"))
+      parts.push(@pp.text("TERMINATED BY ") + quote_string_literal(term))
     None => ()
   }
   if parts.length() > 0 {

@@ -96,10 +96,11 @@ test {
 
 ///|
 test "EXPLAIN words stay usable as identifiers" {
-  for input in [
-    "SELECT analyze FROM t;", "SELECT verbose FROM t;", "SELECT * FROM explain;",
-    "SELECT * FROM t AS analyze;", "CREATE TABLE explain (analyze INT);",
-  ] {
+  for
+    input in [
+      "SELECT analyze FROM t;", "SELECT verbose FROM t;", "SELECT * FROM explain;",
+      "SELECT * FROM t AS analyze;", "CREATE TABLE explain (analyze INT);",
+    ] {
     let stmts = @sqlparser.parse_sql(input)
     inspect(stmts.stmts.length(), content="1")
   }
@@ -107,10 +108,11 @@ test "EXPLAIN words stay usable as identifiers" {
 
 ///|
 test "EXPLAIN still parses after contextual matching" {
-  for input in [
-    "EXPLAIN SELECT 1 FROM t", "EXPLAIN ANALYZE SELECT 1 FROM t",
-    "EXPLAIN VERBOSE SELECT 1 FROM t", "EXPLAIN QUERY PLAN SELECT 1 FROM t",
-  ] {
+  for
+    input in [
+      "EXPLAIN SELECT 1 FROM t", "EXPLAIN ANALYZE SELECT 1 FROM t", "EXPLAIN VERBOSE SELECT 1 FROM t",
+      "EXPLAIN QUERY PLAN SELECT 1 FROM t",
+    ] {
     let stmts = @sqlparser.parse_sql(input)
     let again = @sqlparser.parse_sql(@sqlparser.pretty_print(stmts))
     inspect(stmts == again, content="true")
