@@ -2,13 +2,29 @@
 
 A comprehensive SQL parser library for MoonBit that supports multiple SQL dialects and all major SQL language categories.
 
+## Installation
+
+Add the package to your MoonBit project:
+
+```bash
+moon add moonbit-community/sqlparser
+```
+
+Then import it in the `moon.pkg` of the package that uses it:
+
+```
+import {
+  "moonbit-community/sqlparser",
+}
+```
+
 ## Example Usage
 
 ```moonbit
 // Parse a simple SELECT statement
 let sql = "SELECT name, age FROM users WHERE age > 18"
-let statements = parse_sql(sql)
-let pretty_output = statements.stmts[0] |> pretty_print
+let statements = @sqlparser.parse_sql(sql)
+let pretty_output = statements.stmts[0] |> @sqlparser.pretty_print
 println(pretty_output)
 
 // Parse complex queries with CTEs
@@ -25,19 +41,25 @@ JOIN sales s ON u.id = s.user_id
 ORDER BY s.total DESC
 LIMIT 10
 """
-let result = parse_sql(complex_sql)
+let result = @sqlparser.parse_sql(complex_sql)
 
 // Parse transaction control statements
 let tcl_sql = "BEGIN TRANSACTION; INSERT INTO users VALUES ('Alice'); COMMIT;"
-let tcl_statements = parse_sql(tcl_sql)
+let tcl_statements = @sqlparser.parse_sql(tcl_sql)
 
 // Parse data control statements
 let dcl_sql = "GRANT SELECT, INSERT ON users TO alice WITH GRANT OPTION"
-let dcl_result = parse_sql(dcl_sql)
+let dcl_result = @sqlparser.parse_sql(dcl_sql)
 
 // Dialect-specific parsing
 let mysql_sql = "SHOW TABLES LIKE 'user%'"
-let mysql_result = parse_sql(dialect=MySQL::{}, mysql_sql)
+let mysql_result = @sqlparser.parse_sql(dialect=@sqlparser.MySQL::{ }, mysql_sql)
+```
+
+A minimal runnable version lives in `src/example`:
+
+```bash
+moon run src/example
 ```
 
 ## Architecture
@@ -69,14 +91,6 @@ Run tests with:
 moon test
 ```
 
-## Contributing
-
-The parser is designed for extensibility. To add new SQL features:
-
-1. Add keywords to `keyword.mbt` and `lexer.mbt`
-2. Define AST structures in `ast.mbt` 
-3. Implement parsing logic in appropriate language module
-4. Add statement cases to `parser.mbt`
 ## Contributing
 
 The parser is designed for extensibility. To add new SQL features:
