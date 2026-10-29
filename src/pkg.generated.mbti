@@ -501,11 +501,11 @@ pub(all) struct CreateSequenceStmt {
   name : String
   if_not_exists : Bool
   temporary : Bool
-  increment : Int?
+  increment : Int32?
   minvalue : SequenceLimit?
   maxvalue : SequenceLimit?
-  start_with : Int?
-  cache : Int?
+  start_with : Int32?
+  cache : Int32?
   cycle : Bool?
   owned_by : SequenceOwnedBy?
 } derive(Eq, @debug.Debug)
@@ -573,11 +573,11 @@ pub(all) enum DataType {
   Integer
   Smallint
   Bigint
-  Float(Int?)
+  Float(Int32?)
   Real
   Double
-  Char(Int)
-  Varchar(Int)
+  Char(Int32)
+  Varchar(Int32)
   Text
   Boolean
   Timestamp
@@ -1155,7 +1155,7 @@ pub fn Keyword::to_string(Self) -> String
 pub impl Show for Keyword
 
 pub(all) enum Literal {
-  Integer(Int)
+  Integer(Int32)
   Double(Double)
   String(String)
   Boolean(Bool)
@@ -1219,7 +1219,7 @@ pub(all) struct LoadDataStmt {
   character_set : String?
   fields_options : LoadDataFieldsOptions?
   lines_options : LoadDataLinesOptions?
-  ignore_lines : Int?
+  ignore_lines : Int32?
   columns : Array[String]?
   set_assignments : Array[Assignment]?
 } derive(Eq, @debug.Debug)
@@ -1416,7 +1416,7 @@ pub(all) enum Precedence {
   UnaryNot
   JsonOperator
 }
-pub fn Precedence::value(Self) -> Int
+pub fn Precedence::value(Self) -> Int32
 
 pub(all) struct PrepareStmt {
   name : String
@@ -1608,7 +1608,7 @@ pub impl @prettyprinter.Pretty for SelectStmt
 pub impl Show for SelectStmt
 
 pub(all) enum SequenceLimit {
-  Value(Int)
+  Value(Int32)
   NoLimit
 } derive(Eq, @debug.Debug)
 pub fn SequenceLimit::equal(Self, Self) -> Bool
@@ -1832,7 +1832,7 @@ pub(all) struct Statements {
 } derive(Eq, @debug.Debug)
 pub fn Statements::equal(Self, Self) -> Bool
 #alias("_[_]")
-pub fn Statements::get(Self, Int) -> Statement
+pub fn Statements::get(Self, Int32) -> Statement
 pub fn Statements::not_equal(Self, Self) -> Bool
 pub fn Statements::output(Self, &Logger) -> Unit
 pub fn Statements::pretty(Self) -> @prettyprinter.Document
@@ -1955,7 +1955,7 @@ pub fn Token::to_string(Self) -> String
 pub impl Show for Token
 
 pub(all) enum Top {
-  Constant(Int)
+  Constant(Int32)
   Expr(Expr)
 } derive(Eq, @debug.Debug)
 pub fn Top::equal(Self, Self) -> Bool
