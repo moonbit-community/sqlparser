@@ -2,6 +2,8 @@
 
 A comprehensive SQL parser library for MoonBit that supports multiple SQL dialects and all major SQL language categories.
 
+This project is a MoonBit port of [Apache DataFusion's sqlparser-rs](https://github.com/apache/datafusion-sqlparser-rs), which is also licensed under Apache-2.0.
+
 ## Installation
 
 Add the package to your MoonBit project:
