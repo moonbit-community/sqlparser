@@ -162,7 +162,7 @@ fn read_frac(input : StringView) -> (Token, StringView) {
   if idx == 0 {
     (Period, rest)
   } else {
-    (Number("." + input.view(start_offset=0, end_offset=idx).to_owned()), rest)
+    (Number("." + input.clamped_view(start=0, end=idx).to_owned()), rest)
   }
 }
 
@@ -173,7 +173,7 @@ fn read_number(input : StringView) -> (Token, StringView) {
     ['.', .. rest] => read_while(rest, idx + 1, c => c.is_ascii_digit())
     rest => (idx, rest)
   }
-  (Number(input.view(start_offset=0, end_offset=idx).to_owned()), rest)
+  (Number(input.clamped_view(start=0, end=idx).to_owned()), rest)
 }
 
 ///|
@@ -182,7 +182,7 @@ fn Lexer::read_identifier_or_keyword(
   input : StringView,
 ) -> (Token, StringView) {
   let (idx, rest) = read_while(input, 0, is_ascii_alphabetic_or_digit)
-  let word = input.view(start_offset=0, end_offset=idx).to_lower()
+  let word = input.clamped_view(start=0, end=idx).to_lower()
 
   // First try dialect-specific keywords
   let token = match self.dialect.read_keyword(word.to_owned()) {
@@ -426,7 +426,7 @@ fn Lexer::read_dollar_placeholder(
 
   // Read the number part
   let (idx, rest) = read_while(input, 0, c => c.is_ascii_digit())
-  let placeholder = "$" + input.view(start_offset=0, end_offset=idx).to_owned()
+  let placeholder = "$" + input.clamped_view(start=0, end=idx).to_owned()
   (Placeholder(placeholder), rest)
 }
 
@@ -444,7 +444,7 @@ fn Lexer::read_colon_parameter(
 
   // Read the parameter name part
   let (idx, rest) = read_while(input, 0, is_ascii_alphabetic_or_digit)
-  let placeholder = ":" + input.view(start_offset=0, end_offset=idx).to_owned()
+  let placeholder = ":" + input.clamped_view(start=0, end=idx).to_owned()
   (Placeholder(placeholder), rest)
 }
 
@@ -463,7 +463,7 @@ fn Lexer::read_at_parameter(
 
   // Read the parameter name part
   let (idx, rest) = read_while(input, 0, is_ascii_alphabetic_or_digit)
-  let placeholder = "@" + input.view(start_offset=0, end_offset=idx).to_owned()
+  let placeholder = "@" + input.clamped_view(start=0, end=idx).to_owned()
   (Placeholder(placeholder), rest)
 }
 
