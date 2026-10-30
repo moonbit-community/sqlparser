@@ -22,8 +22,8 @@ This document outlines missing features compared to comprehensive SQL parsers li
 - [x] **USE database** - Database switching (critical for multi-database environments) ✅ **COMPLETED**
 - [x] **Parameterized queries** - Prepared statement placeholders (?, $1, :name, @param) ✅ **COMPLETED**
 - [x] **PREPARE/EXECUTE** - Prepared statement support ✅ **COMPLETED**
-- [ ] **EXPLAIN variants** - EXPLAIN ANALYZE, EXPLAIN VERBOSE, etc.
-- [ ] **SHOW variants** - SHOW FUNCTIONS, SHOW VARIABLES, SHOW STATUS
+- [x] **EXPLAIN variants** - EXPLAIN ANALYZE, EXPLAIN VERBOSE, etc. ✅ **COMPLETED** (also EXPLAIN QUERY PLAN and FORMAT options)
+- [x] **SHOW variants** - SHOW FUNCTIONS, SHOW VARIABLES, SHOW STATUS ✅ **COMPLETED** (already implemented; verified against the parser this round)
 
 ## Medium Priority (Enhanced Functionality)
 

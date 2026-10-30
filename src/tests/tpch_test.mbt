@@ -512,7 +512,7 @@ test "TPCH 14" {
     stmt,
     content=(
       #|SELECT
-      #|  100 * sum(CASE
+      #|  100.0 * sum(CASE
       #|    WHEN p_type LIKE 'PROMO%' THEN l_extendedprice * (1 - l_discount)
       #|    ELSE 0
       #|  END) / sum(l_extendedprice * (1 - l_discount)) AS promo_revenue
@@ -617,7 +617,7 @@ test "TPCH 17" {
     stmt,
     content=(
       #|SELECT
-      #|  sum(l_extendedprice) / 7 AS avg_yearly
+      #|  sum(l_extendedprice) / 7.0 AS avg_yearly
       #|FROM
       #|  lineitem,
       #|  part
@@ -847,7 +847,7 @@ test "TPCH 22" {
       #|        FROM
       #|          customer
       #|        WHERE
-      #|          c_acctbal > 0 
+      #|          c_acctbal > 0.0 
       #|          AND SUBSTRING(c_phone FROM 1 FOR 2) IN ('13', '31', '23', '29', '30', '18', '17')
       #|      ) 
       #|      AND NOT EXISTS (
@@ -865,4 +865,23 @@ test "TPCH 22" {
       #|  cntrycode;
     ),
   )
+}
+
+///|
+test "TPCH queries round-trip through pretty printing" {
+  for i in 1..<=22 {
+    let path = "src/tests/tpch/\{i}.sql"
+    let stmts = read_and_parse(path)
+    let printed = @sqlparser.pretty_print(stmts)
+    let again = @sqlparser.parse_sql(printed) catch {
+      e => {
+        println("\{path}: reparse failed: \{e}")
+        panic()
+      }
+    }
+    if (stmts == again) == false {
+      println("\{path}: pretty-printed SQL does not round-trip to an equal AST")
+      panic()
+    }
+  }
 }

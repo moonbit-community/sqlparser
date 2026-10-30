@@ -162,6 +162,10 @@ fn Parser::parse_statement(
       self.parse_use_statement(tokens).map(stmt => Use(stmt))
     [Keyword(Copy), .. _rest] =>
       self.parse_copy_statement(tokens).map(stmt => Copy(stmt))
+    // "explain" is matched contextually so it stays usable as a plain
+    // identifier (column/table names), like "query" and "plan" below.
+    [Identifier(word), .. _rest] if word.to_lower() == "explain" =>
+      self.parse_explain_statement(tokens).map(stmt => Explain(stmt))
     [Keyword(Prepare), .. _rest] =>
       self.parse_prepare_statement(tokens).map(stmt => Prepare(stmt))
     [Keyword(Execute), .. _rest] =>
