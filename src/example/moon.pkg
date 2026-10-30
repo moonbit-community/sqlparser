@@ -1,0 +1,5 @@
+import {
+  "moonbit-community/sqlparser",
+}
+
+pkgtype(kind: "executable")
