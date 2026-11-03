@@ -617,11 +617,11 @@ fn Parser::parse_table_ref(
   let joins = []
   let tokens = for tokens = tokens {
     match tokens {
-      tokens if tokens[0] is Keyword(Join) ||
-        tokens[0] is Keyword(Left) ||
-        tokens[0] is Keyword(Right) ||
-        tokens[0] is Keyword(Full) ||
-        tokens[0] is Keyword(Inner) => {
+      [Keyword(Join), .. _tokens]
+      | [Keyword(Left), .. _tokens]
+      | [Keyword(Right), .. _tokens]
+      | [Keyword(Full), .. _tokens]
+      | [Keyword(Inner), .. _tokens] => {
         let (join_operator_maker, tokens) = match tokens {
           [Keyword(Join), .. tokens] =>
             (constraint => JoinOperator::Join(constraint), tokens)
