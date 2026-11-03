@@ -328,7 +328,7 @@ test "Create table AS SELECT with WHERE" {
       #|FROM
       #|  students
       #|WHERE
-      #|  grade > 3;
+      #|  grade > 3.0;
     ),
   )
 }

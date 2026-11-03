@@ -52,20 +52,21 @@ priv struct Lexer {
 }
 
 ///|
+/// Tokenize `input` into a token stream. The result always ends with exactly
+/// one `Eof` token, even when the input does not end with whitespace, so
+/// parsers may safely peek at the head of any non-empty view.
 pub fn tokenize(
   dialect~ : &Dialect = MySQL::{ },
   input : String,
 ) -> Array[Token] raise LexerError {
   let lexer = Lexer::{ dialect, }
   let tokens = []
-  for input = input[:] {
-    match input {
-      [] => break
-      input => {
-        let (token, input) = lexer.next_token(input)
-        tokens.push(token)
-        continue input
-      }
+  for rest = input[:] {
+    let (token, rest) = lexer.next_token(rest)
+    tokens.push(token)
+    match token {
+      Eof => break
+      _ => continue rest
     }
   }
   tokens
@@ -595,7 +596,7 @@ test "Double quoted string" {
   debug_inspect(
     tokens,
     content=(
-      #|[StringLiteral("Hello,\" World!")]
+      #|[StringLiteral("Hello,\" World!"), Eof]
     ),
   )
 }
@@ -615,14 +616,24 @@ fn skip_line_comment(input : StringView) -> StringView {
 test "Lexing one keyword" {
   let input = "SELECT"
   let tokens = tokenize(input)
-  debug_inspect(tokens, content="[Keyword(Select)]")
+  debug_inspect(
+    tokens,
+    content=(
+      #|[Keyword(Select), Eof]
+    ),
+  )
 }
 
 ///|
 test "Lexing two keywords" {
   let input = "SELECT FROM"
   let tokens = tokenize(input)
-  debug_inspect(tokens, content="[Keyword(Select), Keyword(From)]")
+  debug_inspect(
+    tokens,
+    content=(
+      #|[Keyword(Select), Keyword(From), Eof]
+    ),
+  )
 }
 
 ///|
@@ -642,6 +653,7 @@ test "Lexing simple query" {
       #|  Eq,
       #|  Number("1"),
       #|  Semicolon,
+      #|  Eof,
       #|]
     ),
   )
@@ -660,6 +672,7 @@ test "Lexing single quoted string" {
       #|  Keyword(From),
       #|  Identifier("t"),
       #|  Semicolon,
+      #|  Eof,
       #|]
     ),
   )
@@ -678,6 +691,7 @@ test "Lexing single quoted string with escaped quotes" {
       #|  Keyword(From),
       #|  Identifier("t"),
       #|  Semicolon,
+      #|  Eof,
       #|]
     ),
   )
@@ -689,7 +703,9 @@ test "Lexing binary operators" {
   let tokens = tokenize(input)
   debug_inspect(
     tokens,
-    content="[Lt, Eq, Gt, DoubleEq, Neq, LtEq, GtEq, Spaceship]",
+    content=(
+      #|[Lt, Eq, Gt, DoubleEq, Neq, LtEq, GtEq, Spaceship, Eof]
+    ),
   )
 }
 
@@ -734,6 +750,7 @@ test "Skip line comment 2" {
       #|  Number("1"),
       #|  Semicolon,
       #|  Number("123"),
+      #|  Eof,
       #|]
     ),
   )
@@ -756,6 +773,7 @@ test "Decimal point only" {
       #|  Number("1.1"),
       #|  Number("22.22"),
       #|  Semicolon,
+      #|  Eof,
       #|]
     ),
   )
@@ -776,6 +794,7 @@ test "Decimal point" {
       #|  Keyword(From),
       #|  Identifier("t"),
       #|  Semicolon,
+      #|  Eof,
       #|]
     ),
   )
@@ -806,6 +825,7 @@ test "Single quoted string with escaped backslash" {
       #|  Keyword(From),
       #|  Identifier("t"),
       #|  Semicolon,
+      #|  Eof,
       #|]
     ),
   )
@@ -824,6 +844,7 @@ test "MySQL backtick quoted identifiers" {
       #|  Keyword(From),
       #|  Identifier("table name"),
       #|  Semicolon,
+      #|  Eof,
       #|]
     ),
   )
@@ -842,6 +863,7 @@ test "MySQL backtick with escaped backticks" {
       #|  Keyword(From),
       #|  Identifier("t"),
       #|  Semicolon,
+      #|  Eof,
       #|]
     ),
   )
